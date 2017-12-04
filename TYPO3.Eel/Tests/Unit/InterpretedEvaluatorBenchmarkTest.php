@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel\Tests\Unit;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Eel\Context;
 use TYPO3\Eel\InterpretedEvaluator;
@@ -27,15 +30,15 @@ class InterpretedEvaluatorBenchmarkTest extends \TYPO3\Flow\Tests\UnitTestCase
 
         $evaluator = new InterpretedEvaluator();
         $expression = 'foo.bar=="Test"||foo.baz=="Test"||reverse(foo).bar=="Test"';
-        $context = new Context(array(
-            'foo' => array(
+        $context = new Context([
+            'foo' => [
                 'bar' => 'Test1',
                 'baz' => 'Test2'
-            ),
+            ],
             'reverse' => function ($array) {
                 return array_reverse($array, true);
             }
-        ));
+        ]);
         for ($i = 0; $i < 10000; $i++) {
             $evaluator->evaluate($expression, $context);
         }

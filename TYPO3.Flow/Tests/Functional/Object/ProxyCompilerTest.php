@@ -1,30 +1,35 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Object;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Object\Proxy\ProxyInterface;
 use TYPO3\Flow\Reflection\ClassReflection;
+use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
  * Functional tests for the Proxy Compiler and related features
  *
  */
-class ProxyCompilerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class ProxyCompilerTest extends FunctionalTestCase
 {
     /**
      * @test
      */
     public function proxyClassesStillContainAnnotationsFromItsOriginalClass()
     {
-        $class = new ClassReflection('TYPO3\Flow\Tests\Functional\Object\Fixtures\PrototypeClassA');
+        $class = new ClassReflection(Fixtures\PrototypeClassA::class);
         $method = $class->getMethod('setSomeProperty');
 
-        $this->assertTrue($class->implementsInterface('TYPO3\Flow\Object\Proxy\ProxyInterface'));
+        $this->assertTrue($class->implementsInterface(ProxyInterface::class));
         $this->assertTrue($class->isTaggedWith('scope'));
         $this->assertTrue($method->isTaggedWith('session'));
     }
@@ -34,7 +39,7 @@ class ProxyCompilerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function proxyClassesStillContainDocCommentsFromItsOriginalClass()
     {
-        $class = new ClassReflection('TYPO3\Flow\Tests\Functional\Object\Fixtures\ClassWithDocComments');
+        $class = new ClassReflection(Fixtures\ClassWithDocComments::class);
         $expectedResult = 'This is a example doc comment which should be copied' . chr(10) . 'to the proxy class.';
         $actualResult = $class->getDescription();
 
@@ -46,10 +51,10 @@ class ProxyCompilerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function proxiedMethodsStillContainReturnAnnotationFromOriginalClass()
     {
-        $class = new ClassReflection('TYPO3\Flow\Tests\Functional\Object\Fixtures\PrototypeClassA');
+        $class = new ClassReflection(Fixtures\PrototypeClassA::class);
         $method = $class->getMethod('getSingletonA');
 
-        $this->assertEquals(array('\TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassA The singleton class A'), $method->getTagValues('return'));
+        $this->assertEquals(['SingletonClassA The singleton class A'], $method->getTagValues('return'));
     }
 
     /**
@@ -57,10 +62,10 @@ class ProxyCompilerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function proxiedMethodsStillContainParamDocumentationFromOriginalClass()
     {
-        $class = new ClassReflection('TYPO3\Flow\Tests\Functional\Object\Fixtures\PrototypeClassA');
+        $class = new ClassReflection(Fixtures\PrototypeClassA::class);
         $method = $class->getMethod('setSomeProperty');
 
-        $this->assertEquals(array('string $someProperty The property value'), $method->getTagValues('param'));
+        $this->assertEquals(['string $someProperty The property value'], $method->getTagValues('param'));
     }
 
     /**
@@ -68,10 +73,10 @@ class ProxyCompilerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function proxiedMethodsDoContainAnnotationsOnlyOnce()
     {
-        $class = new ClassReflection('TYPO3\Flow\Tests\Functional\Object\Fixtures\PrototypeClassA');
+        $class = new ClassReflection(Fixtures\PrototypeClassA::class);
         $method = $class->getMethod('setSomeProperty');
 
-        $this->assertEquals(array('autoStart=true'), $method->getTagValues('session'));
+        $this->assertEquals(['autoStart=true'], $method->getTagValues('session'));
     }
 
     /**
@@ -79,8 +84,8 @@ class ProxyCompilerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function classesAnnotatedWithProxyDisableAreNotProxied()
     {
-        $singletonB = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassB');
-        $this->assertNotInstanceOf('TYPO3\Flow\Object\Proxy\ProxyInterface', $singletonB);
+        $singletonB = $this->objectManager->get(Fixtures\SingletonClassB::class);
+        $this->assertNotInstanceOf(ProxyInterface::class, $singletonB);
     }
 
     /**
@@ -88,14 +93,14 @@ class ProxyCompilerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function setInstanceOfSubClassDoesNotOverrideParentClass()
     {
-        $singletonE = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassE');
-        $this->assertEquals('TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassE', get_class($singletonE));
+        $singletonE = $this->objectManager->get(Fixtures\SingletonClassE::class);
+        $this->assertEquals(Fixtures\SingletonClassE::class, get_class($singletonE));
 
-        $singletonEsub = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassEsub');
-        $this->assertEquals('TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassEsub', get_class($singletonEsub));
+        $singletonEsub = $this->objectManager->get(Fixtures\SingletonClassEsub::class);
+        $this->assertEquals(Fixtures\SingletonClassEsub::class, get_class($singletonEsub));
 
-        $singletonE2 = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassE');
-        $this->assertEquals('TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassE', get_class($singletonE2));
+        $singletonE2 = $this->objectManager->get(Fixtures\SingletonClassE::class);
+        $this->assertEquals(Fixtures\SingletonClassE::class, get_class($singletonE2));
         $this->assertSame($singletonE, $singletonE2);
     }
 
@@ -104,7 +109,7 @@ class ProxyCompilerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function transientPropertiesAreNotSerializedOnSleep()
     {
-        $prototypeF = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Object\Fixtures\PrototypeClassF');
+        $prototypeF = $this->objectManager->get(Fixtures\PrototypeClassF::class);
         $prototypeF->setTransientProperty('foo');
         $prototypeF->setNonTransientProperty('bar');
 

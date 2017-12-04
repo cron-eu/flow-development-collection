@@ -1,23 +1,28 @@
 <?php
 namespace TYPO3\Flow\Http\Client;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Configuration\ConfigurationManager;
 use TYPO3\Flow\Core\Bootstrap;
 use TYPO3\Flow\Error\Debugger;
 use TYPO3\Flow\Exception;
+use TYPO3\Flow\Http\Component\ComponentChain;
 use TYPO3\Flow\Http\Component\ComponentContext;
 use TYPO3\Flow\Http;
 use TYPO3\Flow\Mvc\Dispatcher;
 use TYPO3\Flow\Mvc\Routing\Router;
 use TYPO3\Flow\Security\Context;
+use TYPO3\Flow\Session\SessionInterface;
 use TYPO3\Flow\Tests\FunctionalTestRequestHandler;
 use TYPO3\Flow\Validation\ValidatorResolver;
 
@@ -102,31 +107,17 @@ class InternalRequestEngine implements RequestEngineInterface
         $requestHandler->setHttpResponse($response);
 
         $objectManager = $this->bootstrap->getObjectManager();
-        $baseComponentChain = $objectManager->get('TYPO3\Flow\Http\Component\ComponentChain');
+        $baseComponentChain = $objectManager->get(ComponentChain::class);
         $componentContext = new ComponentContext($httpRequest, $response);
 
         try {
             $baseComponentChain->handle($componentContext);
+        } catch (\Throwable $throwable) {
+            $this->prepareErrorResponse($throwable, $response);
         } catch (\Exception $exception) {
-            $pathPosition = strpos($exception->getFile(), 'Packages/');
-            $filePathAndName = ($pathPosition !== false) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
-            $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
-            $content = PHP_EOL . 'Uncaught Exception in Flow ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
-            $content .= 'thrown in file ' . $filePathAndName . PHP_EOL;
-            $content .= 'in line ' . $exception->getLine() . PHP_EOL . PHP_EOL;
-            $content .= Debugger::getBacktraceCode($exception->getTrace(), false, true) . PHP_EOL;
-
-            if ($exception instanceof Exception) {
-                $statusCode = $exception->getStatusCode();
-            } else {
-                $statusCode = 500;
-            }
-            $response->setStatus($statusCode);
-            $response->setContent($content);
-            $response->setHeader('X-Flow-ExceptionCode', $exception->getCode());
-            $response->setHeader('X-Flow-ExceptionMessage', $exception->getMessage());
+            $this->prepareErrorResponse($exception, $response);
         }
-        $session = $this->bootstrap->getObjectManager()->get('TYPO3\Flow\Session\SessionInterface');
+        $session = $this->bootstrap->getObjectManager()->get(SessionInterface::class);
         if ($session->isStarted()) {
             $session->close();
         }
@@ -141,5 +132,33 @@ class InternalRequestEngine implements RequestEngineInterface
     public function getRouter()
     {
         return $this->router;
+    }
+
+    /**
+     * Prepare a response in case an error occurred.
+     *
+     * @param object $exception \Exception or \Throwable
+     * @param Http\Response $response
+     * @return void
+     */
+    protected function prepareErrorResponse($exception, Http\Response $response)
+    {
+        $pathPosition = strpos($exception->getFile(), 'Packages/');
+        $filePathAndName = ($pathPosition !== false) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
+        $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
+        $content = PHP_EOL . 'Uncaught Exception in Flow ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
+        $content .= 'thrown in file ' . $filePathAndName . PHP_EOL;
+        $content .= 'in line ' . $exception->getLine() . PHP_EOL . PHP_EOL;
+        $content .= Debugger::getBacktraceCode($exception->getTrace(), false, true) . PHP_EOL;
+
+        if ($exception instanceof Exception) {
+            $statusCode = $exception->getStatusCode();
+        } else {
+            $statusCode = 500;
+        }
+        $response->setStatus($statusCode);
+        $response->setContent($content);
+        $response->setHeader('X-Flow-ExceptionCode', $exception->getCode());
+        $response->setHeader('X-Flow-ExceptionMessage', $exception->getMessage());
     }
 }

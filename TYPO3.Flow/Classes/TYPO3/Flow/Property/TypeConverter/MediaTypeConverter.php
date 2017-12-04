@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Property\PropertyMappingConfigurationInterface;
@@ -26,7 +29,7 @@ class MediaTypeConverter extends AbstractTypeConverter implements MediaTypeConve
     /**
      * @var string
      */
-    protected $sourceTypes = array('string');
+    protected $sourceTypes = ['string'];
 
     /**
      * @var string
@@ -50,11 +53,11 @@ class MediaTypeConverter extends AbstractTypeConverter implements MediaTypeConve
      * @return array
      * @api
      */
-    public function convertFrom($source, $targetType, array $convertedChildProperties = array(), PropertyMappingConfigurationInterface $configuration = null)
+    public function convertFrom($source, $targetType, array $convertedChildProperties = [], PropertyMappingConfigurationInterface $configuration = null)
     {
         $mediaType = null;
         if ($configuration !== null) {
-            $mediaType = $configuration->getConfigurationValue('TYPO3\Flow\Property\TypeConverter\MediaTypeConverterInterface', MediaTypeConverterInterface::CONFIGURATION_MEDIA_TYPE);
+            $mediaType = $configuration->getConfigurationValue(MediaTypeConverterInterface::class, MediaTypeConverterInterface::CONFIGURATION_MEDIA_TYPE);
         }
         if ($mediaType === null) {
             $mediaType = MediaTypeConverterInterface::DEFAULT_MEDIA_TYPE;
@@ -75,9 +78,9 @@ class MediaTypeConverter extends AbstractTypeConverter implements MediaTypeConve
     {
         $mediaTypeParts = MediaTypes::parseMediaType($mediaType);
         if (!isset($mediaTypeParts['subtype']) || $mediaTypeParts['subtype'] === '') {
-            return array();
+            return [];
         }
-        $result = array();
+        $result = [];
         switch ($mediaTypeParts['subtype']) {
             case 'json':
             case 'x-json':
@@ -85,14 +88,17 @@ class MediaTypeConverter extends AbstractTypeConverter implements MediaTypeConve
             case 'x-javascript':
                 $result = json_decode($requestBody, true);
                 if ($result === null) {
-                    return array();
+                    return [];
                 }
             break;
             case 'xml':
+                $entityLoaderValue = libxml_disable_entity_loader(true);
                 try {
                     $xmlElement = new \SimpleXMLElement(urldecode($requestBody), LIBXML_NOERROR);
+                    libxml_disable_entity_loader($entityLoaderValue);
                 } catch (\Exception $e) {
-                    return array();
+                    libxml_disable_entity_loader($entityLoaderValue);
+                    return [];
                 }
                 $result = Arrays::convertObjectToArray($xmlElement);
             break;

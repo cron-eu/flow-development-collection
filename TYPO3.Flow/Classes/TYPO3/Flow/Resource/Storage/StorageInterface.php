@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Resource\Storage;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Resource\CollectionInterface;
-use TYPO3\Flow\Resource\Resource;
+use TYPO3\Flow\Resource\Resource as PersistentResource;
+use TYPO3\Flow\Resource\Storage\Object as StorageObject;
 
 /**
  * Interface for a resource storage
@@ -30,11 +34,11 @@ interface StorageInterface
      * Returns a stream handle which can be used internally to open / copy the given resource
      * stored in this storage.
      *
-     * @param \TYPO3\Flow\Resource\Resource $resource The resource stored in this storage
+     * @param PersistentResource $resource The resource stored in this storage
      * @return resource | boolean The resource stream or FALSE if the stream could not be obtained
      * @api
      */
-    public function getStreamByResource(Resource $resource);
+    public function getStreamByResource(PersistentResource $resource);
 
     /**
      * Returns a stream handle which can be used internally to open / copy the given resource
@@ -49,7 +53,7 @@ interface StorageInterface
     /**
      * Retrieve all Objects stored in this storage.
      *
-     * @return array<\TYPO3\Flow\Resource\Storage\Object>
+     * @return array<StorageObject>
      * @api
      */
     public function getObjects();
@@ -58,7 +62,7 @@ interface StorageInterface
      * Retrieve all Objects stored in this storage, filtered by the given collection name
      *
      * @param CollectionInterface $collection
-     * @return array<\TYPO3\Flow\Resource\Storage\Object>
+     * @return array<StorageObject>
      * @api
      */
     public function getObjectsByCollection(CollectionInterface $collection);

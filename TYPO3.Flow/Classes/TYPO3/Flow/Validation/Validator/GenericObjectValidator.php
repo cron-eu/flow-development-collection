@@ -1,12 +1,18 @@
 <?php
 namespace TYPO3\Flow\Validation\Validator;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Reflection\ObjectAccess;
+use TYPO3\Flow\Error\Result as ErrorResult;
 
 /**
  * A generic object validator which allows for specifying property validators.
@@ -18,7 +24,7 @@ class GenericObjectValidator extends AbstractValidator implements ObjectValidato
     /**
      * @var array
      */
-    protected $propertyValidators = array();
+    protected $propertyValidators = [];
 
     /**
      * @var \SplObjectStorage
@@ -42,15 +48,15 @@ class GenericObjectValidator extends AbstractValidator implements ObjectValidato
      * the Error Messages object which occurred.
      *
      * @param mixed $value The value that should be validated
-     * @return \TYPO3\Flow\Error\Result
+     * @return ErrorResult
      * @api
      */
     public function validate($value)
     {
-        $this->result = new \TYPO3\Flow\Error\Result();
+        $this->result = new ErrorResult();
         if ($this->acceptsEmptyValues === false || $this->isEmpty($value) === false) {
             if (!is_object($value)) {
-                $this->addError('Object expected, %1$s given.', 1241099149, array(gettype($value)));
+                $this->addError('Object expected, %1$s given.', 1241099149, [gettype($value)]);
             } elseif ($this->isValidatedAlready($value) === false) {
                 $this->isValid($value);
             }
@@ -68,7 +74,7 @@ class GenericObjectValidator extends AbstractValidator implements ObjectValidato
      */
     protected function isValid($object)
     {
-        $messages = new \TYPO3\Flow\Error\Result();
+        $messages = new ErrorResult();
         foreach ($this->propertyValidators as $propertyName => $validators) {
             $propertyValue = $this->getPropertyValue($object, $propertyName);
             $result = $this->checkProperty($propertyValue, $validators);
@@ -112,10 +118,10 @@ class GenericObjectValidator extends AbstractValidator implements ObjectValidato
             $object->__load();
         }
 
-        if (\TYPO3\Flow\Reflection\ObjectAccess::isPropertyGettable($object, $propertyName)) {
-            return \TYPO3\Flow\Reflection\ObjectAccess::getProperty($object, $propertyName);
+        if (ObjectAccess::isPropertyGettable($object, $propertyName)) {
+            return ObjectAccess::getProperty($object, $propertyName);
         } else {
-            return \TYPO3\Flow\Reflection\ObjectAccess::getProperty($object, $propertyName, true);
+            return ObjectAccess::getProperty($object, $propertyName, true);
         }
     }
 
@@ -125,7 +131,7 @@ class GenericObjectValidator extends AbstractValidator implements ObjectValidato
      *
      * @param mixed $value The value to be validated
      * @param array $validators The validators to be called on the value
-     * @return NULL|\TYPO3\Flow\Error\Result
+     * @return NULL|ErrorResult
      */
     protected function checkProperty($value, $validators)
     {
@@ -150,11 +156,11 @@ class GenericObjectValidator extends AbstractValidator implements ObjectValidato
      * Adds the given validator for validation of the specified property.
      *
      * @param string $propertyName Name of the property to validate
-     * @param \TYPO3\Flow\Validation\Validator\ValidatorInterface $validator The property validator
+     * @param ValidatorInterface $validator The property validator
      * @return void
      * @api
      */
-    public function addPropertyValidator($propertyName, \TYPO3\Flow\Validation\Validator\ValidatorInterface $validator)
+    public function addPropertyValidator($propertyName, ValidatorInterface $validator)
     {
         if (!isset($this->propertyValidators[$propertyName])) {
             $this->propertyValidators[$propertyName] = new \SplObjectStorage();
@@ -171,7 +177,7 @@ class GenericObjectValidator extends AbstractValidator implements ObjectValidato
     public function getPropertyValidators($propertyName = null)
     {
         if ($propertyName !== null) {
-            return (isset($this->propertyValidators[$propertyName])) ? $this->propertyValidators[$propertyName] : array();
+            return (isset($this->propertyValidators[$propertyName])) ? $this->propertyValidators[$propertyName] : [];
         } else {
             return $this->propertyValidators;
         }

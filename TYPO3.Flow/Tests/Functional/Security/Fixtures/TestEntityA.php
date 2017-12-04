@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Security\Fixtures;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Doctrine\ORM\Mapping as ORM;
 use TYPO3\Flow\Annotations as Flow;
@@ -19,7 +22,7 @@ use TYPO3\Flow\Annotations as Flow;
 class TestEntityA
 {
     /**
-     * @var \TYPO3\Flow\Tests\Functional\Security\Fixtures\TestEntityB
+     * @var TestEntityB
      * @ORM\OneToOne(inversedBy="relatedEntityA")
      */
     protected $relatedEntityB;
@@ -27,7 +30,7 @@ class TestEntityA
     /**
      * Constructor
      *
-     * @param \TYPO3\Flow\Tests\Functional\Security\Fixtures\TestEntityB $relatedEntityB
+     * @param TestEntityB $relatedEntityB
      */
     public function __construct($relatedEntityB)
     {
@@ -35,7 +38,7 @@ class TestEntityA
     }
 
     /**
-     * @param \TYPO3\Flow\Tests\Functional\Security\Fixtures\TestEntityB $relatedEntityB
+     * @param TestEntityB $relatedEntityB
      */
     public function setRelatedEntityB($relatedEntityB)
     {
@@ -43,7 +46,7 @@ class TestEntityA
     }
 
     /**
-     * @return \TYPO3\Flow\Tests\Functional\Security\Fixtures\TestEntityB
+     * @return TestEntityB
      */
     public function getRelatedEntityB()
     {

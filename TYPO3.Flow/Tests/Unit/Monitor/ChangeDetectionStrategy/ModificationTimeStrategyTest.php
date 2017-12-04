@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Monitor\ChangeDetectionStrategy;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
@@ -33,7 +36,7 @@ class ModificationTimeStrategyTest extends \TYPO3\Flow\Tests\UnitTestCase
     {
         vfsStream::setup('testDirectory');
 
-        $this->cache = $this->getMock('TYPO3\Flow\Cache\Frontend\StringFrontend', array(), array(), '', false);
+        $this->cache = $this->getMockBuilder(\TYPO3\Flow\Cache\Frontend\StringFrontend::class)->disableOriginalConstructor()->getMock();
 
         $this->strategy = new \TYPO3\Flow\Monitor\ChangeDetectionStrategy\ModificationTimeStrategy();
         $this->strategy->injectCache($this->cache);

@@ -1,19 +1,24 @@
 <?php
 namespace TYPO3\Flow\Security\Authentication\Provider;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Security\Authentication\AuthenticationProviderInterface;
+use TYPO3\Flow\Security\Authentication\TokenInterface;
 
 /**
  * An abstract authentication provider.
  */
-abstract class AbstractProvider implements \TYPO3\Flow\Security\Authentication\AuthenticationProviderInterface
+abstract class AbstractProvider implements AuthenticationProviderInterface
 {
     /**
      * @var string
@@ -23,7 +28,7 @@ abstract class AbstractProvider implements \TYPO3\Flow\Security\Authentication\A
     /**
      * @var array
      */
-    protected $options = array();
+    protected $options = [];
 
     /**
      * Constructor
@@ -31,7 +36,7 @@ abstract class AbstractProvider implements \TYPO3\Flow\Security\Authentication\A
      * @param string $name The name of this authentication provider
      * @param array $options Additional configuration options
      */
-    public function __construct($name, array $options = array())
+    public function __construct($name, array $options = [])
     {
         $this->name = $name;
         $this->options = $options;
@@ -40,10 +45,10 @@ abstract class AbstractProvider implements \TYPO3\Flow\Security\Authentication\A
     /**
      * Returns TRUE if the given token can be authenticated by this provider
      *
-     * @param \TYPO3\Flow\Security\Authentication\TokenInterface $authenticationToken The token that should be authenticated
+     * @param TokenInterface $authenticationToken The token that should be authenticated
      * @return boolean TRUE if the given token class can be authenticated by this provider
      */
-    public function canAuthenticate(\TYPO3\Flow\Security\Authentication\TokenInterface $authenticationToken)
+    public function canAuthenticate(TokenInterface $authenticationToken)
     {
         if ($authenticationToken->getAuthenticationProviderName() === $this->name) {
             return true;

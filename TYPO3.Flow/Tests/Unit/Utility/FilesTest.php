@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Utility;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use org\bovigo\vfs\vfsStream;
 use TYPO3\Flow\Tests\UnitTestCase;
@@ -79,7 +82,7 @@ class FilesTest extends UnitTestCase
      */
     public function concatenatePathsWorksForEmptyPath()
     {
-        $this->assertEquals('', Files::concatenatePaths(array()));
+        $this->assertEquals('', Files::concatenatePaths([]));
     }
 
     /**
@@ -87,7 +90,7 @@ class FilesTest extends UnitTestCase
      */
     public function concatenatePathsWorksForOnePath()
     {
-        $this->assertEquals('foo', Files::concatenatePaths(array('foo')));
+        $this->assertEquals('foo', Files::concatenatePaths(['foo']));
     }
 
     /**
@@ -95,7 +98,7 @@ class FilesTest extends UnitTestCase
      */
     public function concatenatePathsWorksForTwoPath()
     {
-        $this->assertEquals('foo/bar', Files::concatenatePaths(array('foo', 'bar')));
+        $this->assertEquals('foo/bar', Files::concatenatePaths(['foo', 'bar']));
     }
 
     /**
@@ -103,7 +106,7 @@ class FilesTest extends UnitTestCase
      */
     public function concatenatePathsWorksForPathsWithLeadingSlash()
     {
-        $this->assertEquals('/foo/bar', Files::concatenatePaths(array('/foo', 'bar')));
+        $this->assertEquals('/foo/bar', Files::concatenatePaths(['/foo', 'bar']));
     }
 
     /**
@@ -111,7 +114,7 @@ class FilesTest extends UnitTestCase
      */
     public function concatenatePathsWorksForPathsWithTrailingSlash()
     {
-        $this->assertEquals('foo/bar', Files::concatenatePaths(array('foo', 'bar/')));
+        $this->assertEquals('foo/bar', Files::concatenatePaths(['foo', 'bar/']));
     }
 
     /**
@@ -119,7 +122,7 @@ class FilesTest extends UnitTestCase
      */
     public function concatenatePathsWorksForPathsWithLeadingAndTrailingSlash()
     {
-        $this->assertEquals('/foo/bar/bar/foo', Files::concatenatePaths(array('/foo/bar/', '/bar/foo/')));
+        $this->assertEquals('/foo/bar/bar/foo', Files::concatenatePaths(['/foo/bar/', '/bar/foo/']));
     }
 
     /**
@@ -127,7 +130,7 @@ class FilesTest extends UnitTestCase
      */
     public function concatenatePathsWorksForBrokenPaths()
     {
-        $this->assertEquals('/foo/bar/bar', Files::concatenatePaths(array('\\foo/bar\\', '\\bar')));
+        $this->assertEquals('/foo/bar/bar', Files::concatenatePaths(['\\foo/bar\\', '\\bar']));
     }
 
     /**
@@ -135,7 +138,7 @@ class FilesTest extends UnitTestCase
      */
     public function concatenatePathsWorksForEmptyPathArrayElements()
     {
-        $this->assertEquals('foo/bar', Files::concatenatePaths(array('foo', '', 'bar')));
+        $this->assertEquals('foo/bar', Files::concatenatePaths(['foo', '', 'bar']));
     }
 
     /**
@@ -151,11 +154,11 @@ class FilesTest extends UnitTestCase
      */
     public function pathsWithProtocol()
     {
-        return array(
-            array('file:///foo\\bar', 'file:///foo/bar'),
-            array('vfs:///foo\\bar', 'vfs:///foo/bar'),
-            array('phar:///foo\\bar', 'phar:///foo/bar')
-        );
+        return [
+            ['file:///foo\\bar', 'file:///foo/bar'],
+            ['vfs:///foo\\bar', 'vfs:///foo/bar'],
+            ['phar:///foo\\bar', 'phar:///foo/bar']
+        ];
     }
 
     /**
@@ -207,7 +210,7 @@ class FilesTest extends UnitTestCase
      */
     public function is_linkReturnsFalseForExistingDirectoryThatIsNoSymlink()
     {
-        $targetPath = Files::concatenatePaths(array(dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectory')) . '/';
+        $targetPath = Files::concatenatePaths([dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectory']) . '/';
         if (!is_dir($targetPath)) {
             Files::createDirectoryRecursively($targetPath);
         }
@@ -219,11 +222,11 @@ class FilesTest extends UnitTestCase
      */
     public function is_linkReturnsTrueForExistingSymlinkDirectory()
     {
-        $targetPath = Files::concatenatePaths(array(dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectory'));
+        $targetPath = Files::concatenatePaths([dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectory']);
         if (!is_dir($targetPath)) {
             Files::createDirectoryRecursively($targetPath);
         }
-        $linkPath = Files::concatenatePaths(array(dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectoryLink'));
+        $linkPath = Files::concatenatePaths([dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectoryLink']);
         if (is_dir($linkPath)) {
             Files::removeDirectoryRecursively($linkPath);
         }
@@ -355,11 +358,11 @@ class FilesTest extends UnitTestCase
      */
     public function unlinkProperlyRemovesSymlinksPointingToDirectories()
     {
-        $targetPath = Files::concatenatePaths(array(dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectory'));
+        $targetPath = Files::concatenatePaths([dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectory']);
         if (!is_dir($targetPath)) {
             Files::createDirectoryRecursively($targetPath);
         }
-        $linkPath = Files::concatenatePaths(array(dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectoryLink'));
+        $linkPath = Files::concatenatePaths([dirname(tempnam($this->temporaryDirectory, '')), 'FlowFilesTestDirectoryLink']);
         if (is_dir($linkPath)) {
             Files::removeDirectoryRecursively($linkPath);
         }
@@ -374,9 +377,9 @@ class FilesTest extends UnitTestCase
      * @outputBuffering enabled
      *     ... because the chmod call in ResourceManager emits a warning making this fail in strict mode
      */
-    public function unlinkReturnsFalseIfSpecifiedPathDoesNotExist()
+    public function unlinkReturnsTrueIfSpecifiedPathDoesNotExist()
     {
-        $this->assertFalse(Files::unlink('NonExistingPath'));
+        $this->assertTrue(Files::unlink('NonExistingPath'));
     }
 
     /**
@@ -444,103 +447,103 @@ class FilesTest extends UnitTestCase
      */
     public function bytesToSizeStringDataProvider()
     {
-        return array(
+        return [
 
             // invalid values
-            array(
+            [
                 'bytes' => 'invalid',
                 'decimals' => null,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '0 B'
-            ),
-            array(
+            ],
+            [
                 'bytes' => '-100',
                 'decimals' => 2,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '0.00 B'
-            ),
-            array(
+            ],
+            [
                 'bytes' => -100,
                 'decimals' => 2,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '0.00 B'
-            ),
-            array(
+            ],
+            [
                 'bytes' => '',
                 'decimals' => 2,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '0.00 B'
-            ),
-            array(
-                'bytes' => array(),
+            ],
+            [
+                'bytes' => [],
                 'decimals' => 2,
                 'decimalSeparator' => ',',
                 'thousandsSeparator' => null,
                 'expected' => '0,00 B'
-            ),
+            ],
 
             // valid values
-            array(
+            [
                 'bytes' => 123,
                 'decimals' => null,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '123 B'
-            ),
-            array(
+            ],
+            [
                 'bytes' => '43008',
                 'decimals' => 1,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '42.0 KB'
-            ),
-            array(
+            ],
+            [
                 'bytes' => 1024,
                 'decimals' => 1,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '1.0 KB'
-            ),
-            array(
+            ],
+            [
                 'bytes' => 1023,
                 'decimals' => 2,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '1,023.00 B'
-            ),
-            array(
+            ],
+            [
                 'bytes' => 1073741823,
                 'decimals' => null,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '1,024 MB'
-            ),
-            array(
+            ],
+            [
                 'bytes' => 1073741823,
                 'decimals' => 1,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => '.',
                 'expected' => '1.024.0 MB'
-            ),
-            array(
+            ],
+            [
                 'bytes' => pow(1024, 5),
                 'decimals' => 1,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '1.0 PB'
-            ),
-            array(
+            ],
+            [
                 'bytes' => pow(1024, 8),
                 'decimals' => 1,
                 'decimalSeparator' => null,
                 'thousandsSeparator' => null,
                 'expected' => '1.0 YB'
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -563,60 +566,60 @@ class FilesTest extends UnitTestCase
      */
     public function sizeStringToBytesDataProvider()
     {
-        return array(
+        return [
 
             // invalid values
-            array(
+            [
                 'sizeString' => 'invalid',
                 'expected' => 0.0
-            ),
-            array(
+            ],
+            [
                 'sizeString' => '',
                 'expected' => 0.0
-            ),
-            array(
+            ],
+            [
                 'sizeString' => false,
                 'expected' => 0.0
-            ),
+            ],
 
             // valid values
-            array(
+            [
                 'sizeString' => '12345',
                 'expected' => 12345.0
-            ),
-            array(
+            ],
+            [
                 'sizeString' => '54321 b',
                 'expected' => 54321.0
-            ),
-            array(
+            ],
+            [
                 'sizeString' => '1024M',
                 'expected' => 1073741824.0
-            ),
-            array(
+            ],
+            [
                 'sizeString' => '1024.0 MB',
                 'expected' => 1073741824.0
-            ),
-            array(
+            ],
+            [
                 'sizeString' => '500 MB',
                 'expected' => 524288000.0
-            ),
-            array(
+            ],
+            [
                 'sizeString' => '500m',
                 'expected' => 524288000.0
-            ),
-            array(
+            ],
+            [
                 'sizeString' => '1.0 KB',
                 'expected' => 1024.0
-            ),
-            array(
+            ],
+            [
                 'sizeString' => '1 GB',
                 'expected' => (float)pow(1024, 3)
-            ),
-            array(
+            ],
+            [
                 'sizeString' => '1 Z',
                 'expected' => (float)pow(1024, 7)
-            )
-        );
+            ]
+        ];
     }
 
     /**

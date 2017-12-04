@@ -1,26 +1,32 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Reflection;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Reflection\ClassReflection;
+use TYPO3\Flow\Reflection\ParameterReflection;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for the ParameterReflection
- *
  */
-class ParameterReflectionTest extends \TYPO3\Flow\Tests\UnitTestCase
+class ParameterReflectionTest extends UnitTestCase
 {
     /**
      * @test
      */
     public function getDeclaringClassReturnsFlowsClassReflection($dummy = null)
     {
-        $parameter = new \TYPO3\Flow\Reflection\ParameterReflection(array(__CLASS__, 'fixtureMethod'), 'arg2');
-        $this->assertInstanceOf('TYPO3\Flow\Reflection\ClassReflection', $parameter->getDeclaringClass());
+        $parameter = new ParameterReflection([__CLASS__, 'fixtureMethod'], 'arg2');
+        $this->assertInstanceOf(ClassReflection::class, $parameter->getDeclaringClass());
     }
 
     /**
@@ -28,8 +34,8 @@ class ParameterReflectionTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function getClassReturnsFlowsClassReflection($dummy = null)
     {
-        $parameter = new \TYPO3\Flow\Reflection\ParameterReflection(array(__CLASS__, 'fixtureMethod'), 'arg1');
-        $this->assertInstanceOf('TYPO3\Flow\Reflection\ClassReflection', $parameter->getClass());
+        $parameter = new ParameterReflection([__CLASS__, 'fixtureMethod'], 'arg1');
+        $this->assertInstanceOf(ClassReflection::class, $parameter->getClass());
     }
 
     /**

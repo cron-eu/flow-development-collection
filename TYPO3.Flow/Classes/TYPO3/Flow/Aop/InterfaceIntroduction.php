@@ -1,13 +1,17 @@
 <?php
 namespace TYPO3\Flow\Aop;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Aop\Pointcut\Pointcut;
 
 /**
  * Implementation of the interface introduction declaration.
@@ -29,7 +33,7 @@ class InterfaceIntroduction
 
     /**
      * The pointcut this introduction applies to
-     * @var \TYPO3\Flow\Aop\Pointcut\Pointcut
+     * @var Pointcut
      */
     protected $pointcut;
 
@@ -38,9 +42,9 @@ class InterfaceIntroduction
      *
      * @param string $declaringAspectClassName Name of the aspect containing the declaration for this introduction
      * @param string $interfaceName Name of the interface to introduce
-     * @param \TYPO3\Flow\Aop\Pointcut\Pointcut $pointcut The pointcut for this introduction
+     * @param Pointcut $pointcut The pointcut for this introduction
      */
-    public function __construct($declaringAspectClassName, $interfaceName, \TYPO3\Flow\Aop\Pointcut\Pointcut $pointcut)
+    public function __construct($declaringAspectClassName, $interfaceName, Pointcut $pointcut)
     {
         $this->declaringAspectClassName = $declaringAspectClassName;
         $this->interfaceName = $interfaceName;
@@ -60,7 +64,7 @@ class InterfaceIntroduction
     /**
      * Returns the pointcut this introduction applies to
      *
-     * @return \TYPO3\Flow\Aop\Pointcut\Pointcut The pointcut
+     * @return Pointcut The pointcut
      */
     public function getPointcut()
     {

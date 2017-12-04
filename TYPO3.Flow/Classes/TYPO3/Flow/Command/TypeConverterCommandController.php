@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Command;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Cli\CommandController;
@@ -37,14 +40,14 @@ class TypeConverterCommandController extends CommandController
     {
         foreach ($this->propertyMapper->getTypeConverters() as $sourceType => $targetTypePriorityAndInstance) {
             $this->outputLine();
-            $this->outputLine('<b>Source type "%s":</b>', array($sourceType));
+            $this->outputLine('<b>Source type "%s":</b>', [$sourceType]);
 
             foreach ($targetTypePriorityAndInstance as $targetType => $priorityAndInstance) {
-                $this->outputFormatted('<b>Target type "%s":</b>', array($targetType), 4);
+                $this->outputFormatted('<b>Target type "%s":</b>', [$targetType], 4);
 
                 krsort($priorityAndInstance);
                 foreach ($priorityAndInstance as $priority => $instance) {
-                    $this->outputFormatted('%3s: %s', array($priority, get_class($instance)), 8);
+                    $this->outputFormatted('%3s: %s', [$priority, get_class($instance)], 8);
                 }
                 $this->outputLine();
             }

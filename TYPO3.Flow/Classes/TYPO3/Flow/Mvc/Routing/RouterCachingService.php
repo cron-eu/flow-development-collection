@@ -1,16 +1,23 @@
 <?php
 namespace TYPO3\Flow\Mvc\Routing;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Cache\CacheAwareInterface;
+use TYPO3\Flow\Cache\Frontend\StringFrontend;
+use TYPO3\Flow\Cache\Frontend\VariableFrontend;
 use TYPO3\Flow\Http\Request;
+use TYPO3\Flow\Log\SystemLoggerInterface;
+use TYPO3\Flow\Persistence\PersistenceManagerInterface;
 use TYPO3\Flow\Utility\Arrays;
 use TYPO3\Flow\Validation\Validator\UuidValidator;
 
@@ -22,25 +29,25 @@ use TYPO3\Flow\Validation\Validator\UuidValidator;
 class RouterCachingService
 {
     /**
-     * @var \TYPO3\Flow\Cache\Frontend\VariableFrontend
+     * @var VariableFrontend
      * @Flow\Inject
      */
     protected $routeCache;
 
     /**
-     * @var \TYPO3\Flow\Cache\Frontend\StringFrontend
+     * @var StringFrontend
      * @Flow\Inject
      */
     protected $resolveCache;
 
     /**
-     * @var \TYPO3\Flow\Persistence\PersistenceManagerInterface
+     * @var PersistenceManagerInterface
      * @Flow\Inject
      */
     protected $persistenceManager;
 
     /**
-     * @var \TYPO3\Flow\Log\SystemLoggerInterface
+     * @var SystemLoggerInterface
      * @Flow\Inject
      */
     protected $systemLogger;
@@ -217,7 +224,7 @@ class RouterCachingService
      */
     protected function extractUuids(array $values)
     {
-        $uuids = array();
+        $uuids = [];
         foreach ($values as $value) {
             if (is_string($value)) {
                 if (preg_match(UuidValidator::PATTERN_MATCH_UUID, $value) !== 0) {

@@ -1,25 +1,32 @@
 <?php
 namespace TYPO3\Flow\Persistence\Doctrine;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use Doctrine\ORM\EntityRepository;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Persistence\Exception\IllegalObjectTypeException;
+use TYPO3\Flow\Persistence\PersistenceManagerInterface;
+use TYPO3\Flow\Persistence\RepositoryInterface;
 
 /**
  * The Flow default Repository, based on Doctrine 2
  *
  * @api
  */
-abstract class Repository extends \Doctrine\ORM\EntityRepository implements \TYPO3\Flow\Persistence\RepositoryInterface
+abstract class Repository extends EntityRepository implements RepositoryInterface
 {
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Persistence\PersistenceManagerInterface
+     * @var PersistenceManagerInterface
      */
     protected $persistenceManager;
 
@@ -34,7 +41,7 @@ abstract class Repository extends \Doctrine\ORM\EntityRepository implements \TYP
     /**
      * @var array
      */
-    protected $defaultOrderings = array();
+    protected $defaultOrderings = [];
 
     /**
      * Initializes a new Repository.
@@ -46,7 +53,7 @@ abstract class Repository extends \Doctrine\ORM\EntityRepository implements \TYP
     {
         if ($classMetadata === null) {
             if (defined('static::ENTITY_CLASSNAME') === false) {
-                $this->objectType = preg_replace(array('/\\\Repository\\\/', '/Repository$/'), array('\\Model\\', ''), get_class($this));
+                $this->objectType = preg_replace(['/\\\Repository\\\/', '/Repository$/'], ['\\Model\\', ''], get_class($this));
             } else {
                 $this->objectType = static::ENTITY_CLASSNAME;
             }
@@ -117,12 +124,12 @@ abstract class Repository extends \Doctrine\ORM\EntityRepository implements \TYP
     /**
      * Returns a query for objects of this repository
      *
-     * @return \TYPO3\Flow\Persistence\Doctrine\Query
+     * @return Query
      * @api
      */
     public function createQuery()
     {
-        $query = new \TYPO3\Flow\Persistence\Doctrine\Query($this->objectType);
+        $query = new Query($this->objectType);
         if ($this->defaultOrderings) {
             $query->setOrderings($this->defaultOrderings);
         }
@@ -188,13 +195,13 @@ abstract class Repository extends \Doctrine\ORM\EntityRepository implements \TYP
      *
      * @param object $object The modified object
      * @return void
-     * @throws \TYPO3\Flow\Persistence\Exception\IllegalObjectTypeException
+     * @throws IllegalObjectTypeException
      * @api
      */
     public function update($object)
     {
         if (!($object instanceof $this->objectType)) {
-            throw new \TYPO3\Flow\Persistence\Exception\IllegalObjectTypeException('The modified object given to update() was not of the type (' . $this->objectType . ') this repository manages.', 1249479625);
+            throw new IllegalObjectTypeException('The modified object given to update() was not of the type (' . $this->objectType . ') this repository manages.', 1249479625);
         }
         $this->persistenceManager->update($object);
     }

@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel\Helper;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Eel\ProtectedContextAwareInterface;
@@ -328,7 +331,7 @@ class MathHelper implements ProtectedContextAwareInterface
     public function max($x = null, $y_ = null)
     {
         $arguments = func_get_args();
-        if ($arguments !== array()) {
+        if ($arguments !== []) {
             return call_user_func_array('max', func_get_args());
         } else {
             return -INF;
@@ -343,7 +346,7 @@ class MathHelper implements ProtectedContextAwareInterface
     public function min($x = null, $y_ = null)
     {
         $arguments = func_get_args();
-        if ($arguments !== array()) {
+        if ($arguments !== []) {
             return call_user_func_array('min', func_get_args());
         } else {
             return INF;

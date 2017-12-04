@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel\Tests\Unit;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Eel\Context;
 
@@ -22,13 +25,13 @@ class ContextTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function simpleValues()
     {
-        return array(
-            array('Test', 'Test'),
-            array(true, true),
-            array(42, 42),
-            array(7.0, 7.0),
-            array(null, null)
-        );
+        return [
+            ['Test', 'Test'],
+            [true, true],
+            [42, 42],
+            [7.0, 7.0],
+            [null, null]
+        ];
     }
 
     /**
@@ -52,13 +55,13 @@ class ContextTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function arrayValues()
     {
-        return array(
-            array(array(), array()),
-            array(array(1, 2, 3), array(1, 2, 3)),
+        return [
+            [[], []],
+            [[1, 2, 3], [1, 2, 3]],
             // Unwrap has to be recursive
-            array(array(new Context('Foo')), array('Foo')),
-            array(array('arr' => array(new Context('Foo'))), array('arr' => array('Foo')))
-        );
+            [[new Context('Foo')], ['Foo']],
+            [['arr' => [new Context('Foo')]], ['arr' => ['Foo']]]
+        ];
     }
 
     /**
@@ -82,13 +85,13 @@ class ContextTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function arrayGetValues()
     {
-        return array(
-            array(array(), 'foo', null),
-            array(array('foo' => 'bar'), 'foo', 'bar'),
-            array(array(1, 2, 3), '1', 2),
-            array(array('foo' => array('bar' => 'baz')), 'foo', array('bar' => 'baz')),
-            array(new \ArrayObject(array('foo' => 'bar')), 'foo', 'bar')
-        );
+        return [
+            [[], 'foo', null],
+            [['foo' => 'bar'], 'foo', 'bar'],
+            [[1, 2, 3], '1', 2],
+            [['foo' => ['bar' => 'baz']], 'foo', ['bar' => 'baz']],
+            [new \ArrayObject(['foo' => 'bar']), 'foo', 'bar']
+        ];
     }
 
     /**
@@ -119,13 +122,13 @@ class ContextTest extends \TYPO3\Flow\Tests\UnitTestCase
         $getterObject->setProperty('some value');
         $getterObject->setBooleanProperty(true);
 
-        return array(
-            array($simpleObject, 'bar', null),
-            array($simpleObject, 'foo', 'bar'),
-            array($getterObject, 'foo', null),
-            array($getterObject, 'callMe', null),
-            array($getterObject, 'booleanProperty', true)
-        );
+        return [
+            [$simpleObject, 'bar', null],
+            [$simpleObject, 'foo', 'bar'],
+            [$getterObject, 'foo', null],
+            [$getterObject, 'callMe', null],
+            [$getterObject, 'booleanProperty', true]
+        ];
     }
 
     /**

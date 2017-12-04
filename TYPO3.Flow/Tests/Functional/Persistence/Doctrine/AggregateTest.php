@@ -1,23 +1,25 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Persistence\Doctrine;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations\After;
-use TYPO3\Flow\Tests\Functional\Persistence\Fixtures\Post;
-use TYPO3\Flow\Tests\Functional\Persistence\Fixtures\Image;
-use TYPO3\Flow\Tests\Functional\Persistence\Fixtures\Comment;
-use TYPO3\Flow\Tests\Functional\Persistence\Fixtures\TestValueObject;
+use TYPO3\Flow\Persistence\Doctrine\PersistenceManager;
+use TYPO3\Flow\Tests\Functional\Persistence\Fixtures;
+use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
  * Testcase for aggregate-related behavior
  */
-class AggregateTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class AggregateTest extends FunctionalTestCase
 {
     /**
      * @var boolean
@@ -25,12 +27,12 @@ class AggregateTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     protected static $testablePersistenceEnabled = true;
 
     /**
-     * @var \TYPO3\Flow\Tests\Functional\Persistence\Fixtures\PostRepository;
+     * @var Fixtures\PostRepository;
      */
     protected $postRepository;
 
     /**
-     * @var \TYPO3\Flow\Tests\Functional\Persistence\Fixtures\CommentRepository;
+     * @var Fixtures\CommentRepository;
      */
     protected $commentRepository;
 
@@ -40,11 +42,11 @@ class AggregateTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     public function setUp()
     {
         parent::setUp();
-        if (!$this->persistenceManager instanceof \TYPO3\Flow\Persistence\Doctrine\PersistenceManager) {
+        if (!$this->persistenceManager instanceof PersistenceManager) {
             $this->markTestSkipped('Doctrine persistence is not enabled');
         }
-        $this->postRepository = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Persistence\Fixtures\PostRepository');
-        $this->commentRepository = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Persistence\Fixtures\CommentRepository');
+        $this->postRepository = $this->objectManager->get(Fixtures\PostRepository::class);
+        $this->commentRepository = $this->objectManager->get(Fixtures\CommentRepository::class);
     }
 
     /**
@@ -52,8 +54,8 @@ class AggregateTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function entitiesWithinAggregateAreRemovedAutomaticallyWithItsRootEntity()
     {
-        $image = new Image();
-        $post = new Post();
+        $image = new Fixtures\Image();
+        $post = new Fixtures\Post();
         $post->setImage($image);
 
         $this->postRepository->add($post);
@@ -61,7 +63,7 @@ class AggregateTest extends \TYPO3\Flow\Tests\FunctionalTestCase
 
         $imageIdentifier = $this->persistenceManager->getIdentifierByObject($image);
 
-        $retrievedImage = $this->persistenceManager->getObjectByIdentifier($imageIdentifier, 'TYPO3\Flow\Tests\Functional\Persistence\Fixtures\Image');
+        $retrievedImage = $this->persistenceManager->getObjectByIdentifier($imageIdentifier, Fixtures\Image::class);
         $this->assertSame($image, $retrievedImage);
 
         $this->postRepository->remove($post);
@@ -75,10 +77,10 @@ class AggregateTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function entitiesWithOwnRepositoryAreNotRemovedIfRelatedRootEntityIsRemoved()
     {
-        $comment = new Comment();
+        $comment = new Fixtures\Comment();
         $this->commentRepository->add($comment);
 
-        $post = new Post();
+        $post = new Fixtures\Post();
         $post->setComment($comment);
 
         $this->postRepository->add($post);
@@ -86,13 +88,13 @@ class AggregateTest extends \TYPO3\Flow\Tests\FunctionalTestCase
 
         $commentIdentifier = $this->persistenceManager->getIdentifierByObject($comment);
 
-        $retrievedComment = $this->persistenceManager->getObjectByIdentifier($commentIdentifier, 'TYPO3\Flow\Tests\Functional\Persistence\Fixtures\Comment');
+        $retrievedComment = $this->persistenceManager->getObjectByIdentifier($commentIdentifier, Fixtures\Comment::class);
         $this->assertSame($comment, $retrievedComment);
 
         $this->postRepository->remove($post);
         $this->persistenceManager->persistAll();
 
-        $retrievedComment = $this->persistenceManager->getObjectByIdentifier($commentIdentifier, 'TYPO3\Flow\Tests\Functional\Persistence\Fixtures\Comment');
+        $retrievedComment = $this->persistenceManager->getObjectByIdentifier($commentIdentifier, Fixtures\Comment::class);
         $this->assertSame($comment, $retrievedComment);
     }
 
@@ -103,11 +105,11 @@ class AggregateTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function valueObjectsAreNotCascadeRemovedWhenARelatedEntityIsDeleted()
     {
-        $post1 = new Post();
-        $post1->setAuthor(new TestValueObject('Some Name'));
+        $post1 = new Fixtures\Post();
+        $post1->setAuthor(new Fixtures\TestValueObject('Some Name'));
 
-        $post2 = new Post();
-        $post2->setAuthor(new TestValueObject('Some Name'));
+        $post2 = new Fixtures\Post();
+        $post2->setAuthor(new Fixtures\TestValueObject('Some Name'));
 
         $this->postRepository->add($post1);
         $this->postRepository->add($post2);

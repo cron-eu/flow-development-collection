@@ -1,21 +1,25 @@
 <?php
 namespace TYPO3\Flow\Aop\Builder;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Aop\Exception;
 
 /**
  * An AOP interceptor code builder for methods enriched by advices.
  *
  * @Flow\Scope("singleton")
  */
-class AdvicedMethodInterceptorBuilder extends \TYPO3\Flow\Aop\Builder\AbstractMethodInterceptorBuilder
+class AdvicedMethodInterceptorBuilder extends AbstractMethodInterceptorBuilder
 {
     /**
      * Builds interception PHP code for an adviced method
@@ -24,12 +28,12 @@ class AdvicedMethodInterceptorBuilder extends \TYPO3\Flow\Aop\Builder\AbstractMe
      * @param array $interceptedMethods An array of method names and their meta information, including advices for the method (if any)
      * @param string $targetClassName Name of the target class to build the interceptor for
      * @return string PHP code of the interceptor
-     * @throws \TYPO3\Flow\Aop\Exception
+     * @throws Exception
      */
     public function build($methodName, array $interceptedMethods, $targetClassName)
     {
         if ($methodName === '__construct') {
-            throw new \TYPO3\Flow\Aop\Exception('The ' . __CLASS__ . ' cannot build constructor interceptor code.', 1173107446);
+            throw new Exception('The ' . __CLASS__ . ' cannot build constructor interceptor code.', 1173107446);
         }
 
         $declaringClassName = $interceptedMethods[$methodName]['declaringClassName'];

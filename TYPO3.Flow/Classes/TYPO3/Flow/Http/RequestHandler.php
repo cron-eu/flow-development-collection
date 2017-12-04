@@ -1,16 +1,20 @@
 <?php
 namespace TYPO3\Flow\Http;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Core\Bootstrap;
 use TYPO3\Flow\Configuration\ConfigurationManager;
+use TYPO3\Flow\Http\Component\ComponentChain;
 use TYPO3\Flow\Http\Component\ComponentContext;
 
 /**
@@ -61,7 +65,9 @@ class RequestHandler implements HttpRequestHandlerInterface
     public function __construct(Bootstrap $bootstrap)
     {
         $this->bootstrap = $bootstrap;
-        $this->exit = function () { exit(); };
+        $this->exit = function () {
+            exit();
+        };
     }
 
     /**
@@ -156,9 +162,9 @@ class RequestHandler implements HttpRequestHandlerInterface
     protected function resolveDependencies()
     {
         $objectManager = $this->bootstrap->getObjectManager();
-        $this->baseComponentChain = $objectManager->get('TYPO3\Flow\Http\Component\ComponentChain');
+        $this->baseComponentChain = $objectManager->get(ComponentChain::class);
 
-        $configurationManager = $objectManager->get('TYPO3\Flow\Configuration\ConfigurationManager');
+        $configurationManager = $objectManager->get(ConfigurationManager::class);
         $this->settings = $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.Flow');
     }
 }

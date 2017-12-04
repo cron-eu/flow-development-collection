@@ -1,16 +1,19 @@
 <?php
 namespace TYPO3\Flow\Resource\Streams;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
- * A generic stream wrapper sitting between PHP and stream wrappers implementing
- * \TYPO3\Flow\Resource\Streams\StreamWrapperInterface.
+ * A generic stream wrapper sitting between PHP and stream wrappers
+ * implementing StreamWrapperInterface.
  *
  * The resource manager will register configured stream wrappers with this class,
  * enabling the use of Flow goodies like DI in those stream wrappers.
@@ -23,7 +26,7 @@ class StreamWrapperAdapter
     /**
      * @var array
      */
-    protected static $registeredStreamWrappers = array();
+    protected static $registeredStreamWrappers = [];
 
     /**
      * @var resource
@@ -31,7 +34,7 @@ class StreamWrapperAdapter
     public $context;
 
     /**
-     * @var \TYPO3\Flow\Resource\Streams\StreamWrapperInterface
+     * @var StreamWrapperInterface
      */
     protected $streamWrapper;
 

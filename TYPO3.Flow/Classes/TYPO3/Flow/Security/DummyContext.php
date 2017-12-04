@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Security;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Mvc\ActionRequest;
+use TYPO3\Flow\Mvc\RequestInterface;
 use TYPO3\Flow\Security\Authentication\TokenInterface;
 use TYPO3\Flow\Security\Policy\Role;
 
@@ -34,7 +38,7 @@ class DummyContext extends Context
      * Array of configured tokens (might have request patterns)
      * @var array
      */
-    protected $tokens = array();
+    protected $tokens = [];
 
     /**
      * @var string
@@ -42,7 +46,7 @@ class DummyContext extends Context
     protected $csrfProtectionToken;
 
     /**
-     * @var \TYPO3\Flow\Mvc\RequestInterface
+     * @var RequestInterface
      */
     protected $interceptedRequest;
 
@@ -80,7 +84,7 @@ class DummyContext extends Context
     }
 
     /**
-     * Sets the \TYPO3\Flow\Security\Authentication\Tokens of the security context which should be active.
+     * Sets the Authentication\Tokens of the security context which should be active.
      *
      * @param TokenInterface[] $tokens Array of set tokens
      * @return array
@@ -91,7 +95,7 @@ class DummyContext extends Context
     }
 
     /**
-     * Returns all \TYPO3\Flow\Security\Authentication\Tokens of the security context which are
+     * Returns all Authentication\Tokens of the security context which are
      * active for the current request. If a token has a request pattern that cannot match
      * against the current request it is determined as not active.
      *
@@ -103,7 +107,7 @@ class DummyContext extends Context
     }
 
     /**
-     * Returns all \TYPO3\Flow\Security\Authentication\Tokens of the security context which are
+     * Returns all Authentication\Tokens of the security context which are
      * active for the current request and of the given type. If a token has a request pattern that cannot match
      * against the current request it is determined as not active.
      *
@@ -112,7 +116,7 @@ class DummyContext extends Context
      */
     public function getAuthenticationTokensOfType($className)
     {
-        $tokens = array();
+        $tokens = [];
         foreach ($this->tokens as $token) {
             if ($token instanceof $className) {
                 $tokens[] = $token;
@@ -243,7 +247,7 @@ class DummyContext extends Context
     public function clearContext()
     {
         $this->roles = null;
-        $this->tokens = array();
+        $this->tokens = [];
         $this->csrfProtectionToken = null;
         $this->interceptedRequest = null;
         $this->initialized = false;

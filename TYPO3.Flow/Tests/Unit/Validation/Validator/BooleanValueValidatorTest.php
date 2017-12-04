@@ -1,22 +1,26 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Validation\Validator;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Validation\Validator\BooleanValueValidator;
 
 require_once('AbstractValidatorTestcase.php');
 
 /**
  * Testcase for the true validator
- *
  */
-class BooleanValueValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\AbstractValidatorTestcase
+class BooleanValueValidatorTest extends AbstractValidatorTestcase
 {
-    protected $validatorClassName = 'TYPO3\Flow\Validation\Validator\BooleanValueValidator';
+    protected $validatorClassName = BooleanValueValidator::class;
 
     /**
      * @test
@@ -47,7 +51,7 @@ class BooleanValueValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valida
      */
     public function validateReturnsNoErrorIfTheGivenValueIsFalseAndExpectedValueIsFalse()
     {
-        $this->validatorOptions(array('expectedValue' => false));
+        $this->validatorOptions(['expectedValue' => false]);
         $this->assertFalse($this->validator->validate(false)->hasErrors());
     }
 

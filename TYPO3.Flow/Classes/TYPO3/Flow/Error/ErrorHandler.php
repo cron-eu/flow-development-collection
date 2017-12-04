@@ -1,14 +1,18 @@
 <?php
 namespace TYPO3\Flow\Error;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Error as FlowError;
 
 /**
  * Global error handler for Flow
@@ -20,7 +24,7 @@ class ErrorHandler
     /**
      * @var array
      */
-    protected $exceptionalErrors = array();
+    protected $exceptionalErrors = [];
 
     /**
      * Constructs this error handler - registers itself as the default error handler.
@@ -28,7 +32,7 @@ class ErrorHandler
      */
     public function __construct()
     {
-        set_error_handler(array($this, 'handleError'));
+        set_error_handler([$this, 'handleError']);
     }
 
     /**
@@ -53,7 +57,7 @@ class ErrorHandler
      * @param string $errorFile Name of the file the error occurred in
      * @param integer $errorLine Line number where the error occurred
      * @return void
-     * @throws \TYPO3\Flow\Error\Exception with the data passed to this method
+     * @throws FlowError\Exception with the data passed to this method
      * @throws \Exception
      */
     public function handleError($errorLevel, $errorMessage, $errorFile, $errorLine)
@@ -62,7 +66,7 @@ class ErrorHandler
             return;
         }
 
-        $errorLevels = array(
+        $errorLevels = [
             E_WARNING            => 'Warning',
             E_NOTICE             => 'Notice',
             E_USER_ERROR         => 'User Error',
@@ -70,11 +74,11 @@ class ErrorHandler
             E_USER_NOTICE        => 'User Notice',
             E_STRICT             => 'Runtime Notice',
             E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
-        );
+        ];
 
         if (in_array($errorLevel, (array)$this->exceptionalErrors)) {
-            if (class_exists('TYPO3\Flow\Error\Exception')) {
-                throw new \TYPO3\Flow\Error\Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
+            if (class_exists(FlowError\Exception::class)) {
+                throw new FlowError\Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
             } else {
                 throw new \Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
             }

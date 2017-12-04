@@ -1,28 +1,32 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\I18n\Cldr;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use org\bovigo\vfs\vfsStream;
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\I18n;
 
 /**
  * Testcase for the CldrRepository
- *
  */
-class CldrRepositoryTest extends \TYPO3\Flow\Tests\UnitTestCase
+class CldrRepositoryTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\I18n\Cldr\CldrRepository
+     * @var I18n\Cldr\CldrRepository
      */
     protected $repository;
 
     /**
-     * @var \TYPO3\Flow\I18n\Locale
+     * @var I18n\Locale
      */
     protected $dummyLocale;
 
@@ -33,10 +37,10 @@ class CldrRepositoryTest extends \TYPO3\Flow\Tests\UnitTestCase
     {
         vfsStream::setup('Foo');
 
-        $this->repository = $this->getAccessibleMock('TYPO3\Flow\I18n\Cldr\CldrRepository', array('dummy'));
+        $this->repository = $this->getAccessibleMock(I18n\Cldr\CldrRepository::class, ['dummy']);
         $this->repository->_set('cldrBasePath', 'vfs://Foo/');
 
-        $this->dummyLocale = new \TYPO3\Flow\I18n\Locale('en');
+        $this->dummyLocale = new I18n\Locale('en');
     }
 
     /**

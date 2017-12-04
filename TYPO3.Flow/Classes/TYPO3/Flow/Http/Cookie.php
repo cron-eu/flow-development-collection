@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Http;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -137,7 +140,7 @@ class Cookie
      * rather than the created cookie.
      *
      * @param string $header The Set-Cookie string without the actual "Set-Cookie:" part
-     * @return \TYPO3\Flow\Http\Cookie
+     * @return Cookie
      * @see http://tools.ietf.org/html/rfc6265
      */
     public static function createFromRawSetCookieHeader($header)

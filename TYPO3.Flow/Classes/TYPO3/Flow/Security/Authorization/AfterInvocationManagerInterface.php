@@ -1,12 +1,18 @@
 <?php
 namespace TYPO3\Flow\Security\Authorization;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Aop\JoinPointInterface;
+use TYPO3\Flow\Security\Context;
 
 /**
  * Contract for an after invocation manager. It is used to check return values of a method against security rules.
@@ -17,13 +23,13 @@ interface AfterInvocationManagerInterface
     /**
      * Processes the given return object. May throw an security exception or filter the result depending on the current user rights.
      *
-     * @param \TYPO3\Flow\Security\Context $securityContext The current security context
+     * @param Context $securityContext The current security context
      * @param object $object The return object to be processed
-     * @param \TYPO3\Flow\Aop\JoinPointInterface $joinPoint The joinpoint of the returning method
+     * @param JoinPointInterface $joinPoint The joinpoint of the returning method
      * @return boolean TRUE if access is granted, FALSE if the manager abstains from decision
      * @throws \TYPO3\Flow\Security\Exception\AccessDeniedException If access is not granted
      */
-    public function process(\TYPO3\Flow\Security\Context $securityContext, $object, \TYPO3\Flow\Aop\JoinPointInterface $joinPoint);
+    public function process(Context $securityContext, $object, JoinPointInterface $joinPoint);
 
     /**
      * Returns TRUE if this after invocation processor can process return objects of the given class name

@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Object\Fixtures;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -20,7 +23,7 @@ class PrototypeClassA implements PrototypeClassAishInterface
 {
     /**
      * @Flow\Transient
-     * @var \TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassA
+     * @var SingletonClassA
      */
     protected $singletonA;
 
@@ -30,16 +33,16 @@ class PrototypeClassA implements PrototypeClassAishInterface
     protected $someProperty;
 
     /**
-     * @param \TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassA $singletonA
+     * @param SingletonClassA $singletonA
      * @return void
      */
-    public function injectSingletonA(\TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassA $singletonA)
+    public function injectSingletonA(SingletonClassA $singletonA)
     {
         $this->singletonA = $singletonA;
     }
 
     /**
-     * @return \TYPO3\Flow\Tests\Functional\Object\Fixtures\SingletonClassA The singleton class A
+     * @return SingletonClassA The singleton class A
      */
     public function getSingletonA()
     {

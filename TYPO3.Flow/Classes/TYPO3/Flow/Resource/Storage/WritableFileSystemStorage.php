@@ -1,15 +1,20 @@
 <?php
 namespace TYPO3\Flow\Resource\Storage;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Resource\Resource;
+use TYPO3\Flow\Resource\Resource as PersistentResource;
+use TYPO3\Flow\Resource\Storage\Exception as StorageException;
+use TYPO3\Flow\Utility\Algorithms;
 use TYPO3\Flow\Utility\Files;
 
 /**
@@ -29,10 +34,10 @@ class WritableFileSystemStorage extends FileSystemStorage implements WritableSto
             Files::createDirectoryRecursively($this->path);
         }
         if (!is_dir($this->path) && !is_link($this->path)) {
-            throw new Exception('The directory "' . $this->path . '" which was configured as a resource storage does not exist.', 1361533189);
+            throw new StorageException('The directory "' . $this->path . '" which was configured as a resource storage does not exist.', 1361533189);
         }
         if (!is_writable($this->path)) {
-            throw new Exception('The directory "' . $this->path . '" which was configured as a resource storage is not writable.', 1361533190);
+            throw new StorageException('The directory "' . $this->path . '" which was configured as a resource storage is not writable.', 1361533190);
         }
     }
 
@@ -43,12 +48,12 @@ class WritableFileSystemStorage extends FileSystemStorage implements WritableSto
      *
      * @param string | resource $source The URI (or local path and filename) or the PHP resource stream to import the resource from
      * @param string $collectionName Name of the collection the new Resource belongs to
-     * @throws Exception
+     * @throws StorageException
      * @return Resource A resource object representing the imported resource
      */
     public function importResource($source, $collectionName)
     {
-        $temporaryTargetPathAndFilename = $this->environment->getPathToTemporaryDirectory() . uniqid('TYPO3_Flow_ResourceImport_');
+        $temporaryTargetPathAndFilename = $this->environment->getPathToTemporaryDirectory() . 'TYPO3_Flow_ResourceImport_' . Algorithms::generateRandomString(13);
 
         if (is_resource($source)) {
             try {
@@ -56,13 +61,13 @@ class WritableFileSystemStorage extends FileSystemStorage implements WritableSto
                 stream_copy_to_stream($source, $target);
                 fclose($target);
             } catch (\Exception $e) {
-                throw new Exception(sprintf('Could import the content stream to temporary file "%s".', $temporaryTargetPathAndFilename), 1380880079);
+                throw new StorageException(sprintf('Could import the content stream to temporary file "%s".', $temporaryTargetPathAndFilename), 1380880079);
             }
         } else {
             try {
                 copy($source, $temporaryTargetPathAndFilename);
             } catch (\Exception $e) {
-                throw new Exception(sprintf('Could not copy the file from "%s" to temporary file "%s".', $source, $temporaryTargetPathAndFilename), 1375198876);
+                throw new StorageException(sprintf('Could not copy the file from "%s" to temporary file "%s".', $source, $temporaryTargetPathAndFilename), 1375198876);
             }
         }
 
@@ -80,16 +85,16 @@ class WritableFileSystemStorage extends FileSystemStorage implements WritableSto
      *
      * @param string $content The actual content to import
      * @param string $collectionName Name of the collection the new Resource belongs to
-     * @return Resource A resource object representing the imported resource
-     * @throws Exception
+     * @return PersistentResource A resource object representing the imported resource
+     * @throws StorageException
      */
     public function importResourceFromContent($content, $collectionName)
     {
-        $temporaryTargetPathAndFilename = $this->environment->getPathToTemporaryDirectory() . uniqid('TYPO3_Flow_ResourceImport_');
+        $temporaryTargetPathAndFilename = $this->environment->getPathToTemporaryDirectory() . 'TYPO3_Flow_ResourceImport_' . Algorithms::generateRandomString(13);
         try {
             file_put_contents($temporaryTargetPathAndFilename, $content);
         } catch (\Exception $e) {
-            throw new Exception(sprintf('Could import the content stream to temporary file "%s".', $temporaryTargetPathAndFilename), 1381156098);
+            throw new StorageException(sprintf('Could import the content stream to temporary file "%s".', $temporaryTargetPathAndFilename), 1381156098);
         }
 
         return $this->importTemporaryFile($temporaryTargetPathAndFilename, $collectionName);
@@ -98,10 +103,10 @@ class WritableFileSystemStorage extends FileSystemStorage implements WritableSto
     /**
      * Deletes the storage data related to the given Resource object
      *
-     * @param \TYPO3\Flow\Resource\Resource $resource The Resource to delete the storage data of
+     * @param PersistentResource $resource The Resource to delete the storage data of
      * @return boolean TRUE if removal was successful
      */
-    public function deleteResource(Resource $resource)
+    public function deleteResource(PersistentResource $resource)
     {
         $pathAndFilename = $this->getStoragePathAndFilenameByHash($resource->getSha1());
         if (!file_exists($pathAndFilename)) {
@@ -117,26 +122,30 @@ class WritableFileSystemStorage extends FileSystemStorage implements WritableSto
     /**
      * Imports the given temporary file into the storage and creates the new resource object.
      *
-     * @param string $temporaryFile
+     * Note: the temporary file is (re-)moved by this method.
+     *
+     * @param string $temporaryPathAndFileName
      * @param string $collectionName
-     * @return Resource
-     * @throws Exception
+     * @return PersistentResource
+     * @throws StorageException
      */
-    protected function importTemporaryFile($temporaryFile, $collectionName)
+    protected function importTemporaryFile($temporaryPathAndFileName, $collectionName)
     {
-        $this->fixFilePermissions($temporaryFile);
-        $sha1Hash = sha1_file($temporaryFile);
-        $finalTargetPathAndFilename = $this->getStoragePathAndFilenameByHash($sha1Hash);
+        $this->fixFilePermissions($temporaryPathAndFileName);
+        $sha1Hash = sha1_file($temporaryPathAndFileName);
+        $targetPathAndFilename = $this->getStoragePathAndFilenameByHash($sha1Hash);
 
-        if (!is_file($finalTargetPathAndFilename)) {
-            $this->moveTemporaryFileToFinalDestination($temporaryFile, $finalTargetPathAndFilename);
+        if (!is_file($targetPathAndFilename)) {
+            $this->moveTemporaryFileToFinalDestination($temporaryPathAndFileName, $targetPathAndFilename);
+        } else {
+            unlink($temporaryPathAndFileName);
         }
 
-        $resource = new Resource();
-        $resource->setFileSize(filesize($finalTargetPathAndFilename));
+        $resource = new PersistentResource();
+        $resource->setFileSize(filesize($targetPathAndFilename));
         $resource->setCollectionName($collectionName);
         $resource->setSha1($sha1Hash);
-        $resource->setMd5(md5_file($finalTargetPathAndFilename));
+        $resource->setMd5(md5_file($targetPathAndFilename));
 
         return $resource;
     }
@@ -147,17 +156,17 @@ class WritableFileSystemStorage extends FileSystemStorage implements WritableSto
      * @param string $temporaryFile
      * @param string $finalTargetPathAndFilename
      * @return void
-     * @throws Exception
+     * @throws StorageException
      */
     protected function moveTemporaryFileToFinalDestination($temporaryFile, $finalTargetPathAndFilename)
     {
         if (!file_exists(dirname($finalTargetPathAndFilename))) {
             Files::createDirectoryRecursively(dirname($finalTargetPathAndFilename));
         }
-        if (rename($temporaryFile, $finalTargetPathAndFilename) === false) {
-            unlink($temporaryFile);
-            throw new Exception(sprintf('The temporary file of the file import could not be moved to the final target "%s".', $finalTargetPathAndFilename), 1381156103);
+        if (copy($temporaryFile, $finalTargetPathAndFilename) === false) {
+            throw new StorageException(sprintf('The temporary file of the file import could not be moved to the final target "%s".', $finalTargetPathAndFilename), 1381156103);
         }
+        unlink($temporaryFile);
 
         $this->fixFilePermissions($finalTargetPathAndFilename);
     }

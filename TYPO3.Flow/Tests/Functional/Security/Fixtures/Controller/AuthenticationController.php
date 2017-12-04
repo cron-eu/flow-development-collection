@@ -1,25 +1,32 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Security\Fixtures\Controller;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Mvc\ActionRequest;
+use TYPO3\Flow\Exception as FlowException;
+use TYPO3\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
+use TYPO3\Flow\Security\Exception\AuthenticationRequiredException;
 
 /**
  * A controller for functional testing
  */
-class AuthenticationController extends \TYPO3\Flow\Security\Authentication\Controller\AbstractAuthenticationController
+class AuthenticationController extends AbstractAuthenticationController
 {
     /**
-     * @param \TYPO3\Flow\Mvc\ActionRequest $originalRequest
+     * @param ActionRequest $originalRequest
      * @return string
      */
-    public function onAuthenticationSuccess(\TYPO3\Flow\Mvc\ActionRequest $originalRequest = null)
+    public function onAuthenticationSuccess(ActionRequest $originalRequest = null)
     {
         if ($originalRequest !== null) {
             $this->redirectToRequest($originalRequest);
@@ -28,11 +35,11 @@ class AuthenticationController extends \TYPO3\Flow\Security\Authentication\Contr
     }
 
     /**
-     * @param \TYPO3\Flow\Security\Exception\AuthenticationRequiredException $exception
-     * @throws \TYPO3\Flow\Exception
+     * @param AuthenticationRequiredException $exception
+     * @throws FlowException
      */
-    public function onAuthenticationFailure(\TYPO3\Flow\Security\Exception\AuthenticationRequiredException $exception = null)
+    public function onAuthenticationFailure(AuthenticationRequiredException $exception = null)
     {
-        throw new \TYPO3\Flow\Exception('Failure Method Exception', 42);
+        throw new FlowException('Failure Method Exception', 42);
     }
 }

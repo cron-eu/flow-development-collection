@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Error;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 use TYPO3\Flow\Error\AbstractExceptionHandler;
 use TYPO3\Flow\Exception;
 use TYPO3\Flow\Log\SystemLoggerInterface;
@@ -23,20 +26,20 @@ class AbstractExceptionHandlerTest extends UnitTestCase
      */
     public function handleExceptionLogsInformationAboutTheExceptionInTheSystemLog()
     {
-        $options = array(
-            'defaultRenderingOptions' => array(
+        $options = [
+            'defaultRenderingOptions' => [
                 'renderTechnicalDetails' => true,
                 'logException' => true
-            ),
-            'renderingGroups' => array()
-        );
+            ],
+            'renderingGroups' => []
+        ];
 
         $exception = new \Exception('The Message', 12345);
 
-        $mockSystemLogger = $this->getMock('TYPO3\Flow\Log\SystemLoggerInterface');
+        $mockSystemLogger = $this->createMock(SystemLoggerInterface::class);
         $mockSystemLogger->expects($this->once())->method('logException')->with($exception);
 
-        $exceptionHandler = $this->getMockForAbstractClass('TYPO3\Flow\Error\AbstractExceptionHandler', array(), '', false, true, true, array('echoExceptionCli'));
+        $exceptionHandler = $this->getMockForAbstractClass(AbstractExceptionHandler::class, [], '', false, true, true, ['echoExceptionCli']);
         /** @var AbstractExceptionHandler $exceptionHandler */
         $exceptionHandler->setOptions($options);
         $exceptionHandler->injectSystemLogger($mockSystemLogger);
@@ -48,34 +51,34 @@ class AbstractExceptionHandlerTest extends UnitTestCase
      */
     public function handleExceptionDoesNotLogInformationAboutTheExceptionInTheSystemLogIfLogExceptionWasTurnedOff()
     {
-        $options = array(
-            'defaultRenderingOptions' => array(
+        $options = [
+            'defaultRenderingOptions' => [
                 'renderTechnicalDetails' => true,
                 'logException' => true
-            ),
-            'renderingGroups' => array(
-                'notFoundExceptions' => array(
-                    'matchingStatusCodes' => array(404),
-                    'options' => array(
+            ],
+            'renderingGroups' => [
+                'notFoundExceptions' => [
+                    'matchingStatusCodes' => [404],
+                    'options' => [
                         'logException' => false,
                         'templatePathAndFilename' => 'resource://TYPO3.Flow/Private/Templates/Error/Default.html',
-                        'variables' => array(
+                        'variables' => [
                             'errorDescription' => 'Sorry, the page you requested was not found.'
-                        )
+                        ]
 
-                    )
-                )
-            )
-        );
+                    ]
+                ]
+            ]
+        ];
 
         /** @var Exception|\PHPUnit_Framework_MockObject_MockObject $exception */
         $exception = new NoMatchingRouteException();
 
         /** @var SystemLoggerInterface|\PHPUnit_Framework_MockObject_MockObject $mockSystemLogger */
-        $mockSystemLogger = $this->getMockBuilder('TYPO3\Flow\Log\SystemLoggerInterface')->getMock();
+        $mockSystemLogger = $this->getMockBuilder(SystemLoggerInterface::class)->getMock();
         $mockSystemLogger->expects($this->never())->method('logException');
 
-        $exceptionHandler = $this->getMockForAbstractClass('TYPO3\Flow\Error\AbstractExceptionHandler', array(), '', false, true, true, array('echoExceptionCli'));
+        $exceptionHandler = $this->getMockForAbstractClass(AbstractExceptionHandler::class, [], '', false, true, true, ['echoExceptionCli']);
         /** @var AbstractExceptionHandler $exceptionHandler */
         $exceptionHandler->setOptions($options);
         $exceptionHandler->injectSystemLogger($mockSystemLogger);

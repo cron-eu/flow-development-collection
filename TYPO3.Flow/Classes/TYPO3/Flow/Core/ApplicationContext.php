@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Core;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Exception as FlowException;
 
 /**
  * The Flow Context object.
@@ -46,7 +50,7 @@ class ApplicationContext
     /**
      * The parent context, or NULL if there is no parent context
      *
-     * @var \TYPO3\Flow\Core\ApplicationContext
+     * @var ApplicationContext
      */
     protected $parentContext;
 
@@ -54,7 +58,7 @@ class ApplicationContext
      * Initialize the context object.
      *
      * @param string $contextString
-     * @throws \TYPO3\Flow\Exception if the parent context is none of "Development", "Production" or "Testing"
+     * @throws FlowException if the parent context is none of "Development", "Production" or "Testing"
      */
     public function __construct($contextString)
     {
@@ -68,8 +72,8 @@ class ApplicationContext
             $this->parentContext = new ApplicationContext(implode('/', $contextStringParts));
         }
 
-        if (!in_array($this->rootContextString, array('Development', 'Production', 'Testing'))) {
-            throw new \TYPO3\Flow\Exception('The given context "' . $contextString . '" was not valid. Only allowed are Development, Production and Testing, including their sub-contexts', 1335436551);
+        if (!in_array($this->rootContextString, ['Development', 'Production', 'Testing'])) {
+            throw new FlowException('The given context "' . $contextString . '" was not valid. Only allowed are Development, Production and Testing, including their sub-contexts', 1335436551);
         }
 
         $this->contextString = $contextString;
@@ -123,7 +127,7 @@ class ApplicationContext
     /**
      * Returns the parent context object, if any
      *
-     * @return \TYPO3\Flow\Core\ApplicationContext the parent context or NULL, if there is none
+     * @return ApplicationContext the parent context or NULL, if there is none
      * @api
      */
     public function getParent()

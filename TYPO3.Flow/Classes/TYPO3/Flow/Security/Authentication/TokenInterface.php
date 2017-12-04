@@ -1,12 +1,17 @@
 <?php
 namespace TYPO3\Flow\Security\Authentication;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+use TYPO3\Flow\Mvc\ActionRequest;
+use TYPO3\Flow\Security\Account;
 
 /**
  * Contract for an authentication token.
@@ -57,7 +62,7 @@ interface TokenInterface
     public function isAuthenticated();
 
     /**
-     * Sets the authentication status. Usually called by the responsible \TYPO3\Flow\Security\Authentication\AuthenticationManagerInterface
+     * Sets the authentication status. Usually called by the responsible AuthenticationManagerInterface
      *
      * @param integer $authenticationStatus One of NO_CREDENTIALS_GIVEN, WRONG_CREDENTIALS, AUTHENTICATION_SUCCESSFUL
      * @return void
@@ -74,29 +79,29 @@ interface TokenInterface
     /**
      * Sets the authentication entry point
      *
-     * @param \TYPO3\Flow\Security\Authentication\EntryPointInterface $entryPoint The authentication entry point
+     * @param EntryPointInterface $entryPoint The authentication entry point
      * @return void
      */
-    public function setAuthenticationEntryPoint(\TYPO3\Flow\Security\Authentication\EntryPointInterface $entryPoint);
+    public function setAuthenticationEntryPoint(EntryPointInterface $entryPoint);
 
     /**
      * Returns the configured authentication entry point, NULL if none is available
      *
-     * @return \TYPO3\Flow\Security\Authentication\EntryPointInterface The configured authentication entry point, NULL if none is available
+     * @return EntryPointInterface The configured authentication entry point, NULL if none is available
      */
     public function getAuthenticationEntryPoint();
 
     /**
      * Returns TRUE if \TYPO3\Flow\Security\RequestPattern were set
      *
-     * @return boolean True if a \TYPO3\Flow\Security\RequestPattern was set
+     * @return boolean True if a \TYPO3\Flow\Security\RequestPatternInterface was set
      */
     public function hasRequestPatterns();
 
     /**
      * Sets request patterns
      *
-     * @param array $requestPatterns Array of \TYPO3\Flow\Security\RequestPattern to be set
+     * @param array $requestPatterns Array of \TYPO3\Flow\Security\RequestPatternInterface to be set
      * @return void
      * @see hasRequestPattern()
      */
@@ -117,10 +122,10 @@ interface TokenInterface
      * make sure that the authentication manager will (re-)authenticate the tokens with the current credentials.
      * Note: You should not persist the credentials!
      *
-     * @param \TYPO3\Flow\Mvc\ActionRequest $actionRequest The current request instance
+     * @param ActionRequest $actionRequest The current request instance
      * @return boolean TRUE if this token needs to be (re-)authenticated
      */
-    public function updateCredentials(\TYPO3\Flow\Mvc\ActionRequest $actionRequest);
+    public function updateCredentials(ActionRequest $actionRequest);
 
     /**
      * Returns the credentials of this token. The type depends on the provider
@@ -133,17 +138,17 @@ interface TokenInterface
     /**
      * Returns the account if one is authenticated, NULL otherwise.
      *
-     * @return \TYPO3\Flow\Security\Account An account object
+     * @return Account An account object
      */
     public function getAccount();
 
     /**
      * Set the (authenticated) account
      *
-     * @param \TYPO3\Flow\Security\Account $account An account object
+     * @param Account $account An account object
      * @return void
      */
-    public function setAccount(\TYPO3\Flow\Security\Account $account = null);
+    public function setAccount(Account $account = null);
 
     /**
      * Returns a string representation of the token for logging purposes.

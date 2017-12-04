@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Http;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -26,19 +29,19 @@ class UriTemplate
     /**
      * @var array
      */
-    protected static $operators = array(
+    protected static $operators = [
         '+' => true, '#' => true, '.' => true, '/' => true, ';' => true, '?' => true, '&' => true
-    );
+    ];
 
     /**
      * @var array
      */
-    protected static $delimiters = array(':', '/', '?', '#', '[', ']', '@', '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=');
+    protected static $delimiters = [':', '/', '?', '#', '[', ']', '@', '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '='];
 
     /**
      * @var array
      */
-    protected static $encodedDelimiters = array('%3A', '%2F', '%3F', '%23', '%5B', '%5D', '%40', '%21', '%24', '%26', '%27', '%28', '%29', '%2A', '%2B', '%2C', '%3B', '%3D');
+    protected static $encodedDelimiters = ['%3A', '%2F', '%3F', '%23', '%5B', '%5D', '%40', '%21', '%24', '%26', '%27', '%28', '%29', '%2A', '%2B', '%2C', '%3B', '%3D'];
 
     /**
      * Expand the template string using the supplied variables
@@ -55,7 +58,7 @@ class UriTemplate
 
         self::$variables = $variables;
 
-        return preg_replace_callback('/\{([^\}]+)\}/', array('TYPO3\Flow\Http\UriTemplate', 'expandMatch'), $template);
+        return preg_replace_callback('/\{([^\}]+)\}/', [UriTemplate::class, 'expandMatch'], $template);
     }
 
     /**
@@ -67,7 +70,7 @@ class UriTemplate
     protected static function expandMatch(array $matches)
     {
         $parsed = self::parseExpression($matches[1]);
-        $replacements = array();
+        $replacements = [];
 
         $prefix = $parsed['operator'];
         $separator = $parsed['operator'];
@@ -147,7 +150,7 @@ class UriTemplate
 
         $explodedExpression = explode(',', $expression);
         foreach ($explodedExpression as &$expressionPart) {
-            $configuration = array();
+            $configuration = [];
             $expressionPart = trim($expressionPart);
             $colonPosition = strpos($expressionPart, ':');
 
@@ -166,10 +169,10 @@ class UriTemplate
             $expressionPart = $configuration;
         }
 
-        return array(
+        return [
             'operator' => $operator,
             'values' => $explodedExpression
-        );
+        ];
     }
 
     /**
@@ -185,7 +188,7 @@ class UriTemplate
     protected static function encodeArrayVariable(array $variable, array $value, $operator, $separator, &$useQueryString)
     {
         $isAssociativeArray = self::isAssociative($variable);
-        $keyValuePairs = array();
+        $keyValuePairs = [];
 
         foreach ($variable as $key => $var) {
             if ($isAssociativeArray) {
@@ -206,7 +209,7 @@ class UriTemplate
                 if ($isAssociativeArray) {
                     if ($isNestedArray) {
                         // allow for deeply nested structures
-                        $var = strtr(http_build_query(array($key => $var)), array('+' => '%20', '%7e' => '~'));
+                        $var = strtr(http_build_query([$key => $var]), ['+' => '%20', '%7e' => '~']);
                     } else {
                         $var = $key . '=' . $var;
                     }

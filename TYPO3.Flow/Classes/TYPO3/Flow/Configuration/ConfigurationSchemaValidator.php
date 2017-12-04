@@ -1,16 +1,22 @@
 <?php
 namespace TYPO3\Flow\Configuration;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use Symfony\Component\Yaml\Yaml;
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Error\Notice;
 use TYPO3\Flow\Error\Result;
+use TYPO3\Flow\Utility\Arrays;
+use TYPO3\Flow\Utility\Files;
 
 /**
  * A validator for all configuration entries using Schema
@@ -57,12 +63,12 @@ class ConfigurationSchemaValidator
      * @return \TYPO3\Flow\Error\Result the result of the validation
      * @throws Exception\SchemaValidationException
      */
-    public function validate($configurationType = null, $path = null, &$loadedSchemaFiles = array())
+    public function validate($configurationType = null, $path = null, &$loadedSchemaFiles = [])
     {
         if ($configurationType === null) {
             $configurationTypes = $this->configurationManager->getAvailableConfigurationTypes();
         } else {
-            $configurationTypes = array($configurationType);
+            $configurationTypes = [$configurationType];
         }
 
         $result = new Result();
@@ -92,13 +98,13 @@ class ConfigurationSchemaValidator
         $configuration = $this->configurationManager->getConfiguration($configurationType);
 
         // find schema files for the given type and path
-        $schemaFileInfos = array();
+        $schemaFileInfos = [];
         $activePackages = $this->packageManager->getActivePackages();
         foreach ($activePackages as $package) {
             $packageKey = $package->getPackageKey();
-            $packageSchemaPath = \TYPO3\Flow\Utility\Files::concatenatePaths(array($package->getResourcesPath(), 'Private/Schema'));
+            $packageSchemaPath = Files::concatenatePaths([$package->getResourcesPath(), 'Private/Schema']);
             if (is_dir($packageSchemaPath)) {
-                $packageSchemaFiles = \TYPO3\Flow\Utility\Files::readDirectoryRecursively($packageSchemaPath, '.schema.yaml');
+                $packageSchemaFiles = Files::readDirectoryRecursively($packageSchemaPath, '.schema.yaml');
                 foreach ($packageSchemaFiles as $schemaFile) {
                     $schemaName = substr($schemaFile, strlen($packageSchemaPath) + 1, -strlen('.schema.yaml'));
                     $schemaNameParts = explode('.', str_replace('/', '.', $schemaName), 2);
@@ -107,12 +113,12 @@ class ConfigurationSchemaValidator
                     $schemaPath = isset($schemaNameParts[1]) ? $schemaNameParts[1] : null;
 
                     if ($schemaType === $configurationType && ($path === null || strpos($schemaPath, $path) === 0)) {
-                        $schemaFileInfos[] = array(
+                        $schemaFileInfos[] = [
                             'file' => $schemaFile,
                             'name' => $schemaName,
                             'path' => $schemaPath,
                             'packageKey' => $packageKey
-                        );
+                        ];
                     }
                 }
             }
@@ -127,15 +133,15 @@ class ConfigurationSchemaValidator
             $loadedSchemaFiles[] = $schemaFileInfo['file'];
 
             if ($schemaFileInfo['path'] !== null) {
-                $data = \TYPO3\Flow\Utility\Arrays::getValueByPath($configuration, $schemaFileInfo['path']);
+                $data = Arrays::getValueByPath($configuration, $schemaFileInfo['path']);
             } else {
                 $data = $configuration;
             }
 
             if (empty($data)) {
-                $result->addNotice(new Notice('No configuration found, skipping schema "%s".', 1364985445, array(substr($schemaFileInfo['file'], strlen(FLOW_PATH_ROOT)))));
+                $result->addNotice(new Notice('No configuration found, skipping schema "%s".', 1364985445, [substr($schemaFileInfo['file'], strlen(FLOW_PATH_ROOT))]));
             } else {
-                $parsedSchema = \Symfony\Component\Yaml\Yaml::parse($schemaFileInfo['file']);
+                $parsedSchema = Yaml::parse($schemaFileInfo['file']);
                 $validationResultForSingleSchema = $this->schemaValidator->validate($data, $parsedSchema);
 
                 if ($schemaFileInfo['path'] !== null) {

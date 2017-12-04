@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\I18n;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * A Configuration instance represents settings to be used with the I18n
@@ -28,7 +31,7 @@ class Configuration
     /**
      * @var array
      */
-    protected $fallbackRule = array('strict' => false, 'order' => array());
+    protected $fallbackRule = ['strict' => false, 'order' => []];
 
     /**
      * Constructs a new configuration object with the given locale identifier to
@@ -40,16 +43,16 @@ class Configuration
     public function __construct($defaultLocaleIdentifier)
     {
         try {
-            $this->defaultLocale = new \TYPO3\Flow\I18n\Locale($defaultLocaleIdentifier);
-        } catch (\TYPO3\Flow\I18n\Exception\InvalidLocaleIdentifierException $exception) {
-            throw new \TYPO3\Flow\I18n\Exception\InvalidLocaleIdentifierException('The default locale identifier "' . $defaultLocaleIdentifier . '" given is invalid.', 1280935191);
+            $this->defaultLocale = new Locale($defaultLocaleIdentifier);
+        } catch (Exception\InvalidLocaleIdentifierException $exception) {
+            throw new Exception\InvalidLocaleIdentifierException('The default locale identifier "' . $defaultLocaleIdentifier . '" given is invalid.', 1280935191);
         }
     }
 
     /**
      * Returns the default locale of this configuration.
      *
-     * @return \TYPO3\Flow\I18n\Locale
+     * @return Locale
      */
     public function getDefaultLocale()
     {
@@ -59,7 +62,7 @@ class Configuration
     /**
      * Sets the current locale of this configuration.
      *
-     * @param \TYPO3\Flow\I18n\Locale $locale
+     * @param Locale $locale
      * @return void
      */
     public function setCurrentLocale(Locale $locale)
@@ -72,11 +75,11 @@ class Configuration
      * no current locale has been set or the set current locale has
      * a language code of "mul".
      *
-     * @return \TYPO3\Flow\I18n\Locale
+     * @return Locale
      */
     public function getCurrentLocale()
     {
-        if (!$this->currentLocale instanceof \TYPO3\Flow\I18n\Locale
+        if (!$this->currentLocale instanceof Locale
             || $this->currentLocale->getLanguage() === 'mul') {
             return $this->defaultLocale;
         }

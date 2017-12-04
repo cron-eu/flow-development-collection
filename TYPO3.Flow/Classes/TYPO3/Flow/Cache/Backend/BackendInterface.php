@@ -1,12 +1,17 @@
 <?php
 namespace TYPO3\Flow\Cache\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Cache\Frontend\FrontendInterface;
 
 /**
  * A contract for a Cache Backend
@@ -18,11 +23,11 @@ interface BackendInterface
     /**
      * Sets a reference to the cache frontend which uses this backend
      *
-     * @param \TYPO3\Flow\Cache\Frontend\FrontendInterface $cache The frontend for this backend
+     * @param FrontendInterface $cache The frontend for this backend
      * @return void
      * @api
      */
-    public function setCache(\TYPO3\Flow\Cache\Frontend\FrontendInterface $cache);
+    public function setCache(FrontendInterface $cache);
 
     /**
      * Returns the internally used, prefixed entry identifier for the given public
@@ -51,7 +56,7 @@ interface BackendInterface
      * @throws \TYPO3\Flow\Cache\Exception\InvalidDataException if $data is not a string
      * @api
      */
-    public function set($entryIdentifier, $data, array $tags = array(), $lifetime = null);
+    public function set($entryIdentifier, $data, array $tags = [], $lifetime = null);
 
     /**
      * Loads data from the cache.

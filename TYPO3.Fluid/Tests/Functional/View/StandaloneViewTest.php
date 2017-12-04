@@ -1,13 +1,17 @@
 <?php
 namespace TYPO3\Fluid\Tests\Functional\View;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Cache\CacheManager;
 use TYPO3\Flow\Http\Request;
 use TYPO3\Flow\Http\Uri;
 use TYPO3\Flow\Mvc\ActionRequest;
@@ -260,5 +264,39 @@ class StandaloneViewTest extends FunctionalTestCase
         $expected = '<foo:bar /><bar:foo></bar:foo><foo.bar:baz />foobar';
         $actual = $standaloneView->render();
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Tests the wrong interceptor behavior described in ticket FLOW-430
+     * Basically the rendering should be consistent regardless of cache flushes,
+     * but due to the way the interceptor configuration was build the second second
+     * rendering was bound to fail, this should never happen.
+     *
+     * @test
+     */
+    public function interceptorsWorkInPartialRenderedInStandaloneSection()
+    {
+        $httpRequest = Request::create(new Uri('http://localhost'));
+        $actionRequest = new ActionRequest($httpRequest);
+        $actionRequest->setFormat('html');
+
+        $standaloneView = new StandaloneView($actionRequest, $this->standaloneViewNonce);
+
+        $standaloneView->assign('hack', '<h1>HACK</h1>');
+        $standaloneView->setTemplatePathAndFilename(__DIR__ . '/Fixtures/NestedRenderingConfiguration/TemplateWithSection.txt');
+
+        $expected = 'Christian uses &lt;h1&gt;HACK&lt;/h1&gt;';
+        $actual = trim($standaloneView->renderSection('test'));
+        $this->assertSame($expected, $actual, 'First rendering was not escaped.');
+
+        // To avoid any side effects we create a separate accessible mock to find the cache identifier for the partial
+        $dummyTemplateView = $this->getAccessibleMock(StandaloneView::class, null, array($actionRequest, $this->standaloneViewNonce));
+        $partialCacheIdentifier = $dummyTemplateView->_call('createIdentifierForFile', __DIR__ . '/Fixtures/NestedRenderingConfiguration/Partials/Test.html', 'partial_Test');
+        $templateCache = $this->objectManager->get(CacheManager::class)->getCache('Fluid_TemplateCache');
+        $templateCache->remove($partialCacheIdentifier);
+
+        $expected = 'Christian uses &lt;h1&gt;HACK&lt;/h1&gt;';
+        $actual = trim($standaloneView->renderSection('test'));
+        $this->assertSame($expected, $actual, 'Second rendering was not escaped.');
     }
 }

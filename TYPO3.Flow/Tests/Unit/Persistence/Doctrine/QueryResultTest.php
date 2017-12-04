@@ -1,21 +1,25 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Persistence\Doctrine;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Persistence\Doctrine\QueryResult;
 use TYPO3\Flow\Persistence\Doctrine\Query;
+use TYPO3\Flow\Persistence\QueryInterface;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for \TYPO3\Flow\Persistence\QueryResult
- *
  */
-class QueryResultTest extends \TYPO3\Flow\Tests\UnitTestCase
+class QueryResultTest extends UnitTestCase
 {
     /**
      * @var QueryResult
@@ -34,7 +38,7 @@ class QueryResultTest extends \TYPO3\Flow\Tests\UnitTestCase
     public function setUp()
     {
         $this->query = $this->getMockBuilder(Query::class)->disableOriginalConstructor()->disableOriginalClone()->getMock();
-        $this->query->expects($this->any())->method('getResult')->will($this->returnValue(array('First result', 'second result', 'third result')));
+        $this->query->expects($this->any())->method('getResult')->will($this->returnValue(['First result', 'second result', 'third result']));
         $this->queryResult = new QueryResult($this->query);
     }
 
@@ -43,7 +47,7 @@ class QueryResultTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function getQueryReturnsQueryObject()
     {
-        $this->assertInstanceOf('TYPO3\Flow\Persistence\QueryInterface', $this->queryResult->getQuery());
+        $this->assertInstanceOf(QueryInterface::class, $this->queryResult->getQuery());
     }
 
     /**

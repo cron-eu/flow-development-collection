@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel\Tests\Unit;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Eel\Context;
 use TYPO3\Eel\CompilingEvaluator;
@@ -17,7 +20,7 @@ use TYPO3\Eel\CompilingEvaluator;
 class CompilingEvaluatorTest extends AbstractEvaluatorTest
 {
     /**
-     * @return \TYPO3\Eel\Context
+     * @return Context
      */
     protected function createEvaluator()
     {
@@ -40,11 +43,11 @@ class CompilingEvaluatorTest extends AbstractEvaluatorTest
      *
      * @param mixed $expected
      * @param string $expression
-     * @param \TYPO3\Eel\Context $context
+     * @param Context $context
      */
     protected function assertEvaluated($expected, $expression, $context)
     {
-        $evaluator = $this->getAccessibleMock('TYPO3\Eel\CompilingEvaluator', array('dummy'));
+        $evaluator = $this->getAccessibleMock(CompilingEvaluator::class, ['dummy']);
         // note, this is not a public method. We should expect expressions coming in here to be trimmed already.
         $code = $evaluator->_call('generateEvaluatorCode', trim($expression));
         $this->assertSame($expected, $evaluator->evaluate($expression, $context), 'Code ' . $code . ' should evaluate to expected result');

@@ -1,27 +1,32 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Property\TypeConverter\BooleanConverter;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for the Boolean converter
- *
  */
-class BooleanConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
+class BooleanConverterTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\Property\TypeConverter\BooleanConverter
+     * @var BooleanConverter
      */
     protected $converter;
 
     public function setUp()
     {
-        $this->converter = new \TYPO3\Flow\Property\TypeConverter\BooleanConverter();
+        $this->converter = new BooleanConverter();
     }
 
     /**
@@ -29,7 +34,7 @@ class BooleanConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function checkMetadata()
     {
-        $this->assertEquals(array('boolean', 'string', 'integer', 'float'), $this->converter->getSupportedSourceTypes(), 'Source types do not match');
+        $this->assertEquals(['boolean', 'string', 'integer', 'float'], $this->converter->getSupportedSourceTypes(), 'Source types do not match');
         $this->assertEquals('boolean', $this->converter->getSupportedTargetType(), 'Target type does not match');
         $this->assertEquals(1, $this->converter->getPriority(), 'Priority does not match');
     }
@@ -63,26 +68,26 @@ class BooleanConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
 
     public function convertFromDataProvider()
     {
-        return array(
-            array('', false),
-            array('0', false),
-            array('1', true),
-            array('false', false),
-            array('true', true),
-            array('some string', true),
-            array('FaLsE', false),
-            array('tRuE', true),
-            array('tRuE', true),
-            array('off', false),
-            array('N', false),
-            array('no', false),
-            array('not no', true),
-            array(true, true),
-            array(false, false),
-            array(1, true),
-            array(0, false),
-            array(1.0, true),
-        );
+        return [
+            ['', false],
+            ['0', false],
+            ['1', true],
+            ['false', false],
+            ['true', true],
+            ['some string', true],
+            ['FaLsE', false],
+            ['tRuE', true],
+            ['tRuE', true],
+            ['off', false],
+            ['N', false],
+            ['no', false],
+            ['not no', true],
+            [true, true],
+            [false, false],
+            [1, true],
+            [0, false],
+            [1.0, true],
+        ];
     }
 
     /**

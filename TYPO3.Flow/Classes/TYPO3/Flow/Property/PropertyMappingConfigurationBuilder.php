@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Property;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -20,17 +23,17 @@ class PropertyMappingConfigurationBuilder
     /**
      * Builds the default property mapping configuration.
      *
-     * @param string $type the implementation class name of the PropertyMappingConfiguration to instantiate; must be a subclass of TYPO3\Flow\Property\PropertyMappingConfiguration
-     * @return \TYPO3\Flow\Property\PropertyMappingConfiguration
+     * @param string $type the implementation class name of the PropertyMappingConfiguration to instantiate; must be a subclass of PropertyMappingConfiguration
+     * @return PropertyMappingConfiguration
      */
-    public function build($type = 'TYPO3\Flow\Property\PropertyMappingConfiguration')
+    public function build($type = PropertyMappingConfiguration::class)
     {
         $configuration = new $type();
 
-        $configuration->setTypeConverterOptions('TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter', array(
-            \TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED => true,
-            \TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter::CONFIGURATION_MODIFICATION_ALLOWED => true
-        ));
+        $configuration->setTypeConverterOptions(TypeConverter\PersistentObjectConverter::class, [
+            TypeConverter\PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED => true,
+            TypeConverter\PersistentObjectConverter::CONFIGURATION_MODIFICATION_ALLOWED => true
+        ]);
         $configuration->allowAllProperties();
 
         return $configuration;

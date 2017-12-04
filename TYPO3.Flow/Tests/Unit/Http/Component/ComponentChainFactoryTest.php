@@ -1,15 +1,17 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Http\Component;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
-use TYPO3\Flow\Http\Component\ComponentChainFactory;
-use TYPO3\Flow\Http\Component\ComponentInterface;
+use TYPO3\Flow\Http;
 use TYPO3\Flow\Object\ObjectManagerInterface;
 use TYPO3\Flow\Tests\UnitTestCase;
 
@@ -19,7 +21,7 @@ use TYPO3\Flow\Tests\UnitTestCase;
 class ComponentChainFactoryTest extends UnitTestCase
 {
     /**
-     * @var ComponentChainFactory
+     * @var Http\Component\ComponentChainFactory
      */
     protected $componentChainFactory;
 
@@ -29,18 +31,18 @@ class ComponentChainFactoryTest extends UnitTestCase
     protected $mockObjectManager;
 
     /**
-     * @var ComponentInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var Http\Component\ComponentInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $mockComponent;
 
     public function setUp()
     {
-        $this->componentChainFactory = new ComponentChainFactory();
+        $this->componentChainFactory = new Http\Component\ComponentChainFactory();
 
-        $this->mockObjectManager = $this->getMockBuilder('TYPO3\Flow\Object\ObjectManagerInterface')->getMock();
+        $this->mockObjectManager = $this->getMockBuilder(ObjectManagerInterface::class)->getMock();
         $this->inject($this->componentChainFactory, 'objectManager', $this->mockObjectManager);
 
-        $this->mockComponent = $this->getMockBuilder('TYPO3\Flow\Http\Component\ComponentInterface')->getMock();
+        $this->mockComponent = $this->getMockBuilder(Http\Component\ComponentInterface::class)->getMock();
     }
 
     /**
@@ -48,19 +50,19 @@ class ComponentChainFactoryTest extends UnitTestCase
      */
     public function createInitializesComponentsInTheRightOrderAccordingToThePositionDirective()
     {
-        $chainConfiguration = array(
-            'foo' => array(
+        $chainConfiguration = [
+            'foo' => [
                 'component' => 'Foo\Component\ClassName',
-            ),
-            'bar' => array(
+            ],
+            'bar' => [
                 'component' => 'Bar\Component\ClassName',
                 'position' => 'before foo',
-            ),
-            'baz' => array(
+            ],
+            'baz' => [
                 'component' => 'Baz\Component\ClassName',
                 'position' => 'after bar'
-            ),
-        );
+            ],
+        ];
 
         $this->mockObjectManager->expects($this->at(0))->method('get')->with('Bar\Component\ClassName')->will($this->returnValue($this->mockComponent));
         $this->mockObjectManager->expects($this->at(1))->method('get')->with('Baz\Component\ClassName')->will($this->returnValue($this->mockComponent));
@@ -75,11 +77,11 @@ class ComponentChainFactoryTest extends UnitTestCase
      */
     public function createThrowsExceptionIfComponentClassNameIsNotConfigured()
     {
-        $chainConfiguration = array(
-            'foo' => array(
+        $chainConfiguration = [
+            'foo' => [
                 'position' => 'start',
-            ),
-        );
+            ],
+        ];
 
         $this->componentChainFactory->create($chainConfiguration);
     }
@@ -90,11 +92,11 @@ class ComponentChainFactoryTest extends UnitTestCase
      */
     public function createThrowsExceptionIfComponentClassNameDoesNotImplementComponentInterface()
     {
-        $chainConfiguration = array(
-            'foo' => array(
+        $chainConfiguration = [
+            'foo' => [
                 'component' => 'Foo\Component\ClassName',
-            ),
-        );
+            ],
+        ];
 
         $this->mockObjectManager->expects($this->at(0))->method('get')->with('Foo\Component\ClassName')->will($this->returnValue(new \stdClass()));
         $this->componentChainFactory->create($chainConfiguration);

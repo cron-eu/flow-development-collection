@@ -1,13 +1,18 @@
 <?php
 namespace TYPO3\Eel\FlowQuery\Operations;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Eel\FlowQuery\FlowQueryException;
+use TYPO3\Eel\FlowQuery\OperationInterface;
 use TYPO3\Flow\Annotations as Flow;
 
 /**
@@ -16,7 +21,7 @@ use TYPO3\Flow\Annotations as Flow;
  *
  * @api
  */
-abstract class AbstractOperation implements \TYPO3\Eel\FlowQuery\OperationInterface
+abstract class AbstractOperation implements OperationInterface
 {
     /**
      * The short name of the operation
@@ -63,12 +68,12 @@ abstract class AbstractOperation implements \TYPO3\Eel\FlowQuery\OperationInterf
     /**
      * @return string the short name of the operation
      * @api
-     * @throws \TYPO3\Eel\FlowQuery\FlowQueryException
+     * @throws FlowQueryException
      */
     public static function getShortName()
     {
         if (!is_string(static::$shortName)) {
-            throw new \TYPO3\Eel\FlowQuery\FlowQueryException('Short name in class ' . __CLASS__ . ' is empty.', 1332488549);
+            throw new FlowQueryException('Short name in class ' . __CLASS__ . ' is empty.', 1332488549);
         }
         return static::$shortName;
     }

@@ -1,21 +1,25 @@
 <?php
 namespace TYPO3\Flow\Persistence\Doctrine;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Persistence\QueryResultInterface;
 
 /**
  * A lazy result list that is returned by Query::execute()
  *
  * @api
  */
-class QueryResult implements \TYPO3\Flow\Persistence\QueryResultInterface
+class QueryResult implements QueryResultInterface
 {
     /**
      * @var array
@@ -30,14 +34,14 @@ class QueryResult implements \TYPO3\Flow\Persistence\QueryResultInterface
     protected $numberOfRows;
 
     /**
-     * @var \TYPO3\Flow\Persistence\Doctrine\Query
+     * @var Query
      */
     protected $query;
 
     /**
-     * @param \TYPO3\Flow\Persistence\Doctrine\Query $query
+     * @param Query $query
      */
-    public function __construct(\TYPO3\Flow\Persistence\Doctrine\Query $query)
+    public function __construct(Query $query)
     {
         $this->query = $query;
     }
@@ -57,7 +61,7 @@ class QueryResult implements \TYPO3\Flow\Persistence\QueryResultInterface
     /**
      * Returns a clone of the query object
      *
-     * @return \TYPO3\Flow\Persistence\Doctrine\Query
+     * @return Query
      * @api
      */
     public function getQuery()

@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Session;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -25,7 +28,7 @@ interface SessionManagerInterface
      * Returns the currently active session which stores session data for the
      * current HTTP request on this local system.
      *
-     * @return \TYPO3\Flow\Session\SessionInterface
+     * @return SessionInterface
      * @api
      */
     public function getCurrentSession();
@@ -35,7 +38,7 @@ interface SessionManagerInterface
      * NULL is returned.
      *
      * @param string $sessionIdentifier The session identifier
-     * @return \TYPO3\Flow\Session\SessionInterface
+     * @return SessionInterface
      * @api
      */
     public function getSession($sessionIdentifier);
@@ -43,7 +46,7 @@ interface SessionManagerInterface
     /**
      * Returns all active sessions, even remote ones.
      *
-     * @return array<\TYPO3\Flow\Session\Session>
+     * @return array<Session>
      * @api
      */
     public function getActiveSessions();

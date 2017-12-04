@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\I18n;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -83,7 +86,7 @@ class Locale
      *
      * @param string $localeIdentifier A valid locale identifier according to UTS#35
      * @throws \InvalidArgumentException When argument is not a string
-     * @throws \TYPO3\Flow\I18n\Exception\InvalidLocaleIdentifierException If the locale identifier is not valid
+     * @throws Exception\InvalidLocaleIdentifierException If the locale identifier is not valid
      * @api
      */
     public function __construct($localeIdentifier)
@@ -92,7 +95,7 @@ class Locale
             throw new \InvalidArgumentException('A locale identifier must be of type string, ' . gettype($localeIdentifier) . ' given.', 1221216120);
         }
         if (preg_match(self::PATTERN_MATCH_LOCALEIDENTIFIER, $localeIdentifier, $matches) !== 1) {
-            throw new \TYPO3\Flow\I18n\Exception\InvalidLocaleIdentifierException('"' . $localeIdentifier . '" is not a valid locale identifier.', 1221137814);
+            throw new Exception\InvalidLocaleIdentifierException('"' . $localeIdentifier . '" is not a valid locale identifier.', 1221137814);
         }
 
         $this->language = strtolower($matches['language']);

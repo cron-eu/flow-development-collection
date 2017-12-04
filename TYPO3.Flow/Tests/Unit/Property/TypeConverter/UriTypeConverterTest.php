@@ -1,21 +1,28 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Property\TypeConverter\UriTypeConverter;
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\Http;
+use TYPO3\Flow\Error as FlowError;
 
 /**
  * Testcase for the URI type converter
- *
  */
-class UriTypeConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
+class UriTypeConverterTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\Property\TypeConverter\UriTypeConverter
+     * @var UriTypeConverter
      */
     protected $typeConverter;
 
@@ -24,7 +31,7 @@ class UriTypeConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->typeConverter = new \TYPO3\Flow\Property\TypeConverter\UriTypeConverter();
+        $this->typeConverter = new UriTypeConverter();
     }
 
     /**
@@ -42,7 +49,7 @@ class UriTypeConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function targetTypeIsUri()
     {
-        $this->assertSame('TYPO3\Flow\Http\Uri', $this->typeConverter->getSupportedTargetType());
+        $this->assertSame(Http\Uri::class, $this->typeConverter->getSupportedTargetType());
     }
 
     /**
@@ -50,7 +57,7 @@ class UriTypeConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function typeConverterReturnsUriOnValidUri()
     {
-        $this->assertInstanceOf('TYPO3\Flow\Http\Uri', $this->typeConverter->convertFrom('http://localhost/foo', 'TYPO3\Flow\Http\Uri'));
+        $this->assertInstanceOf(Http\Uri::class, $this->typeConverter->convertFrom('http://localhost/foo', Http\Uri::class));
     }
 
     /**
@@ -58,7 +65,7 @@ class UriTypeConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function typeConverterReturnsErrorOnMalformedUri()
     {
-        $actual = $this->typeConverter->convertFrom('http:////localhost', 'TYPO3\Flow\Http\Uri');
-        $this->assertInstanceOf('TYPO3\Flow\Error\Error', $actual);
+        $actual = $this->typeConverter->convertFrom('http:////localhost', Http\Uri::class);
+        $this->assertInstanceOf(FlowError\Error::class, $actual);
     }
 }

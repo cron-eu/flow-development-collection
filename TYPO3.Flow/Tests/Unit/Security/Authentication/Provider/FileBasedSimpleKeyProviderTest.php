@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Security\Authentication\Provider;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Security\Authentication\Provider\FileBasedSimpleKeyProvider;
 use TYPO3\Flow\Security\Authentication\Token\PasswordToken;
@@ -60,13 +63,13 @@ class FileBasedSimpleKeyProviderTest extends UnitTestCase
 
     public function setUp()
     {
-        $this->mockRole = $this->getMockBuilder('TYPO3\Flow\Security\Policy\Role')->disableOriginalConstructor()->getMock();
+        $this->mockRole = $this->getMockBuilder(Role::class)->disableOriginalConstructor()->getMock();
         $this->mockRole->expects($this->any())->method('getIdentifier')->will($this->returnValue('TYPO3.Flow:TestRoleIdentifier'));
 
-        $this->mockPolicyService = $this->getMockBuilder('TYPO3\Flow\Security\Policy\PolicyService')->disableOriginalConstructor()->getMock();
+        $this->mockPolicyService = $this->getMockBuilder(PolicyService::class)->disableOriginalConstructor()->getMock();
         $this->mockPolicyService->expects($this->any())->method('getRole')->with('TYPO3.Flow:TestRoleIdentifier')->will($this->returnValue($this->mockRole));
 
-        $this->mockHashService = $this->getMockBuilder('TYPO3\Flow\Security\Cryptography\HashService')->disableOriginalConstructor()->getMock();
+        $this->mockHashService = $this->getMockBuilder(HashService::class)->disableOriginalConstructor()->getMock();
 
         $expectedPassword = $this->testKeyClearText;
         $expectedHashedPasswordAndSalt = $this->testKeyHashed;
@@ -74,10 +77,10 @@ class FileBasedSimpleKeyProviderTest extends UnitTestCase
             return $hashedPasswordAndSalt === $expectedHashedPasswordAndSalt && $password === $expectedPassword;
         }));
 
-        $this->mockFileBasedSimpleKeyService = $this->getMockBuilder('TYPO3\Flow\Security\Cryptography\FileBasedSimpleKeyService')->disableOriginalConstructor()->getMock();
+        $this->mockFileBasedSimpleKeyService = $this->getMockBuilder(FileBasedSimpleKeyService::class)->disableOriginalConstructor()->getMock();
         $this->mockFileBasedSimpleKeyService->expects($this->any())->method('getKey')->with('testKey')->will($this->returnValue($this->testKeyHashed));
 
-        $this->mockToken = $this->getMockBuilder('TYPO3\Flow\Security\Authentication\Token\PasswordToken')->disableOriginalConstructor()->getMock();
+        $this->mockToken = $this->getMockBuilder(PasswordToken::class)->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -85,10 +88,10 @@ class FileBasedSimpleKeyProviderTest extends UnitTestCase
      */
     public function authenticatingAPasswordTokenChecksIfTheGivenClearTextPasswordMatchesThePersistedHashedPassword()
     {
-        $this->mockToken->expects($this->once())->method('getCredentials')->will($this->returnValue(array('password' => $this->testKeyClearText)));
+        $this->mockToken->expects($this->once())->method('getCredentials')->will($this->returnValue(['password' => $this->testKeyClearText]));
         $this->mockToken->expects($this->once())->method('setAuthenticationStatus')->with(TokenInterface::AUTHENTICATION_SUCCESSFUL);
 
-        $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider', array('keyName' => 'testKey', 'authenticateRoles' => array('TYPO3.Flow:TestRoleIdentifier')));
+        $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider', ['keyName' => 'testKey', 'authenticateRoles' => ['TYPO3.Flow:TestRoleIdentifier']]);
         $this->inject($authenticationProvider, 'policyService', $this->mockPolicyService);
         $this->inject($authenticationProvider, 'hashService', $this->mockHashService);
         $this->inject($authenticationProvider, 'fileBasedSimpleKeyService', $this->mockFileBasedSimpleKeyService);
@@ -101,10 +104,10 @@ class FileBasedSimpleKeyProviderTest extends UnitTestCase
      */
     public function authenticationAddsAnAccountHoldingTheConfiguredRoles()
     {
-        $this->mockToken = $this->getMockBuilder('TYPO3\Flow\Security\Authentication\Token\PasswordToken')->disableOriginalConstructor()->setMethods(array('getCredentials'))->getMock();
-        $this->mockToken->expects($this->once())->method('getCredentials')->will($this->returnValue(array('password' => $this->testKeyClearText)));
+        $this->mockToken = $this->getMockBuilder(PasswordToken::class)->disableOriginalConstructor()->setMethods(['getCredentials'])->getMock();
+        $this->mockToken->expects($this->once())->method('getCredentials')->will($this->returnValue(['password' => $this->testKeyClearText]));
 
-        $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider', array('keyName' => 'testKey', 'authenticateRoles' => array('TYPO3.Flow:TestRoleIdentifier')));
+        $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider', ['keyName' => 'testKey', 'authenticateRoles' => ['TYPO3.Flow:TestRoleIdentifier']]);
         $this->inject($authenticationProvider, 'policyService', $this->mockPolicyService);
         $this->inject($authenticationProvider, 'hashService', $this->mockHashService);
         $this->inject($authenticationProvider, 'fileBasedSimpleKeyService', $this->mockFileBasedSimpleKeyService);
@@ -120,10 +123,10 @@ class FileBasedSimpleKeyProviderTest extends UnitTestCase
      */
     public function authenticationFailsWithWrongCredentialsInAPasswordToken()
     {
-        $this->mockToken->expects($this->once())->method('getCredentials')->will($this->returnValue(array('password' => 'wrong password')));
+        $this->mockToken->expects($this->once())->method('getCredentials')->will($this->returnValue(['password' => 'wrong password']));
         $this->mockToken->expects($this->once())->method('setAuthenticationStatus')->with(TokenInterface::WRONG_CREDENTIALS);
 
-        $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider', array('keyName' => 'testKey', 'authenticateRoles' => array('TYPO3.Flow:TestRoleIdentifier')));
+        $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider', ['keyName' => 'testKey', 'authenticateRoles' => ['TYPO3.Flow:TestRoleIdentifier']]);
         $this->inject($authenticationProvider, 'policyService', $this->mockPolicyService);
         $this->inject($authenticationProvider, 'hashService', $this->mockHashService);
         $this->inject($authenticationProvider, 'fileBasedSimpleKeyService', $this->mockFileBasedSimpleKeyService);
@@ -136,10 +139,10 @@ class FileBasedSimpleKeyProviderTest extends UnitTestCase
      */
     public function authenticationIsSkippedIfNoCredentialsInAPasswordToken()
     {
-        $this->mockToken->expects($this->once())->method('getCredentials')->will($this->returnValue(array()));
+        $this->mockToken->expects($this->once())->method('getCredentials')->will($this->returnValue([]));
         $this->mockToken->expects($this->once())->method('setAuthenticationStatus')->with(TokenInterface::NO_CREDENTIALS_GIVEN);
 
-        $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider', array('keyName' => 'testKey', 'authenticateRoles' => array('TYPO3.Flow:TestRoleIdentifier')));
+        $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider', ['keyName' => 'testKey', 'authenticateRoles' => ['TYPO3.Flow:TestRoleIdentifier']]);
         $this->inject($authenticationProvider, 'policyService', $this->mockPolicyService);
         $this->inject($authenticationProvider, 'hashService', $this->mockHashService);
         $this->inject($authenticationProvider, 'fileBasedSimpleKeyService', $this->mockFileBasedSimpleKeyService);
@@ -153,7 +156,7 @@ class FileBasedSimpleKeyProviderTest extends UnitTestCase
     public function getTokenClassNameReturnsCorrectClassNames()
     {
         $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider');
-        $this->assertSame($authenticationProvider->getTokenClassNames(), array('TYPO3\Flow\Security\Authentication\Token\PasswordToken'));
+        $this->assertSame($authenticationProvider->getTokenClassNames(), [PasswordToken::class]);
     }
 
     /**
@@ -162,7 +165,7 @@ class FileBasedSimpleKeyProviderTest extends UnitTestCase
      */
     public function authenticatingAnUnsupportedTokenThrowsAnException()
     {
-        $someInvalidToken = $this->getMock('TYPO3\Flow\Security\Authentication\TokenInterface');
+        $someInvalidToken = $this->createMock(TokenInterface::class);
 
         $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider');
 
@@ -174,9 +177,9 @@ class FileBasedSimpleKeyProviderTest extends UnitTestCase
      */
     public function canAuthenticateReturnsTrueOnlyForAnTokenThatHasTheCorrectProviderNameSet()
     {
-        $mockToken1 = $this->getMock('TYPO3\Flow\Security\Authentication\TokenInterface');
+        $mockToken1 = $this->createMock(TokenInterface::class);
         $mockToken1->expects($this->once())->method('getAuthenticationProviderName')->will($this->returnValue('myProvider'));
-        $mockToken2 = $this->getMock('TYPO3\Flow\Security\Authentication\TokenInterface');
+        $mockToken2 = $this->createMock(TokenInterface::class);
         $mockToken2->expects($this->once())->method('getAuthenticationProviderName')->will($this->returnValue('someOtherProvider'));
 
         $authenticationProvider = new FileBasedSimpleKeyProvider('myProvider');

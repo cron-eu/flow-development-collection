@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Fluid\Tests\Unit\Core\Parser\SyntaxTree;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * Testcase for ObjectAccessorNode
@@ -19,7 +22,7 @@ class ObjectAccessorNodeTest extends \TYPO3\Flow\Tests\UnitTestCase
     public function evaluateGetsPropertyPathFromVariableContainer()
     {
         $node = new \TYPO3\Fluid\Core\Parser\SyntaxTree\ObjectAccessorNode('foo.bar');
-        $renderingContext = $this->getMock('TYPO3\Fluid\Core\Rendering\RenderingContextInterface');
+        $renderingContext = $this->createMock('TYPO3\Fluid\Core\Rendering\RenderingContextInterface');
         $variableContainer = new \TYPO3\Fluid\Core\ViewHelper\TemplateVariableContainer(array(
             'foo' => array(
                 'bar' => 'some value'
@@ -38,8 +41,8 @@ class ObjectAccessorNodeTest extends \TYPO3\Flow\Tests\UnitTestCase
     public function evaluateCallsObjectAccessOnSubjectWithTemplateObjectAccessInterface()
     {
         $node = new \TYPO3\Fluid\Core\Parser\SyntaxTree\ObjectAccessorNode('foo.bar');
-        $renderingContext = $this->getMock('TYPO3\Fluid\Core\Rendering\RenderingContextInterface');
-        $templateObjectAcessValue = $this->getMock('TYPO3\Fluid\Core\Parser\SyntaxTree\TemplateObjectAccessInterface');
+        $renderingContext = $this->createMock('TYPO3\Fluid\Core\Rendering\RenderingContextInterface');
+        $templateObjectAcessValue = $this->createMock('TYPO3\Fluid\Core\Parser\SyntaxTree\TemplateObjectAccessInterface');
         $variableContainer = new \TYPO3\Fluid\Core\ViewHelper\TemplateVariableContainer(array(
             'foo' => array(
                 'bar' => $templateObjectAcessValue

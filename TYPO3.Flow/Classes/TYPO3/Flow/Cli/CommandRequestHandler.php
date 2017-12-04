@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Cli;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Core\Bootstrap;
+use TYPO3\Flow\Core\LockManager;
 use TYPO3\Flow\Core\RequestHandlerInterface;
 use TYPO3\Flow\Mvc\Dispatcher;
 use TYPO3\Flow\Object\ObjectManagerInterface;
@@ -91,15 +95,15 @@ class CommandRequestHandler implements RequestHandlerInterface
         $runLevel = $this->bootstrap->isCompiletimeCommand(isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '') ? Bootstrap::RUNLEVEL_COMPILETIME : Bootstrap::RUNLEVEL_RUNTIME;
         $this->boot($runLevel);
 
-        $commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
-        $this->request = $this->objectManager->get('TYPO3\Flow\Cli\RequestBuilder')->build(array_slice($commandLine, 1));
+        $commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
+        $this->request = $this->objectManager->get(RequestBuilder::class)->build(array_slice($commandLine, 1));
         $this->response = new Response();
 
         $this->exitIfCompiletimeCommandWasNotCalledCorrectly($runLevel);
 
         if ($runLevel === Bootstrap::RUNLEVEL_RUNTIME) {
             /** @var Context $securityContext */
-            $securityContext = $this->objectManager->get('TYPO3\Flow\Security\Context');
+            $securityContext = $this->objectManager->get(Context::class);
             $securityContext->withoutAuthorizationChecks(function () {
                 $this->dispatcher->dispatch($this->request, $this->response);
             });
@@ -130,7 +134,7 @@ class CommandRequestHandler implements RequestHandlerInterface
         if ($this->bootstrap->isCompiletimeCommand($command->getCommandIdentifier())) {
             $this->response->appendContent(sprintf(
                 "<b>Unrecognized Command</b>\n\n" .
-                "Sorry, but he command \"%s\" must be specified by its full command\n" .
+                "Sorry, but the command \"%s\" must be specified by its full command\n" .
                 "identifier because it is a compile time command which cannot be resolved\n" .
                 "from an abbreviated command identifier.\n\n",
                 $command->getCommandIdentifier())
@@ -155,7 +159,7 @@ class CommandRequestHandler implements RequestHandlerInterface
         $sequence->invoke($this->bootstrap);
 
         $this->objectManager = $this->bootstrap->getObjectManager();
-        $this->dispatcher = $this->objectManager->get('TYPO3\Flow\Mvc\Dispatcher');
+        $this->dispatcher = $this->objectManager->get(Dispatcher::class);
     }
 
     /**
@@ -168,7 +172,7 @@ class CommandRequestHandler implements RequestHandlerInterface
     {
         $this->bootstrap->shutdown($runlevel);
         if ($runlevel === Bootstrap::RUNLEVEL_COMPILETIME) {
-            $this->objectManager->get('TYPO3\Flow\Core\LockManager')->unlockSite();
+            $this->objectManager->get(LockManager::class)->unlockSite();
         }
         exit($this->response->getExitCode());
     }

@@ -1,21 +1,26 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\I18n\Parser;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\I18n;
 
 /**
  * Testcase for the DatetimeParser
- *
  */
-class DatetimeParserTest extends \TYPO3\Flow\Tests\UnitTestCase
+class DatetimeParserTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\I18n\Locale
+     * @var I18n\Locale
      */
     protected $sampleLocale;
 
@@ -30,7 +35,7 @@ class DatetimeParserTest extends \TYPO3\Flow\Tests\UnitTestCase
      *
      * @var array
      */
-    protected $datetimeAttributesTemplate = array(
+    protected $datetimeAttributesTemplate = [
         'year' => null,
         'month' => null,
         'day' => null,
@@ -38,14 +43,14 @@ class DatetimeParserTest extends \TYPO3\Flow\Tests\UnitTestCase
         'minute' => null,
         'second' => null,
         'timezone' => null,
-    );
+    ];
 
     /**
      * @return void
      */
     public function setUp()
     {
-        $this->sampleLocale = new \TYPO3\Flow\I18n\Locale('en_GB');
+        $this->sampleLocale = new I18n\Locale('en_GB');
         $this->sampleLocalizedLiterals = require(__DIR__ . '/../Fixtures/MockLocalizedLiteralsArray.php');
     }
 
@@ -60,11 +65,11 @@ class DatetimeParserTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function sampleDatetimesEasyToParse()
     {
-        return array(
-            array(\TYPO3\Flow\I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_DATE, '1988.11.19 AD', 'yyyy.MM.dd G', array_merge($this->datetimeAttributesTemplate, array('year' => 1988, 'month' => 11, 'day' => 19)), array('yyyy', array('.'), 'MM', array('.'), 'dd', array(' '), 'G')),
-            array(\TYPO3\Flow\I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_TIME, '10:00:59', 'HH:mm:ss', array_merge($this->datetimeAttributesTemplate, array('hour' => 10, 'minute' => 0, 'second' => 59)), array('HH', array(':'), 'mm', array(':'), 'ss')),
-            array(\TYPO3\Flow\I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_TIME, '3 p.m. Europe/Berlin', 'h a zzzz', array_merge($this->datetimeAttributesTemplate, array('hour' => 15, 'timezone' => 'Europe/Berlin')), array('h', array(' '), 'a', array(' '),'zzzz')),
-        );
+        return [
+            [I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_DATE, '1988.11.19 AD', 'yyyy.MM.dd G', array_merge($this->datetimeAttributesTemplate, ['year' => 1988, 'month' => 11, 'day' => 19]), ['yyyy', ['.'], 'MM', ['.'], 'dd', [' '], 'G']],
+            [I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_TIME, '10:00:59', 'HH:mm:ss', array_merge($this->datetimeAttributesTemplate, ['hour' => 10, 'minute' => 0, 'second' => 59]), ['HH', [':'], 'mm', [':'], 'ss']],
+            [I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_TIME, '3 p.m. Europe/Berlin', 'h a zzzz', array_merge($this->datetimeAttributesTemplate, ['hour' => 15, 'timezone' => 'Europe/Berlin']), ['h', [' '], 'a', [' '],'zzzz']],
+        ];
     }
 
     /**
@@ -76,11 +81,11 @@ class DatetimeParserTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function sampleDatetimesHardToParse()
     {
-        return array(
-            array(\TYPO3\Flow\I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_DATE, 'foo 2010/07 /30th', 'y.M.d', array_merge($this->datetimeAttributesTemplate, array('year' => 2010, 'month' => 7, 'day' => 30)), array('y', array('.'), 'M', array('.'), 'd')),
-            array(\TYPO3\Flow\I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_DATE, 'Jun foo 99 Europe/Berlin', 'MMMyyz', array_merge($this->datetimeAttributesTemplate, array('year' => 99, 'month' => 6, 'timezone' => 'Europe/Berlin')), array('MMM', 'yy', 'z')),
-            array(\TYPO3\Flow\I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_TIME, '24:11 CEST', 'K:m zzzz', array_merge($this->datetimeAttributesTemplate, array('hour' => 0, 'minute' => 11, 'timezone' => 'CEST')), array('K', array(':'), 'm', array(' '), 'zzzz')),
-        );
+        return [
+            [I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_DATE, 'foo 2010/07 /30th', 'y.M.d', array_merge($this->datetimeAttributesTemplate, ['year' => 2010, 'month' => 7, 'day' => 30]), ['y', ['.'], 'M', ['.'], 'd']],
+            [I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_DATE, 'Jun foo 99 Europe/Berlin', 'MMMyyz', array_merge($this->datetimeAttributesTemplate, ['year' => 99, 'month' => 6, 'timezone' => 'Europe/Berlin']), ['MMM', 'yy', 'z']],
+            [I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_TIME, '24:11 CEST', 'K:m zzzz', array_merge($this->datetimeAttributesTemplate, ['hour' => 0, 'minute' => 11, 'timezone' => 'CEST']), ['K', [':'], 'm', [' '], 'zzzz']],
+        ];
     }
 
     /**
@@ -89,7 +94,7 @@ class DatetimeParserTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function strictParsingWorksCorrectlyForEasyDatetimes($formatType, $datetimeToParse, $stringFormat, $expectedParsedDatetime, array $parsedFormat)
     {
-        $parser = $this->getAccessibleMock('TYPO3\Flow\I18n\Parser\DatetimeParser', array('dummy'));
+        $parser = $this->getAccessibleMock(I18n\Parser\DatetimeParser::class, ['dummy']);
         $result = $parser->_call('doParsingInStrictMode', $datetimeToParse, $parsedFormat, $this->sampleLocalizedLiterals);
         $this->assertEquals($expectedParsedDatetime, $result);
     }
@@ -100,7 +105,7 @@ class DatetimeParserTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function strictParsingReturnsFalseForHardDatetimes($formatType, $datetimeToParse, $stringFormat, $expectedParsedDatetime, array $parsedFormat)
     {
-        $parser = $this->getAccessibleMock('TYPO3\Flow\I18n\Parser\DatetimeParser', array('dummy'));
+        $parser = $this->getAccessibleMock(I18n\Parser\DatetimeParser::class, ['dummy']);
         $result = $parser->_call('doParsingInStrictMode', $datetimeToParse, $parsedFormat, $this->sampleLocalizedLiterals);
         $this->assertEquals(false, $result);
     }
@@ -111,7 +116,7 @@ class DatetimeParserTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function lenientParsingWorksCorrectlyForEasyDatetimes($formatType, $datetimeToParse, $stringFormat, $expectedParsedDatetime, array $parsedFormat)
     {
-        $parser = $this->getAccessibleMock('TYPO3\Flow\I18n\Parser\DatetimeParser', array('dummy'));
+        $parser = $this->getAccessibleMock(I18n\Parser\DatetimeParser::class, ['dummy']);
         $result = $parser->_call('doParsingInLenientMode', $datetimeToParse, $parsedFormat, $this->sampleLocalizedLiterals);
         $this->assertEquals($expectedParsedDatetime, $result);
     }
@@ -122,7 +127,7 @@ class DatetimeParserTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function lenientParsingWorksCorrectlyForHardDatetimes($formatType, $datetimeToParse, $stringFormat, $expectedParsedDatetime, array $parsedFormat)
     {
-        $parser = $this->getAccessibleMock('TYPO3\Flow\I18n\Parser\DatetimeParser', array('dummy'));
+        $parser = $this->getAccessibleMock(I18n\Parser\DatetimeParser::class, ['dummy']);
         $result = $parser->_call('doParsingInLenientMode', $datetimeToParse, $parsedFormat, $this->sampleLocalizedLiterals);
         $this->assertEquals($expectedParsedDatetime, $result);
     }

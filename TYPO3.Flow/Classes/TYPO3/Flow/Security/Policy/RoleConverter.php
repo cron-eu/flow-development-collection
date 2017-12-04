@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Security\Policy;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Property\PropertyMappingConfigurationInterface;
@@ -24,12 +27,12 @@ class RoleConverter extends AbstractTypeConverter
     /**
      * @var array
      */
-    protected $sourceTypes = array('string');
+    protected $sourceTypes = ['string'];
 
     /**
      * @var string
      */
-    protected $targetType = 'TYPO3\Flow\Security\Policy\Role';
+    protected $targetType = Role::class;
 
     /**
      * @var integer
@@ -51,12 +54,12 @@ class RoleConverter extends AbstractTypeConverter
      * @param PropertyMappingConfigurationInterface $configuration
      * @return object the target type
      */
-    public function convertFrom($source, $targetType, array $convertedChildProperties = array(), PropertyMappingConfigurationInterface $configuration = null)
+    public function convertFrom($source, $targetType, array $convertedChildProperties = [], PropertyMappingConfigurationInterface $configuration = null)
     {
         try {
             $role = $this->policyService->getRole($source);
         } catch (NoSuchRoleException $exception) {
-            return new Error('Could not find a role with the identifier "%s".', 1397212327, array($source));
+            return new Error('Could not find a role with the identifier "%s".', 1397212327, [$source]);
         }
         return $role;
     }

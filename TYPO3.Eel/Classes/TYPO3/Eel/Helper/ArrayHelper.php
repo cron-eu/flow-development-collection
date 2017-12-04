@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel\Helper;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Eel\ProtectedContextAwareInterface;
@@ -36,7 +39,7 @@ class ArrayHelper implements ProtectedContextAwareInterface
         $arguments = func_get_args();
         foreach ($arguments as &$argument) {
             if (!is_array($argument)) {
-                $argument = array($argument);
+                $argument = [$argument];
             }
         }
         return call_user_func_array('array_merge', $arguments);
@@ -165,7 +168,7 @@ class ArrayHelper implements ProtectedContextAwareInterface
      */
     public function random(array $array)
     {
-        if ($array === array()) {
+        if ($array === []) {
             return null;
         }
         $randomIndex = array_rand($array);
@@ -185,12 +188,12 @@ class ArrayHelper implements ProtectedContextAwareInterface
      */
     public function sort(array $array)
     {
-        if ($array === array()) {
+        if ($array === []) {
             return $array;
         }
         natsort($array);
         $i = 0;
-        $newArray = array();
+        $newArray = [];
         foreach ($array as $key => $value) {
             if (is_string($key)) {
                 $newArray[$key] = $value;
@@ -214,13 +217,13 @@ class ArrayHelper implements ProtectedContextAwareInterface
      */
     public function shuffle(array $array, $preserveKeys = true)
     {
-        if ($array === array()) {
+        if ($array === []) {
             return $array;
         }
         if ($preserveKeys) {
             $keys = array_keys($array);
             shuffle($keys);
-            $shuffledArray = array();
+            $shuffledArray = [];
             foreach ($keys as $key) {
                 $shuffledArray[$key] = $array[$key];
             }
@@ -243,7 +246,7 @@ class ArrayHelper implements ProtectedContextAwareInterface
      */
     public function pop(array $array)
     {
-        if ($array === array()) {
+        if ($array === []) {
             return $array;
         }
         array_pop($array);

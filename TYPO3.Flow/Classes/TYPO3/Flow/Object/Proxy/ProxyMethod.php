@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Object\Proxy;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Doctrine\ORM\Mapping as ORM;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Reflection\ReflectionService;
 
 /**
  * Representation of a method within a proxy class
@@ -63,7 +67,7 @@ class ProxyMethod
     public $methodBody = '';
 
     /**
-     * @var \TYPO3\Flow\Reflection\ReflectionService
+     * @var ReflectionService
      */
     protected $reflectionService;
 
@@ -82,10 +86,10 @@ class ProxyMethod
     /**
      * Injects the Reflection Service
      *
-     * @param \TYPO3\Flow\Reflection\ReflectionService $reflectionService
+     * @param ReflectionService $reflectionService
      * @return void
      */
-    public function injectReflectionService(\TYPO3\Flow\Reflection\ReflectionService $reflectionService)
+    public function injectReflectionService(ReflectionService $reflectionService)
     {
         $this->reflectionService = $reflectionService;
     }
@@ -195,7 +199,7 @@ class ProxyMethod
 
         if ($this->reflectionService->hasMethod($className, $methodName)) {
             $methodTags = $this->reflectionService->getMethodTagsValues($className, $methodName);
-            $allowedTags = array('param', 'return', 'throws');
+            $allowedTags = ['param', 'return', 'throws'];
             foreach ($methodTags as $tag => $values) {
                 if (in_array($tag, $allowedTags)) {
                     if (count($values) === 0) {
@@ -209,7 +213,7 @@ class ProxyMethod
             }
             $methodAnnotations = $this->reflectionService->getMethodAnnotations($className, $methodName);
             foreach ($methodAnnotations as $annotation) {
-                $methodDocumentation .= '	 * ' . \TYPO3\Flow\Object\Proxy\Compiler::renderAnnotation($annotation) . "\n";
+                $methodDocumentation .= '	 * ' . Compiler::renderAnnotation($annotation) . "\n";
             }
         }
 

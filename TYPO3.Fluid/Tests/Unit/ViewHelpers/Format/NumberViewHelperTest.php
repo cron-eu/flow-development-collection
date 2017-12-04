@@ -1,26 +1,39 @@
 <?php
 namespace TYPO3\Fluid\Tests\Unit\ViewHelpers\Format;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * Test for \TYPO3\Fluid\ViewHelpers\Format\NumberViewHelper
  */
 class NumberViewHelperTest extends \TYPO3\Flow\Tests\UnitTestCase
 {
+
+    /**
+     * @var \TYPO3\Fluid\ViewHelpers\Format\NumberViewHelper
+     */
+    protected $viewHelper;
+
+    public function setUp()
+    {
+        $this->viewHelper = $this->getMockBuilder('TYPO3\Fluid\ViewHelpers\Format\NumberViewHelper')->setMethods(array('renderChildren'))->getMock();
+    }
+
     /**
      * @test
      */
     public function formatNumberDefaultsToEnglishNotationWithTwoDecimals()
     {
-        $viewHelper = $this->getMock('TYPO3\Fluid\ViewHelpers\Format\NumberViewHelper', array('renderChildren'));
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(10000.0 / 3.0));
-        $actualResult = $viewHelper->render();
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(10000.0 / 3.0));
+        $actualResult = $this->viewHelper->render();
         $this->assertEquals('3,333.33', $actualResult);
     }
 
@@ -29,9 +42,8 @@ class NumberViewHelperTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function formatNumberWithDecimalsDecimalPointAndSeparator()
     {
-        $viewHelper = $this->getMock('TYPO3\Fluid\ViewHelpers\Format\NumberViewHelper', array('renderChildren'));
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(10000.0 / 3.0));
-        $actualResult = $viewHelper->render(3, ',', '.');
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(10000.0 / 3.0));
+        $actualResult = $this->viewHelper->render(3, ',', '.');
         $this->assertEquals('3.333,333', $actualResult);
     }
 
@@ -40,13 +52,12 @@ class NumberViewHelperTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function viewHelperUsesNumberFormatterOnGivenLocale()
     {
-        $numberFormatterMock = $this->getMock('TYPO3\Flow\I18n\Formatter\NumberFormatter', array('formatDecimalNumber'));
-        $numberFormatterMock->expects($this->once())->method('formatDecimalNumber');
+        $mockNumberFormatter = $this->getMockBuilder('TYPO3\Flow\I18n\Formatter\NumberFormatter')->setMethods(array('formatDecimalNumber'))->getMock();
+        $mockNumberFormatter->expects($this->once())->method('formatDecimalNumber');
 
-        $viewHelper = $this->getAccessibleMock('TYPO3\Fluid\ViewHelpers\Format\NumberViewHelper', array('renderChildren'));
-        $viewHelper->_set('numberFormatter', $numberFormatterMock);
-        $viewHelper->setArguments(array('forceLocale' => 'de_DE'));
-        $viewHelper->render(2, '#', '*');
+        $this->inject($this->viewHelper, 'numberFormatter', $mockNumberFormatter);
+        $this->viewHelper->setArguments(array('forceLocale' => 'de_DE'));
+        $this->viewHelper->render(2, '#', '*');
     }
 
     /**
@@ -54,21 +65,19 @@ class NumberViewHelperTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function viewHelperFetchesCurrentLocaleViaI18nService()
     {
-        $viewHelper = $this->getAccessibleMock('TYPO3\Fluid\ViewHelpers\Format\NumberViewHelper', array('renderChildren'));
-
         $localizationConfiguration = new \TYPO3\Flow\I18n\Configuration('de_DE');
 
-        $mockLocalizationService = $this->getMock('TYPO3\Flow\I18n\Service', array('getConfiguration'));
+        $mockLocalizationService = $this->getMockBuilder('TYPO3\Flow\I18n\Service')->setMethods(array('getConfiguration'))->getMock();
         $mockLocalizationService->expects($this->once())->method('getConfiguration')->will($this->returnValue($localizationConfiguration));
-        $this->inject($viewHelper, 'localizationService', $mockLocalizationService);
+        $this->inject($this->viewHelper, 'localizationService', $mockLocalizationService);
 
-        $mockNumberFormatter = $this->getMock('TYPO3\Flow\I18n\Formatter\NumberFormatter', array('formatDecimalNumber'));
+        $mockNumberFormatter = $this->getMockBuilder('TYPO3\Flow\I18n\Formatter\NumberFormatter')->setMethods(array('formatDecimalNumber'))->getMock();
         $mockNumberFormatter->expects($this->once())->method('formatDecimalNumber');
-        $this->inject($viewHelper, 'numberFormatter', $mockNumberFormatter);
+        $this->inject($this->viewHelper, 'numberFormatter', $mockNumberFormatter);
 
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
-        $viewHelper->setArguments(array('forceLocale' => true));
-        $viewHelper->render();
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
+        $this->viewHelper->setArguments(array('forceLocale' => true));
+        $this->viewHelper->render();
     }
 
     /**
@@ -77,20 +86,18 @@ class NumberViewHelperTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function viewHelperConvertsI18nExceptionsIntoViewHelperExceptions()
     {
-        $viewHelper = $this->getAccessibleMock('TYPO3\Fluid\ViewHelpers\Format\NumberViewHelper', array('renderChildren'));
-
         $localizationConfiguration = new \TYPO3\Flow\I18n\Configuration('de_DE');
 
-        $mockLocalizationService = $this->getMock('TYPO3\Flow\I18n\Service', array('getConfiguration'));
+        $mockLocalizationService = $this->getMockBuilder('TYPO3\Flow\I18n\Service')->setMethods(array('getConfiguration'))->getMock();
         $mockLocalizationService->expects($this->once())->method('getConfiguration')->will($this->returnValue($localizationConfiguration));
-        $this->inject($viewHelper, 'localizationService', $mockLocalizationService);
+        $this->inject($this->viewHelper, 'localizationService', $mockLocalizationService);
 
-        $mockNumberFormatter = $this->getMock('TYPO3\Flow\I18n\Formatter\NumberFormatter', array('formatDecimalNumber'));
+        $mockNumberFormatter = $this->getMockBuilder('TYPO3\Flow\I18n\Formatter\NumberFormatter')->setMethods(array('formatDecimalNumber'))->getMock();
         $mockNumberFormatter->expects($this->once())->method('formatDecimalNumber')->will($this->throwException(new \TYPO3\Flow\I18n\Exception()));
-        $this->inject($viewHelper, 'numberFormatter', $mockNumberFormatter);
+        $this->inject($this->viewHelper, 'numberFormatter', $mockNumberFormatter);
 
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
-        $viewHelper->setArguments(array('forceLocale' => true));
-        $viewHelper->render();
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
+        $this->viewHelper->setArguments(array('forceLocale' => true));
+        $this->viewHelper->render();
     }
 }

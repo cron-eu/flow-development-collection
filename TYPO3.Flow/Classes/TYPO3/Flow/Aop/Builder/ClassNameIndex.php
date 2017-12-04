@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Aop\Builder;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -22,7 +25,7 @@ class ClassNameIndex
      * Indexed array by class name
      * @var array
      */
-    protected $classNames = array();
+    protected $classNames = [];
 
     /**
      * Constructor. Note: If you pass a data array here, make sure
@@ -30,7 +33,7 @@ class ClassNameIndex
      *
      * @param array $classNames Array with class names as keys
      */
-    public function __construct(array $classNames = array())
+    public function __construct(array $classNames = [])
     {
         $this->classNames = $classNames;
     }
@@ -44,7 +47,7 @@ class ClassNameIndex
      */
     public function setClassNames(array $classNames)
     {
-        $this->classNames = count($classNames) > 0 ? array_combine($classNames, array_fill(0, count($classNames), true)) : array();
+        $this->classNames = count($classNames) > 0 ? array_combine($classNames, array_fill(0, count($classNames), true)) : [];
     }
 
     /**

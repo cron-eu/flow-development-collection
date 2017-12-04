@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * An interpreting expression parser
@@ -17,13 +20,13 @@ namespace TYPO3\Eel;
 class InterpretedEelParser extends EelParser
 {
     /**
-     * @var \TYPO3\Eel\Context
+     * @var Context
      */
     protected $context;
 
     /**
      * @param string $string
-     * @param \TYPO3\Eel\Context $context The context to interpret
+     * @param Context $context The context to interpret
      */
     public function __construct($string, $context)
     {
@@ -76,7 +79,7 @@ class InterpretedEelParser extends EelParser
 
     public function ObjectPath_MethodCall(&$result, $sub)
     {
-        $arguments = isset($sub['arguments']) ? $sub['arguments'] : array();
+        $arguments = isset($sub['arguments']) ? $sub['arguments'] : [];
         if (!array_key_exists('val', $result)) {
             $result['val'] = $this->context;
         }
@@ -111,7 +114,7 @@ class InterpretedEelParser extends EelParser
     public function ArrayLiteral_Expression(&$result, $sub)
     {
         if (!isset($result['val'])) {
-            $result['val'] = new Context(array());
+            $result['val'] = new Context([]);
         }
         $result['val']->push($sub['val']);
     }
@@ -119,7 +122,7 @@ class InterpretedEelParser extends EelParser
     public function ArrayLiteral__finalise(&$result)
     {
         if (!isset($result['val'])) {
-            $result['val'] = new Context(array());
+            $result['val'] = new Context([]);
         }
     }
 
@@ -136,7 +139,7 @@ class InterpretedEelParser extends EelParser
     public function ObjectLiteral_ObjectLiteralProperty(&$result, $sub)
     {
         if (!isset($result['val'])) {
-            $result['val'] = new Context(array());
+            $result['val'] = new Context([]);
         }
         $result['val']->push($sub['value']['val'], $sub['key']['val']);
     }
@@ -144,7 +147,7 @@ class InterpretedEelParser extends EelParser
     public function ObjectLiteral__finalise(&$result)
     {
         if (!isset($result['val'])) {
-            $result['val'] = new Context(array());
+            $result['val'] = new Context([]);
         }
     }
 

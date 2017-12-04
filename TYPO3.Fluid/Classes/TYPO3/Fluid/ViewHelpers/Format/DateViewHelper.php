@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Fluid\ViewHelpers\Format;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\I18n\Exception as I18nException;
@@ -103,7 +106,7 @@ class DateViewHelper extends AbstractLocaleAwareViewHelper
      *
      * @param mixed $date either a \DateTime object or a string that is accepted by \DateTime constructor
      * @param string $format Format String which is taken to format the Date/Time if none of the locale options are set.
-     * @param string $localeFormatType Whether to format (according to locale set in $forceLocale) date, time or datetime. Must be one of TYPO3\Flow\I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_*'s constants.
+     * @param string $localeFormatType Whether to format (according to locale set in $forceLocale) date, time or dateTime. Must be one of TYPO3\Flow\I18n\Cldr\Reader\DatesReader::FORMAT_TYPE_*'s constants.
      * @param string $localeFormatLength Format length if locale set in $forceLocale. Must be one of TYPO3\Flow\I18n\Cldr\Reader\DatesReader::FORMAT_LENGTH_*'s constants.
      * @param string $cldrFormat Format string in CLDR format (see http://cldr.unicode.org/translation/date-time)
      * @throws ViewHelperException

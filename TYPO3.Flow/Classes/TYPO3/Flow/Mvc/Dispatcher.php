@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Mvc;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Cli\Request as CliRequest;
@@ -43,7 +46,7 @@ class Dispatcher
     /**
      * @var array
      */
-    protected $settings = array();
+    protected $settings = [];
 
     /**
      * Inject the Object Manager through setter injection because property injection
@@ -87,16 +90,16 @@ class Dispatcher
         // NOTE: The dispatcher is used for both Action- and CLI-Requests. For the latter case dispatching might happen during compile-time, that's why we can't inject the following dependencies
 
         /** @var Context $securityContext */
-        $securityContext = $this->objectManager->get('TYPO3\Flow\Security\Context');
+        $securityContext = $this->objectManager->get(Context::class);
         if ($securityContext->areAuthorizationChecksDisabled()) {
             $this->initiateDispatchLoop($request, $response);
             return;
         }
 
         /** @var FirewallInterface $firewall */
-        $firewall = $this->objectManager->get('TYPO3\Flow\Security\Authorization\FirewallInterface');
+        $firewall = $this->objectManager->get(FirewallInterface::class);
         /** @var SecurityLoggerInterface $securityLogger */
-        $securityLogger = $this->objectManager->get('TYPO3\Flow\Log\SecurityLoggerInterface');
+        $securityLogger = $this->objectManager->get(SecurityLoggerInterface::class);
 
         try {
             /** @var ActionRequest $request */

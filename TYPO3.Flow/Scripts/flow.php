@@ -1,11 +1,14 @@
 <?php
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * Bootstrap for the command line
@@ -20,6 +23,12 @@ if (isset($argv[1]) && ($argv[1] === 'typo3.flow:core:setfilepermissions' || $ar
     if (DIRECTORY_SEPARATOR !== '/') {
         exit('The core:setfilepermissions command is only available on UNIX platforms.' . PHP_EOL);
     }
+    
+    $filePermissions = decoct(fileperms(__DIR__ . '/setfilepermissions.sh') & 0777);
+    if ($filePermissions !== '700') {
+        chmod(__DIR__ . '/setfilepermissions.sh', 0700);
+    }
+    
     array_shift($argv);
     array_shift($argv);
     $returnValue = 0;

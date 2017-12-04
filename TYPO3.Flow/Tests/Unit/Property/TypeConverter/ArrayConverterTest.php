@@ -1,20 +1,25 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Property\PropertyMappingConfiguration;
 use TYPO3\Flow\Property\TypeConverter\ArrayConverter;
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\Resource\Resource as ResourceObject;
 
 /**
  * Testcase for the Array converter
- *
  */
-class ArrayConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
+class ArrayConverterTest extends UnitTestCase
 {
     /**
      * @var ArrayConverter
@@ -31,7 +36,7 @@ class ArrayConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function checkMetadata()
     {
-        $this->assertEquals(array('array', 'string', 'TYPO3\Flow\Resource\Resource'), $this->converter->getSupportedSourceTypes(), 'Source types do not match');
+        $this->assertEquals(['array', 'string', ResourceObject::class], $this->converter->getSupportedSourceTypes(), 'Source types do not match');
         $this->assertEquals('array', $this->converter->getSupportedTargetType(), 'Target type does not match');
         $this->assertEquals(1, $this->converter->getPriority(), 'Priority does not match');
     }
@@ -41,18 +46,18 @@ class ArrayConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function convertFromDoesNotModifyTheSourceArray()
     {
-        $sourceArray = array('Foo' => 'Bar', 'Baz');
+        $sourceArray = ['Foo' => 'Bar', 'Baz'];
         $this->assertEquals($sourceArray, $this->converter->convertFrom($sourceArray, 'array'));
     }
 
     public function stringToArrayDataProvider()
     {
-        return array(
-            array('Foo,Bar,Baz', array('Foo', 'Bar', 'Baz'), array()),
-            array('Foo, Bar, Baz', array('Foo', 'Bar', 'Baz'), array(ArrayConverter::CONFIGURATION_STRING_DELIMITER => ', ')),
-            array('', array(), array()),
-            array('[1,2,"foo"]', array(1,2, 'foo'), array(ArrayConverter::CONFIGURATION_STRING_FORMAT => ArrayConverter::STRING_FORMAT_JSON))
-        );
+        return [
+            ['Foo,Bar,Baz', ['Foo', 'Bar', 'Baz'], []],
+            ['Foo, Bar, Baz', ['Foo', 'Bar', 'Baz'], [ArrayConverter::CONFIGURATION_STRING_DELIMITER => ', ']],
+            ['', [], []],
+            ['[1,2,"foo"]', [1,2, 'foo'], [ArrayConverter::CONFIGURATION_STRING_FORMAT => ArrayConverter::STRING_FORMAT_JSON]]
+        ];
     }
 
     /**
@@ -63,17 +68,17 @@ class ArrayConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
     {
 
         // Create a map of arguments to return values.
-        $configurationValueMap = array();
+        $configurationValueMap = [];
         foreach ($mappingConfiguration as $setting => $value) {
-            $configurationValueMap[] = array('TYPO3\Flow\Property\TypeConverter\ArrayConverter', $setting, $value);
+            $configurationValueMap[] = [ArrayConverter::class, $setting, $value];
         }
 
-        $propertyMappingConfiguration = $this->getMock('\TYPO3\Flow\Property\PropertyMappingConfiguration');
+        $propertyMappingConfiguration = $this->createMock(PropertyMappingConfiguration::class);
         $propertyMappingConfiguration
             ->expects($this->any())
             ->method('getConfigurationValue')
             ->will($this->returnValueMap($configurationValueMap));
 
-        $this->assertEquals($expectedResult, $this->converter->convertFrom($source, 'array', array(), $propertyMappingConfiguration));
+        $this->assertEquals($expectedResult, $this->converter->convertFrom($source, 'array', [], $propertyMappingConfiguration));
     }
 }

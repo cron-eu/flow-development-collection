@@ -1,16 +1,21 @@
 <?php
 namespace TYPO3\Flow\Resource\Storage;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Package\PackageInterface;
-use TYPO3\Flow\Resource\Resource;
+use TYPO3\Flow\Package\PackageManagerInterface;
+use TYPO3\Flow\Resource\Resource as PersistentResource;
+use TYPO3\Flow\Resource\Storage\Object as StorageObject;
 use TYPO3\Flow\Utility\Files;
 use TYPO3\Flow\Utility\Unicode\Functions as UnicodeFunctions;
 
@@ -21,7 +26,7 @@ class PackageStorage extends FileSystemStorage
 {
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Package\PackageManagerInterface
+     * @var PackageManagerInterface
      */
     protected $packageManager;
 
@@ -38,7 +43,7 @@ class PackageStorage extends FileSystemStorage
     /**
      * Retrieve all Objects stored in this storage.
      *
-     * @return array<\TYPO3\Flow\Resource\Storage\Object>
+     * @return array<StorageObject>
      */
     public function getObjects()
     {
@@ -49,12 +54,12 @@ class PackageStorage extends FileSystemStorage
      * Return all Objects stored in this storage filtered by the given directory / filename pattern
      *
      * @param string $pattern A glob compatible directory / filename pattern
-     * @return array<\TYPO3\Flow\Resource\Storage\Object>
+     * @return array<StorageObject>
      */
     public function getObjectsByPathPattern($pattern)
     {
-        $objects = array();
-        $directories = array();
+        $objects = [];
+        $directories = [];
 
         if (strpos($pattern, '/') !== false) {
             list($packageKeyPattern, $directoryPattern) = explode('/', $pattern, 2);
@@ -88,7 +93,9 @@ class PackageStorage extends FileSystemStorage
                         list(, $path) = explode('/', str_replace($packages[$packageKey]->getResourcesPath(), '', $pathInfo['dirname']), 2);
                         $object->setRelativePublicationPath($packageKey . '/' . $path . '/');
                     }
-                    $object->setStream(function () use ($resourcePathAndFilename) { return fopen($resourcePathAndFilename, 'r'); });
+                    $object->setStream(function () use ($resourcePathAndFilename) {
+                        return fopen($resourcePathAndFilename, 'r');
+                    });
                     $objects[] = $object;
                 }
             }
@@ -100,10 +107,10 @@ class PackageStorage extends FileSystemStorage
     /**
      * Because we cannot store persistent resources in a PackageStorage, this method always returns FALSE.
      *
-     * @param \TYPO3\Flow\Resource\Resource $resource The resource stored in this storage
+     * @param PersistentResource $resource The resource stored in this storage
      * @return resource | boolean The resource stream or FALSE if the stream could not be obtained
      */
-    public function getStreamByResource(Resource $resource)
+    public function getStreamByResource(PersistentResource $resource)
     {
         return false;
     }
@@ -116,11 +123,11 @@ class PackageStorage extends FileSystemStorage
      */
     public function getPublicResourcePaths()
     {
-        $paths = array();
+        $paths = [];
         $packages = $this->packageManager->getActivePackages();
         foreach ($packages as $packageKey => $package) {
             /** @var PackageInterface $package */
-            $publicResourcesPath = Files::concatenatePaths(array($package->getResourcesPath(), 'Public'));
+            $publicResourcesPath = Files::concatenatePaths([$package->getResourcesPath(), 'Public']);
             if (is_dir($publicResourcesPath)) {
                 $paths[$packageKey] = $publicResourcesPath;
             }

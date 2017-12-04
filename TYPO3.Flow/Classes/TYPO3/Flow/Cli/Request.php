@@ -1,13 +1,18 @@
 <?php
 namespace TYPO3\Flow\Cli;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Mvc\Exception\InvalidArgumentNameException;
+use TYPO3\Flow\Mvc\Exception\NoSuchArgumentException;
 use TYPO3\Flow\Mvc\RequestInterface;
 
 /**
@@ -28,7 +33,7 @@ class Request implements RequestInterface
     protected $controllerCommandName = 'default';
 
     /**
-     * @var \TYPO3\Flow\Cli\Command
+     * @var Command
      */
     protected $command;
 
@@ -36,12 +41,12 @@ class Request implements RequestInterface
      * The arguments for this request
      * @var array
      */
-    protected $arguments = array();
+    protected $arguments = [];
 
     /**
      * @var array
      */
-    protected $exceedingArguments = array();
+    protected $exceedingArguments = [];
 
     /**
      * If this request has been changed and needs to be dispatched again
@@ -105,7 +110,7 @@ class Request implements RequestInterface
     /**
      * Returns the this request, as CLI request nesting is not supported.
      *
-     * @return \TYPO3\Flow\Cli\Request
+     * @return Request
      * @api
      */
     public function getMainRequest()
@@ -151,7 +156,7 @@ class Request implements RequestInterface
     /**
      * Returns the command object for this request
      *
-     * @return \TYPO3\Flow\Cli\Command
+     * @return Command
      */
     public function getCommand()
     {
@@ -167,12 +172,12 @@ class Request implements RequestInterface
      * @param string $argumentName Name of the argument to set
      * @param mixed $value The new value
      * @return void
-     * @throws \TYPO3\Flow\Mvc\Exception\InvalidArgumentNameException
+     * @throws InvalidArgumentNameException
      */
     public function setArgument($argumentName, $value)
     {
         if (!is_string($argumentName) || $argumentName === '') {
-            throw new \TYPO3\Flow\Mvc\Exception\InvalidArgumentNameException('Invalid argument name.', 1300893885);
+            throw new InvalidArgumentNameException('Invalid argument name.', 1300893885);
         }
         $this->arguments[$argumentName] = $value;
     }
@@ -193,12 +198,12 @@ class Request implements RequestInterface
      *
      * @param string $argumentName Name of the argument
      * @return string Value of the argument
-     * @throws \TYPO3\Flow\Mvc\Exception\NoSuchArgumentException if such an argument does not exist
+     * @throws NoSuchArgumentException if such an argument does not exist
      */
     public function getArgument($argumentName)
     {
         if (!isset($this->arguments[$argumentName])) {
-            throw new \TYPO3\Flow\Mvc\Exception\NoSuchArgumentException('An argument "' . $argumentName . '" does not exist for this request.', 1300893886);
+            throw new NoSuchArgumentException('An argument "' . $argumentName . '" does not exist for this request.', 1300893886);
         }
         return $this->arguments[$argumentName];
     }

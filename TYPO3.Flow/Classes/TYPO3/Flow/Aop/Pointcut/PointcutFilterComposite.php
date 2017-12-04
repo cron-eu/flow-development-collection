@@ -1,14 +1,18 @@
 <?php
 namespace TYPO3\Flow\Aop\Pointcut;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Aop\Builder\ClassNameIndex;
 
 /**
  * This composite allows to check for match against a row pointcut filters
@@ -18,12 +22,12 @@ use TYPO3\Flow\Annotations as Flow;
  * @see \TYPO3\Flow\Aop\Pointcut\PointcutExpressionParser, \TYPO3\Flow\Aop\Pointcut\PointcutClassNameFilter, \TYPO3\Flow\Aop\Pointcut\PointcutMethodFilter
  * @Flow\Proxy(false)
  */
-class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
+class PointcutFilterComposite implements PointcutFilterInterface
 {
     /**
      * @var array An array of \TYPO3\Flow\Aop\Pointcut\Pointcut*Filter objects
      */
-    protected $filters = array();
+    protected $filters = [];
 
     /**
      * @var boolean
@@ -33,12 +37,12 @@ class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilter
     /**
      * @var array An array of runtime evaluations
      */
-    protected $runtimeEvaluationsDefinition = array();
+    protected $runtimeEvaluationsDefinition = [];
 
     /**
      * @var array An array of global runtime evaluations
      */
-    protected $globalRuntimeEvaluationsDefinition = array();
+    protected $globalRuntimeEvaluationsDefinition = [];
 
     /**
      * Checks if the specified class and method match the registered class-
@@ -52,7 +56,7 @@ class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilter
      */
     public function matches($className, $methodName, $methodDeclaringClassName, $pointcutQueryIdentifier)
     {
-        $this->runtimeEvaluationsDefinition = array();
+        $this->runtimeEvaluationsDefinition = [];
         $matches = true;
         foreach ($this->filters as &$operatorAndFilter) {
             list($operator, $filter) = $operatorAndFilter;
@@ -61,10 +65,10 @@ class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilter
             $currentRuntimeEvaluationsDefinition = $filter->getRuntimeEvaluationsDefinition();
 
             switch ($operator) {
-                case '&&' :
+                case '&&':
                     if ($currentFilterMatches === true && $filter->hasRuntimeEvaluationsDefinition()) {
                         if (!isset($this->runtimeEvaluationsDefinition[$operator])) {
-                            $this->runtimeEvaluationsDefinition[$operator] = array();
+                            $this->runtimeEvaluationsDefinition[$operator] = [];
                         }
                         $this->runtimeEvaluationsDefinition[$operator] = array_merge_recursive($this->runtimeEvaluationsDefinition[$operator], $currentRuntimeEvaluationsDefinition);
                     }
@@ -73,10 +77,10 @@ class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilter
                     }
                     $matches = $matches && $currentFilterMatches;
                 break;
-                case '&&!' :
+                case '&&!':
                     if ($currentFilterMatches === true && $filter->hasRuntimeEvaluationsDefinition()) {
                         if (!isset($this->runtimeEvaluationsDefinition[$operator])) {
-                            $this->runtimeEvaluationsDefinition[$operator] = array();
+                            $this->runtimeEvaluationsDefinition[$operator] = [];
                         }
                         $this->runtimeEvaluationsDefinition[$operator] = array_merge_recursive($this->runtimeEvaluationsDefinition[$operator], $currentRuntimeEvaluationsDefinition);
                         $currentFilterMatches = false;
@@ -86,19 +90,19 @@ class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilter
                     }
                     $matches = $matches && (!$currentFilterMatches);
                 break;
-                case '||' :
+                case '||':
                     if ($currentFilterMatches === true && $filter->hasRuntimeEvaluationsDefinition()) {
                         if (!isset($this->runtimeEvaluationsDefinition[$operator])) {
-                            $this->runtimeEvaluationsDefinition[$operator] = array();
+                            $this->runtimeEvaluationsDefinition[$operator] = [];
                         }
                         $this->runtimeEvaluationsDefinition[$operator] = array_merge_recursive($this->runtimeEvaluationsDefinition[$operator], $currentRuntimeEvaluationsDefinition);
                     }
                     $matches = $matches || $currentFilterMatches;
                 break;
-                case '||!' :
+                case '||!':
                     if ($currentFilterMatches === true && $filter->hasRuntimeEvaluationsDefinition()) {
                         if (!isset($this->runtimeEvaluationsDefinition[$operator])) {
-                            $this->runtimeEvaluationsDefinition[$operator] = array();
+                            $this->runtimeEvaluationsDefinition[$operator] = [];
                         }
                         $this->runtimeEvaluationsDefinition[$operator] = array_merge_recursive($this->runtimeEvaluationsDefinition[$operator], $currentRuntimeEvaluationsDefinition);
                         $currentFilterMatches = false;
@@ -115,12 +119,12 @@ class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilter
      * Adds a class filter to the composite
      *
      * @param string $operator The operator for this filter
-     * @param \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface $filter A configured class filter
+     * @param PointcutFilterInterface $filter A configured class filter
      * @return void
      */
-    public function addFilter($operator, \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface $filter)
+    public function addFilter($operator, PointcutFilterInterface $filter)
     {
-        $this->filters[] = array($operator, $filter);
+        $this->filters[] = [$operator, $filter];
         if ($operator !== '&&' && $operator !== '&&!') {
             $this->earlyReturn = false;
         }
@@ -186,10 +190,10 @@ class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilter
     /**
      * This method is used to optimize the matching process.
      *
-     * @param \TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex
-     * @return \TYPO3\Flow\Aop\Builder\ClassNameIndex
+     * @param ClassNameIndex $classNameIndex
+     * @return ClassNameIndex
      */
-    public function reduceTargetClassNames(\TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex)
+    public function reduceTargetClassNames(ClassNameIndex $classNameIndex)
     {
         $result = clone $classNameIndex;
         foreach ($this->filters as &$operatorAndFilter) {
@@ -218,7 +222,7 @@ class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilter
      */
     protected function buildRuntimeEvaluationsConditionCode($operator, array $conditions, &$useGlobalObjects = false)
     {
-        $conditionsCode = array();
+        $conditionsCode = [];
 
         if (count($conditions) === 0) {
             return '';
@@ -366,7 +370,7 @@ class PointcutFilterComposite implements \TYPO3\Flow\Aop\Pointcut\PointcutFilter
     protected function buildArgumentEvaluationAccessCode($argumentAccess, &$useGlobalObjects = false)
     {
         if (is_array($argumentAccess)) {
-            $valuesAccessCodes = array();
+            $valuesAccessCodes = [];
             foreach ($argumentAccess as $singleValue) {
                 $valuesAccessCodes[] = $this->buildArgumentEvaluationAccessCode($singleValue);
             }

@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Http\Component;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Object\ObjectManagerInterface;
@@ -38,9 +41,9 @@ class ComponentChainFactory
         $arraySorter = new PositionalArraySorter($chainConfiguration);
         $sortedChainConfiguration = $arraySorter->toArray();
 
-        $chainComponents = array();
+        $chainComponents = [];
         foreach ($sortedChainConfiguration as $componentName => $configuration) {
-            $componentOptions = isset($configuration['componentOptions']) ? $configuration['componentOptions'] : array();
+            $componentOptions = isset($configuration['componentOptions']) ? $configuration['componentOptions'] : [];
             if (isset($configuration['chain'])) {
                 $component = $this->create($configuration['chain']);
             } else {
@@ -55,6 +58,6 @@ class ComponentChainFactory
             $chainComponents[] = $component;
         }
 
-        return new ComponentChain(array('components' => $chainComponents));
+        return new ComponentChain(['components' => $chainComponents]);
     }
 }

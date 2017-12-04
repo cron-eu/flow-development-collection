@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Cache\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 use TYPO3\Flow\Cache\Backend\RedisBackend;
 use TYPO3\Flow\Core\ApplicationContext;
 
@@ -45,12 +48,12 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
         }
 
         $this->redis = $this->getMockBuilder('\Redis')->disableOriginalConstructor()->getMock();
-        $this->cache = $this->getMock('\TYPO3\Flow\Cache\Frontend\FrontendInterface');
+        $this->cache = $this->createMock(\TYPO3\Flow\Cache\Frontend\FrontendInterface::class);
         $this->cache->expects($this->any())
             ->method('getIdentifier')
             ->will($this->returnValue('Foo_Cache'));
 
-        $this->backend = new RedisBackend(new ApplicationContext('Development'), array(), $this->redis);
+        $this->backend = new RedisBackend(new ApplicationContext('Development'), [], $this->redis);
         $this->backend->setCache($this->cache);
     }
 
@@ -62,9 +65,9 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
         $this->redis->expects($this->once())
             ->method('sMembers')
             ->with('Foo_Cache:tag:some_tag')
-            ->will($this->returnValue(array('entry_1', 'entry_2')));
+            ->will($this->returnValue(['entry_1', 'entry_2']));
 
-        $this->assertEquals(array('entry_1', 'entry_2'), $this->backend->findIdentifiersByTag('some_tag'));
+        $this->assertEquals(['entry_1', 'entry_2'], $this->backend->findIdentifiersByTag('some_tag'));
     }
 
     /**
@@ -75,7 +78,7 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
         $this->redis->expects($this->once())
             ->method('lRange')
             ->with('Foo_Cache:entries', 0, -1)
-            ->will($this->returnValue(array('entry_1', 'entry_2')));
+            ->will($this->returnValue(['entry_1', 'entry_2']));
 
         $this->redis->expects($this->exactly(2))
             ->method('persist');
@@ -94,7 +97,7 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
     {
         $defaultLifetime = rand(1, 9999);
         $this->backend->setDefaultLifetime($defaultLifetime);
-        $expected = array('ex' => $defaultLifetime);
+        $expected = ['ex' => $defaultLifetime];
 
         $this->redis->expects($this->any())
             ->method('multi')
@@ -115,7 +118,7 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
     {
         $defaultLifetime = 3600;
         $this->backend->setDefaultLifetime($defaultLifetime);
-        $expected = array('ex' => 1600);
+        $expected = ['ex' => 1600];
 
         $this->redis->expects($this->any())
             ->method('multi')
@@ -126,7 +129,7 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
             ->with($this->anything(), $this->anything(), $expected)
             ->willReturn($this->redis);
 
-        $this->backend->set('foo', 'bar', array(), 1600);
+        $this->backend->set('foo', 'bar', [], 1600);
     }
 
     /**
@@ -192,11 +195,11 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public static function writingOperationsProvider()
     {
-        return array(
-            array('set'),
-            array('remove'),
-            array('flushByTag'),
-            array('freeze')
-        );
+        return [
+            ['set'],
+            ['remove'],
+            ['flushByTag'],
+            ['freeze']
+        ];
     }
 }

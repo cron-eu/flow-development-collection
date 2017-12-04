@@ -1,30 +1,36 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Security\Authentication\Token;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Security\Authentication\EntryPoint\WebRedirect;
+use TYPO3\Flow\Security\Authentication\Token\AbstractToken;
 use TYPO3\Flow\Security\Authentication\TokenInterface;
 use TYPO3\Flow\Security\RequestPattern\Uri as UriRequestPattern;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for abstract authentication token
  *
  */
-class AbstractTokenTest extends \TYPO3\Flow\Tests\UnitTestCase
+class AbstractTokenTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\Security\Authentication\Token\AbstractToken
+     * @var AbstractToken
      */
     protected $token;
 
     public function setup()
     {
-        $this->token = $this->getMockForAbstractClass('TYPO3\Flow\Security\Authentication\Token\AbstractToken');
+        $this->token = $this->getMockForAbstractClass(AbstractToken::class);
     }
 
     /**
@@ -41,7 +47,7 @@ class AbstractTokenTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function authenticationEntryPointCanBeSetAndRetrieved()
     {
-        $entryPoint = new \TYPO3\Flow\Security\Authentication\EntryPoint\WebRedirect();
+        $entryPoint = new WebRedirect();
         $this->token->setAuthenticationEntryPoint($entryPoint);
         $this->assertSame($entryPoint, $this->token->getAuthenticationEntryPoint());
     }
@@ -59,12 +65,12 @@ class AbstractTokenTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function authenticationStatusAndIsAuthenticated()
     {
-        return array(
-            array(TokenInterface::NO_CREDENTIALS_GIVEN, false),
-            array(TokenInterface::AUTHENTICATION_NEEDED, false),
-            array(TokenInterface::WRONG_CREDENTIALS, false),
-            array(TokenInterface::AUTHENTICATION_SUCCESSFUL, true),
-        );
+        return [
+            [TokenInterface::NO_CREDENTIALS_GIVEN, false],
+            [TokenInterface::AUTHENTICATION_NEEDED, false],
+            [TokenInterface::WRONG_CREDENTIALS, false],
+            [TokenInterface::AUTHENTICATION_SUCCESSFUL, true],
+        ];
     }
 
     /**
@@ -100,10 +106,10 @@ class AbstractTokenTest extends \TYPO3\Flow\Tests\UnitTestCase
         $this->assertFalse($this->token->hasRequestPatterns());
 
         $uriRequestPattern = new UriRequestPattern('http://mydomain.com/some/path/pattern');
-        $this->token->setRequestPatterns(array($uriRequestPattern));
+        $this->token->setRequestPatterns([$uriRequestPattern]);
 
         $this->assertTrue($this->token->hasRequestPatterns());
-        $this->assertEquals(array($uriRequestPattern), $this->token->getRequestPatterns());
+        $this->assertEquals([$uriRequestPattern], $this->token->getRequestPatterns());
     }
 
     /**
@@ -113,6 +119,6 @@ class AbstractTokenTest extends \TYPO3\Flow\Tests\UnitTestCase
     public function setRequestPatternsOnlyAcceptsRequestPatterns()
     {
         $uriRequestPattern = new UriRequestPattern('http://mydomain.com/some/path/pattern');
-        $this->token->setRequestPatterns(array($uriRequestPattern, 'no valid pattern'));
+        $this->token->setRequestPatterns([$uriRequestPattern, 'no valid pattern']);
     }
 }

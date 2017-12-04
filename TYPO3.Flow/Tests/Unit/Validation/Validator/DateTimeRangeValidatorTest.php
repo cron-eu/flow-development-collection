@@ -1,12 +1,17 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Validation\Validator;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Validation\Validator\DateTimeRangeValidator;
 
 require_once 'AbstractValidatorTestcase.php';
 
@@ -14,15 +19,15 @@ require_once 'AbstractValidatorTestcase.php';
  * Testcase for the number range validator
  *
  */
-class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\AbstractValidatorTestcase
+class DateTimeRangeValidatorTest extends AbstractValidatorTestcase
 {
     /**
      * @var string
      */
-    protected $validatorClassName = 'TYPO3\Flow\Validation\Validator\DateTimeRangeValidator';
+    protected $validatorClassName = DateTimeRangeValidator::class;
 
     /**
-     * @var \TYPO3\Flow\Validation\Validator\DateTimeRangeValidator
+     * @var DateTimeRangeValidator
      */
     protected $accessibleValidator;
 
@@ -31,7 +36,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function setUp()
     {
-        $this->accessibleValidator = $this->getAccessibleMock('TYPO3\Flow\Validation\Validator\DateTimeRangeValidator', array('dummy'));
+        $this->accessibleValidator = $this->getAccessibleMock(DateTimeRangeValidator::class, ['dummy']);
     }
 
     /**
@@ -75,7 +80,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsNoErrorIfTheGivenValueIsNull()
     {
-        $this->validatorOptions(array('earliestDate' => '2007-03-01T13:00:00Z'));
+        $this->validatorOptions(['earliestDate' => '2007-03-01T13:00:00Z']);
         $this->assertFalse($this->validator->validate(null)->hasErrors());
     }
 
@@ -84,7 +89,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsNoErrorIfTheGivenValueIsAnEmptyString()
     {
-        $this->validatorOptions(array('earliestDate' => '2007-03-01T13:00:00Z'));
+        $this->validatorOptions(['earliestDate' => '2007-03-01T13:00:00Z']);
         $this->assertFalse($this->validator->validate('')->hasErrors());
     }
 
@@ -93,7 +98,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsOneErrorIfGivenValueIsNoDate()
     {
-        $this->validatorOptions(array('earliestDate' => '2007-03-01T13:00:00Z'));
+        $this->validatorOptions(['earliestDate' => '2007-03-01T13:00:00Z']);
 
         $errors = $this->validator->validate('no DateTime object')->getErrors();
         $this->assertSame(1, count($errors));
@@ -104,7 +109,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsNoErrorForAGivenDateMustBeingAfterAFixDate()
     {
-        $this->validatorOptions(array('earliestDate' => '2007-03-01T13:00:00Z'));
+        $this->validatorOptions(['earliestDate' => '2007-03-01T13:00:00Z']);
 
         $this->assertFalse($this->validator->validate(new \DateTime('2009-03-01T13:00:00Z'))->hasErrors());
     }
@@ -114,7 +119,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsErrorForAGivenDateMustBeingAfterAFixDate()
     {
-        $this->validatorOptions(array('earliestDate' => '2007-03-01T13:00:00Z'));
+        $this->validatorOptions(['earliestDate' => '2007-03-01T13:00:00Z']);
 
         $this->assertTrue($this->validator->validate(new \DateTime('2007-02-01T13:00:00Z'))->hasErrors());
     }
@@ -124,7 +129,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsNoErrorForAGivenDateMustBeingAfterACalculatedDateRangeViaAdding()
     {
-        $this->validatorOptions(array('earliestDate' => '2007-03-01T13:00:00Z/P1Y2M10DT2H30M'));
+        $this->validatorOptions(['earliestDate' => '2007-03-01T13:00:00Z/P1Y2M10DT2H30M']);
 
         $this->assertFalse($this->validator->validate(new \DateTime('2009-03-01T13:00:00Z'))->hasErrors());
     }
@@ -134,7 +139,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsErrorForAGivenDateMustBeingAfterACalculatedDateRangeViaSubstracting()
     {
-        $this->validatorOptions(array('earliestDate' => 'P2M10DT2H30M/2011-03-01T13:00:00Z'));
+        $this->validatorOptions(['earliestDate' => 'P2M10DT2H30M/2011-03-01T13:00:00Z']);
 
         $this->assertTrue($this->validator->validate(new \DateTime('2009-03-01T13:00:00Z'))->hasErrors());
     }
@@ -144,7 +149,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsNoErrorForAGivenDateMustBeingBeforeACalculatedDateRangeViaAdding()
     {
-        $this->validatorOptions(array('latestDate' => '2007-03-01T13:00:00Z/P1Y2M10DT2H30M'));
+        $this->validatorOptions(['latestDate' => '2007-03-01T13:00:00Z/P1Y2M10DT2H30M']);
 
         $this->assertFalse($this->validator->validate(new \DateTime('2008-03-01T13:00:00Z'))->hasErrors());
     }
@@ -154,7 +159,7 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsErrorForAGivenDateMustBeingBeforeACalculatedDateRangeViaSubstracting()
     {
-        $this->validatorOptions(array('latestDate' => 'P2M10DT2H30M/2011-03-01T13:00:00Z'));
+        $this->validatorOptions(['latestDate' => 'P2M10DT2H30M/2011-03-01T13:00:00Z']);
 
         $this->assertTrue($this->validator->validate(new \DateTime('2011-02-01T13:00:00Z'))->hasErrors());
     }
@@ -164,10 +169,10 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsErrorForAGivenDateOutsideUpperAndLowerBoundaries()
     {
-        $this->validatorOptions(array(
+        $this->validatorOptions([
             'earliestDate' => '2011-01-01T13:00:00Z',
             'latestDate' => '2011-03-01T13:00:00Z'
-        ));
+        ]);
 
         $this->assertTrue($this->validator->validate(new \DateTime('2011-04-01T13:00:00Z'))->hasErrors());
     }
@@ -177,10 +182,10 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsNoErrorForAGivenDateInsideUpperAndLowerBoundaries()
     {
-        $this->validatorOptions(array(
+        $this->validatorOptions([
             'earliestDate' => '2011-01-01T13:00:00Z',
             'latestDate' => '2011-03-01T13:00:00Z'
-        ));
+        ]);
 
         $this->assertFalse($this->validator->validate(new \DateTime('2011-02-01T13:00:00Z'))->hasErrors());
     }
@@ -190,9 +195,9 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsNoErrorForAGivenDateThatIsEqualToTheMinimumDate()
     {
-        $this->validatorOptions(array(
+        $this->validatorOptions([
             'earliestDate' => '2011-01-01T13:00:00Z',
-        ));
+        ]);
 
         $this->assertFalse($this->validator->validate(new \DateTime('2011-01-01T13:00:00Z'))->hasErrors());
     }
@@ -202,9 +207,9 @@ class DateTimeRangeValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Valid
      */
     public function validateReturnsNoErrorForAGivenDateThatIsEqualToTheMaximumDate()
     {
-        $this->validatorOptions(array(
+        $this->validatorOptions([
             'latestDate' => '2011-01-01T13:00:00Z',
-        ));
+        ]);
 
         $this->assertFalse($this->validator->validate(new \DateTime('2011-01-01T13:00:00Z'))->hasErrors());
     }

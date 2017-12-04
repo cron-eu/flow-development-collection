@@ -1,26 +1,31 @@
 <?php
 namespace TYPO3\Flow\Security\Authentication\Token;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Mvc\ActionRequest;
+use TYPO3\Flow\Reflection\ObjectAccess;
 
 /**
  * An authentication token used for simple password authentication.
  */
-class PasswordToken extends \TYPO3\Flow\Security\Authentication\Token\AbstractToken
+class PasswordToken extends AbstractToken
 {
     /**
      * The password credentials
      * @var array
      * @Flow\Transient
      */
-    protected $credentials = array('password' => '');
+    protected $credentials = ['password' => ''];
 
     /**
      * @var \TYPO3\Flow\Utility\Environment
@@ -35,17 +40,17 @@ class PasswordToken extends \TYPO3\Flow\Security\Authentication\Token\AbstractTo
      * Note: You need to send the password in this POST parameter:
      *       __authentication[TYPO3][Flow][Security][Authentication][Token][PasswordToken][password]
      *
-     * @param \TYPO3\Flow\Mvc\ActionRequest $actionRequest The current action request
+     * @param ActionRequest $actionRequest The current action request
      * @return void
      */
-    public function updateCredentials(\TYPO3\Flow\Mvc\ActionRequest $actionRequest)
+    public function updateCredentials(ActionRequest $actionRequest)
     {
         if ($actionRequest->getHttpRequest()->getMethod() !== 'POST') {
             return;
         }
 
         $postArguments = $actionRequest->getInternalArguments();
-        $password = \TYPO3\Flow\Reflection\ObjectAccess::getPropertyPath($postArguments, '__authentication.TYPO3.Flow.Security.Authentication.Token.PasswordToken.password');
+        $password = ObjectAccess::getPropertyPath($postArguments, '__authentication.TYPO3.Flow.Security.Authentication.Token.PasswordToken.password');
 
         if (!empty($password)) {
             $this->credentials['password'] = $password;

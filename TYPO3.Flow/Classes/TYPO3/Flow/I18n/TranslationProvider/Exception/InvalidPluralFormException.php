@@ -1,12 +1,17 @@
 <?php
 namespace TYPO3\Flow\I18n\TranslationProvider\Exception;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\I18n;
 
 /**
  * An "Invalid Plural Form" exception
@@ -17,6 +22,6 @@ namespace TYPO3\Flow\I18n\TranslationProvider\Exception;
  *
  * @api
  */
-class InvalidPluralFormException extends \TYPO3\Flow\I18n\Exception
+class InvalidPluralFormException extends I18n\Exception
 {
 }

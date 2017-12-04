@@ -1,20 +1,25 @@
 <?php
 namespace TYPO3\Flow\Log\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Log\Exception\CouldNotOpenResourceException;
+use TYPO3\Flow\Utility\Files;
 
 /**
  * A log backend which writes log entries into a file
  *
  * @api
  */
-class FileBackend extends \TYPO3\Flow\Log\Backend\AbstractBackend
+class FileBackend extends AbstractBackend
 {
     /**
      * An array of severity labels, indexed by their integer constant
@@ -125,12 +130,12 @@ class FileBackend extends \TYPO3\Flow\Log\Backend\AbstractBackend
      * the log file or opening a database connection.
      *
      * @return void
-     * @throws \TYPO3\Flow\Log\Exception\CouldNotOpenResourceException
+     * @throws CouldNotOpenResourceException
      * @api
      */
     public function open()
     {
-        $this->severityLabels = array(
+        $this->severityLabels = [
             LOG_EMERG   => 'EMERGENCY',
             LOG_ALERT   => 'ALERT    ',
             LOG_CRIT    => 'CRITICAL ',
@@ -139,7 +144,7 @@ class FileBackend extends \TYPO3\Flow\Log\Backend\AbstractBackend
             LOG_NOTICE  => 'NOTICE   ',
             LOG_INFO    => 'INFO     ',
             LOG_DEBUG   => 'DEBUG    ',
-        );
+        ];
 
         if (file_exists($this->logFileUrl) && $this->maximumLogFileSize > 0 && filesize($this->logFileUrl) > $this->maximumLogFileSize) {
             $this->rotateLogFile();
@@ -151,14 +156,14 @@ class FileBackend extends \TYPO3\Flow\Log\Backend\AbstractBackend
             $logPath = dirname($this->logFileUrl);
             if (!file_exists($logPath) || (!is_dir($logPath) && !is_link($logPath))) {
                 if ($this->createParentDirectories === false) {
-                    throw new \TYPO3\Flow\Log\Exception\CouldNotOpenResourceException('Could not open log file "' . $this->logFileUrl . '" for write access because the parent directory does not exist.', 1243931200);
+                    throw new CouldNotOpenResourceException('Could not open log file "' . $this->logFileUrl . '" for write access because the parent directory does not exist.', 1243931200);
                 }
-                \TYPO3\Flow\Utility\Files::createDirectoryRecursively($logPath);
+                Files::createDirectoryRecursively($logPath);
             }
 
             $this->fileHandle = fopen($this->logFileUrl, 'ab');
             if ($this->fileHandle === false) {
-                throw new \TYPO3\Flow\Log\Exception\CouldNotOpenResourceException('Could not open log file "' . $this->logFileUrl . '" for write access.', 1243588980);
+                throw new CouldNotOpenResourceException('Could not open log file "' . $this->logFileUrl . '" for write access.', 1243588980);
             }
 
             $streamMeta = stream_get_meta_data($this->fileHandle);
@@ -169,7 +174,7 @@ class FileBackend extends \TYPO3\Flow\Log\Backend\AbstractBackend
             }
         }
         if ($this->fileHandle === false) {
-            throw new \TYPO3\Flow\Log\Exception\CouldNotOpenResourceException('Could not open log file "' . $this->logFileUrl . '" for write access.', 1229448440);
+            throw new CouldNotOpenResourceException('Could not open log file "' . $this->logFileUrl . '" for write access.', 1229448440);
         }
     }
 

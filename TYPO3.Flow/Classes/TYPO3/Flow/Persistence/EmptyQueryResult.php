@@ -1,31 +1,34 @@
 <?php
 namespace TYPO3\Flow\Persistence;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * An empty result list
  *
  * @api
  */
-class EmptyQueryResult implements  QueryResultInterface
+class EmptyQueryResult implements QueryResultInterface
 {
     /**
-     * @var \TYPO3\Flow\Persistence\QueryInterface
+     * @var QueryInterface
      */
     protected $query;
 
     /**
      * Constructor
      *
-     * @param \TYPO3\Flow\Persistence\QueryInterface $query
+     * @param QueryInterface $query
      */
-    public function __construct(\TYPO3\Flow\Persistence\QueryInterface $query)
+    public function __construct(QueryInterface $query)
     {
         $this->query = $query;
     }
@@ -33,7 +36,7 @@ class EmptyQueryResult implements  QueryResultInterface
     /**
      * Returns a clone of the query object
      *
-     * @return \TYPO3\Flow\Persistence\QueryInterface
+     * @return QueryInterface
      * @api
      */
     public function getQuery()
@@ -60,7 +63,7 @@ class EmptyQueryResult implements  QueryResultInterface
      */
     public function toArray()
     {
-        return array();
+        return [];
     }
 
     /**

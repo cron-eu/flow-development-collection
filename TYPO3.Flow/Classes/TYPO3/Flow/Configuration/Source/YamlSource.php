@@ -1,14 +1,20 @@
 <?php
 namespace TYPO3\Flow\Configuration\Source;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use Symfony\Component\Yaml\Yaml;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Configuration\Exception\ParseErrorException;
+use TYPO3\Flow\Error\Exception;
 use TYPO3\Flow\Utility\Arrays;
 
 /**
@@ -69,11 +75,11 @@ class YamlSource
      * @param string $pathAndFilename Full path and filename of the file to load, excluding the file extension (ie. ".yaml")
      * @param boolean $allowSplitSource If TRUE, the type will be used as a prefix when looking for configuration files
      * @return array
-     * @throws \TYPO3\Flow\Configuration\Exception\ParseErrorException
+     * @throws ParseErrorException
      */
     public function load($pathAndFilename, $allowSplitSource = false)
     {
-        $pathsAndFileNames = array($pathAndFilename . '.yaml');
+        $pathsAndFileNames = [$pathAndFilename . '.yaml'];
         if ($allowSplitSource === true) {
             $splitSourcePathsAndFileNames = glob($pathAndFilename . '.*.yaml');
             if ($splitSourcePathsAndFileNames !== false) {
@@ -81,24 +87,24 @@ class YamlSource
                 $pathsAndFileNames = array_merge($pathsAndFileNames, $splitSourcePathsAndFileNames);
             }
         }
-        $configuration = array();
+        $configuration = [];
         foreach ($pathsAndFileNames as $pathAndFilename) {
             if (file_exists($pathAndFilename)) {
                 try {
                     if ($this->usePhpYamlExtension) {
                         $loadedConfiguration = @yaml_parse_file($pathAndFilename);
                         if ($loadedConfiguration === false) {
-                            throw new \TYPO3\Flow\Configuration\Exception\ParseErrorException('A parse error occurred while parsing file "' . $pathAndFilename . '".', 1391894094);
+                            throw new ParseErrorException('A parse error occurred while parsing file "' . $pathAndFilename . '".', 1391894094);
                         }
                     } else {
-                        $loadedConfiguration = \Symfony\Component\Yaml\Yaml::parse($pathAndFilename);
+                        $loadedConfiguration = Yaml::parse($pathAndFilename);
                     }
 
                     if (is_array($loadedConfiguration)) {
                         $configuration = Arrays::arrayMergeRecursiveOverrule($configuration, $loadedConfiguration);
                     }
-                } catch (\TYPO3\Flow\Error\Exception $exception) {
-                    throw new \TYPO3\Flow\Configuration\Exception\ParseErrorException('A parse error occurred while parsing file "' . $pathAndFilename . '". Error message: ' . $exception->getMessage(), 1232014321);
+                } catch (Exception $exception) {
+                    throw new ParseErrorException('A parse error occurred while parsing file "' . $pathAndFilename . '". Error message: ' . $exception->getMessage(), 1232014321);
                 }
             }
         }
@@ -118,7 +124,7 @@ class YamlSource
         if (file_exists($pathAndFilename . '.yaml')) {
             $header = $this->getHeaderFromFile($pathAndFilename . '.yaml');
         }
-        $yaml = \Symfony\Component\Yaml\Yaml::dump($configuration, 99, 2);
+        $yaml = Yaml::dump($configuration, 99, 2);
         file_put_contents($pathAndFilename . '.yaml', $header . chr(10) . $yaml);
     }
 

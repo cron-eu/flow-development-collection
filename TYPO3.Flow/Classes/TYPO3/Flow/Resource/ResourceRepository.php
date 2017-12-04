@@ -1,16 +1,21 @@
 <?php
 namespace TYPO3\Flow\Resource;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\Flow\Persistence\QueryResultInterface;
 use TYPO3\Flow\Persistence\Repository;
+use TYPO3\Flow\Resource\Resource as PersistentResource;
 
 /**
  * Resource Repository
@@ -19,14 +24,14 @@ use TYPO3\Flow\Persistence\Repository;
  * provided by Resource Manager instead.
  *
  * @Flow\Scope("singleton")
- * @see \TYPO3\Flow\Resource\ResourceManager
+ * @see ResourceManager
  */
 class ResourceRepository extends Repository
 {
     /**
      * @var string
      */
-    const ENTITY_CLASSNAME = 'TYPO3\Flow\Resource\Resource';
+    const ENTITY_CLASSNAME = PersistentResource::class;
 
     /**
      * @var \SplObjectStorage
@@ -50,7 +55,7 @@ class ResourceRepository extends Repository
 
     /**
      * @param object $object
-     * @throws \TYPO3\Flow\Persistence\Exception\IllegalObjectTypeException
+     * @throws IllegalObjectTypeException
      */
     public function add($object)
     {
@@ -105,10 +110,10 @@ class ResourceRepository extends Repository
     /**
      * Finds other resources which are referring to the same resource data and filename
      *
-     * @param Resource $resource The resource used for finding similar resources
+     * @param PersistentResource $resource The resource used for finding similar resources
      * @return QueryResultInterface The result, including the given resource
      */
-    public function findSimilarResources(Resource $resource)
+    public function findSimilarResources(PersistentResource $resource)
     {
         $query = $this->createQuery();
         $query->matching(
@@ -144,7 +149,7 @@ class ResourceRepository extends Repository
      * Find one resource by SHA1
      *
      * @param string $sha1Hash
-     * @return Resource
+     * @return PersistentResource
      */
     public function findOneBySha1($sha1Hash)
     {

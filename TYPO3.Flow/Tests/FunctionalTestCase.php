@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Configuration\ConfigurationManager;
 use TYPO3\Flow\Core\Bootstrap;
@@ -342,7 +345,7 @@ abstract class FunctionalTestCase extends \TYPO3\Flow\Tests\BaseTestCase
      * @param array $defaults An array of defaults declarations
      * @param boolean $appendExceedingArguments If exceeding arguments may be appended
      * @param array $httpMethods An array of accepted http methods
-     * @return void
+     * @return Route
      * @api
      */
     protected function registerRoute($name, $uriPattern, array $defaults, $appendExceedingArguments = false, array $httpMethods = null)
@@ -356,6 +359,7 @@ abstract class FunctionalTestCase extends \TYPO3\Flow\Tests\BaseTestCase
             $route->setHttpMethods($httpMethods);
         }
         $this->router->addRoute($route);
+        return $route;
     }
 
     /**

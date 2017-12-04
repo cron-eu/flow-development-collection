@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Utility;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Reflection\ObjectAccess;
@@ -95,7 +98,7 @@ class PositionalArraySorter
     {
         $sortedArrayKeys = $this->getSortedKeys();
 
-        $sortedArray = array();
+        $sortedArray = [];
         foreach ($sortedArrayKeys as $key) {
             $sortedArray[$key] = $this->subject[$key];
         }
@@ -126,7 +129,7 @@ class PositionalArraySorter
 
         $sortedKeysMap = $this->generateSortedKeysMap();
 
-        $sortedKeys = array();
+        $sortedKeys = [];
         array_walk_recursive($sortedKeysMap, function ($value) use (&$sortedKeys) {
             $sortedKeys[] = $value;
         });
@@ -144,7 +147,7 @@ class PositionalArraySorter
      */
     protected function extractMiddleKeys(array &$arrayKeysWithPosition)
     {
-        $this->middleKeys = array();
+        $this->middleKeys = [];
         foreach ($arrayKeysWithPosition as $key => $position) {
             if (!is_numeric($position)) {
                 continue;
@@ -165,7 +168,7 @@ class PositionalArraySorter
      */
     protected function extractStartKeys(array &$arrayKeysWithPosition)
     {
-        $this->startKeys = array();
+        $this->startKeys = [];
         foreach ($arrayKeysWithPosition as $key => $position) {
             if (preg_match('/^start(?: ([0-9]+))?$/', $position, $matches) < 1) {
                 continue;
@@ -190,7 +193,7 @@ class PositionalArraySorter
      */
     protected function extractEndKeys(array &$arrayKeysWithPosition)
     {
-        $this->endKeys = array();
+        $this->endKeys = [];
         foreach ($arrayKeysWithPosition as $key => $position) {
             if (preg_match('/^end(?: ([0-9]+))?$/', $position, $matches) < 1) {
                 continue;
@@ -215,9 +218,9 @@ class PositionalArraySorter
      */
     protected function extractBeforeKeys(array &$arrayKeysWithPosition)
     {
-        $this->beforeKeys = array();
+        $this->beforeKeys = [];
         foreach ($arrayKeysWithPosition as $key => $position) {
-            if (preg_match('/^before ([a-zA-Z0-9]+)(?: ([0-9]+))?$/', $position, $matches) < 1) {
+            if (preg_match('/^before (\S+)(?: ([0-9]+))?$/', $position, $matches) < 1) {
                 continue;
             }
             if (isset($matches[2])) {
@@ -242,9 +245,9 @@ class PositionalArraySorter
      */
     protected function extractAfterKeys(array &$arrayKeysWithPosition)
     {
-        $this->afterKeys = array();
+        $this->afterKeys = [];
         foreach ($arrayKeysWithPosition as $key => $position) {
-            if (preg_match('/^after ([a-zA-Z0-9]+)(?: ([0-9]+))?$/', $position, $matches) < 1) {
+            if (preg_match('/^after (\S+)(?: ([0-9]+))?$/', $position, $matches) < 1) {
                 continue;
             }
             if (isset($matches[2])) {
@@ -267,7 +270,7 @@ class PositionalArraySorter
      */
     protected function collectArrayKeysAndPositions()
     {
-        $arrayKeysWithPosition = array();
+        $arrayKeysWithPosition = [];
 
         foreach ($this->subject as $key => $value) {
             // if the value was set to NULL it was unset and should not be used
@@ -294,7 +297,7 @@ class PositionalArraySorter
      */
     protected function generateSortedKeysMap()
     {
-        $sortedKeysMap = array();
+        $sortedKeysMap = [];
 
         $startKeys = $this->startKeys;
         $middleKeys = $this->middleKeys;

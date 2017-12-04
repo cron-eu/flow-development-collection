@@ -1,13 +1,18 @@
 <?php
 namespace TYPO3\Flow\Reflection;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Utility\Exception\InvalidTypeException;
+use TYPO3\Flow\Utility\TypeHandling;
 
 /**
  * A class schema
@@ -51,14 +56,14 @@ class ClassSchema
      *
      * @var array
      */
-    protected $properties = array();
+    protected $properties = [];
 
     /**
      * The properties forming the identity of an object
      *
      * @var array
      */
-    protected $identityProperties = array();
+    protected $identityProperties = [];
 
     /**
      * Constructs this class schema
@@ -114,16 +119,16 @@ class ClassSchema
     public function addProperty($name, $type, $lazy = false, $transient = false)
     {
         try {
-            $type = \TYPO3\Flow\Utility\TypeHandling::parseType($type);
-        } catch (\TYPO3\Flow\Utility\Exception\InvalidTypeException $exception) {
+            $type = TypeHandling::parseType($type);
+        } catch (InvalidTypeException $exception) {
             throw new \InvalidArgumentException(sprintf($exception->getMessage(), 'class "' . $name . '"'), 1315564474);
         }
-        $this->properties[$name] = array(
+        $this->properties[$name] = [
             'type' => $type['type'],
             'elementType' => $type['elementType'],
             'lazy' => $lazy,
             'transient' => $transient
-        );
+        ];
     }
 
     /**
@@ -174,7 +179,7 @@ class ClassSchema
         }
         $this->modelType = $modelType;
         if ($modelType === self::MODELTYPE_VALUEOBJECT) {
-            $this->identityProperties = array();
+            $this->identityProperties = [];
             $this->repositoryClassName = null;
         }
     }
@@ -194,12 +199,12 @@ class ClassSchema
      *
      * @param string $repositoryClassName
      * @return void
-     * @throws \TYPO3\Flow\Reflection\Exception\ClassSchemaConstraintViolationException
+     * @throws Exception\ClassSchemaConstraintViolationException
      */
     public function setRepositoryClassName($repositoryClassName)
     {
         if ($this->modelType === self::MODELTYPE_VALUEOBJECT && $repositoryClassName !== null) {
-            throw new \TYPO3\Flow\Reflection\Exception\ClassSchemaConstraintViolationException('Value objects must not be aggregate roots (have a repository)', 1268739172);
+            throw new Exception\ClassSchemaConstraintViolationException('Value objects must not be aggregate roots (have a repository)', 1268739172);
         }
         $this->repositoryClassName = $repositoryClassName;
     }
@@ -263,12 +268,12 @@ class ClassSchema
      * @param string $propertyName
      * @return void
      * @throws \InvalidArgumentException
-     * @throws \TYPO3\Flow\Reflection\Exception\ClassSchemaConstraintViolationException
+     * @throws Exception\ClassSchemaConstraintViolationException
      */
     public function markAsIdentityProperty($propertyName)
     {
         if ($this->modelType === self::MODELTYPE_VALUEOBJECT) {
-            throw new \TYPO3\Flow\Reflection\Exception\ClassSchemaConstraintViolationException('Value objects must not have identity properties', 1264102084);
+            throw new Exception\ClassSchemaConstraintViolationException('Value objects must not have identity properties', 1264102084);
         }
         if (!array_key_exists($propertyName, $this->properties)) {
             throw new \InvalidArgumentException('Property "' . $propertyName . '" must be added to the class schema before it can be marked as identity property.', 1233775407);

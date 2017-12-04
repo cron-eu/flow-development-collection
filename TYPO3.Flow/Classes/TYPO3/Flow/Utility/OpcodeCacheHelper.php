@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Utility;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * This class contains a helper to clear PHP Opcode Caches, auto-detecting the current opcache system in use.
@@ -30,7 +33,7 @@ class OpcodeCacheHelper
      */
     protected static function initialize()
     {
-        self::$clearCacheCallbacks = array();
+        self::$clearCacheCallbacks = [];
 
         // Zend OpCache (built in by default since PHP 5.5) - http://php.net/manual/de/book.opcache.php
         if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') === '1') {
@@ -47,7 +50,7 @@ class OpcodeCacheHelper
         if (extension_loaded('wincache') && ini_get('wincache.ocenabled') === '1') {
             self::$clearCacheCallbacks[] = function ($absolutePathAndFilename) {
                 if ($absolutePathAndFilename !== null) {
-                    wincache_refresh_if_changed(array($absolutePathAndFilename));
+                    wincache_refresh_if_changed([$absolutePathAndFilename]);
                 } else {
                     // Refresh everything!
                     wincache_refresh_if_changed();

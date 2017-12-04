@@ -1,26 +1,31 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Session;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\Session;
 
 /**
  * Testcase for the Transient Session implementation
- *
  */
-class TransientSessionTest extends \TYPO3\Flow\Tests\UnitTestCase
+class TransientSessionTest extends UnitTestCase
 {
     /**
      * @test
      */
     public function theTransientSessionImplementsTheSessionInterface()
     {
-        $session = new \TYPO3\Flow\Session\TransientSession();
-        $this->assertInstanceOf('TYPO3\Flow\Session\SessionInterface', $session);
+        $session = new Session\TransientSession();
+        $this->assertInstanceOf(Session\SessionInterface::class, $session);
     }
 
     /**
@@ -28,7 +33,7 @@ class TransientSessionTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function aSessionIdIsGeneratedOnStartingTheSession()
     {
-        $session = new \TYPO3\Flow\Session\TransientSession();
+        $session = new Session\TransientSession();
         $session->start();
         $this->assertTrue(strlen($session->getId()) == 13);
     }
@@ -39,7 +44,7 @@ class TransientSessionTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function tryingToGetTheSessionIdWithoutStartingTheSessionThrowsAnException()
     {
-        $session = new \TYPO3\Flow\Session\TransientSession();
+        $session = new Session\TransientSession();
         $session->getId();
     }
 
@@ -48,7 +53,7 @@ class TransientSessionTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function stringsCanBeStoredByCallingPutData()
     {
-        $session = new \TYPO3\Flow\Session\TransientSession();
+        $session = new Session\TransientSession();
         $session->start();
         $session->putData('theKey', 'some data');
         $this->assertEquals('some data', $session->getData('theKey'));
@@ -59,7 +64,7 @@ class TransientSessionTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function allSessionDataCanBeFlushedByCallingDestroy()
     {
-        $session = new \TYPO3\Flow\Session\TransientSession();
+        $session = new Session\TransientSession();
         $session->start();
         $session->putData('theKey', 'some data');
         $session->destroy();
@@ -72,7 +77,7 @@ class TransientSessionTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function hasKeyReturnsTrueOrFalseAccordingToAvailableKeys()
     {
-        $session = new \TYPO3\Flow\Session\TransientSession();
+        $session = new Session\TransientSession();
         $session->start();
         $session->putData('theKey', 'some data');
         $this->assertTrue($session->hasKey('theKey'));

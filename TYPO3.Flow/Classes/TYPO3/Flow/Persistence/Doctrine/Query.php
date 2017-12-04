@@ -1,14 +1,23 @@
 <?php
 namespace TYPO3\Flow\Persistence\Doctrine;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use Doctrine\Common\Persistence\ObjectManager;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Log\SystemLoggerInterface;
+use TYPO3\Flow\Persistence\Exception\InvalidQueryException;
+use TYPO3\Flow\Persistence\Generic\Qom\Constraint;
+use TYPO3\Flow\Persistence\QueryInterface;
+use TYPO3\Flow\Persistence\QueryResultInterface;
 use TYPO3\Flow\Utility\Unicode\Functions as UnicodeFunctions;
 
 /**
@@ -16,7 +25,7 @@ use TYPO3\Flow\Utility\Unicode\Functions as UnicodeFunctions;
  *
  * @api
  */
-class Query implements \TYPO3\Flow\Persistence\QueryInterface
+class Query implements QueryInterface
 {
     /**
      * @var string
@@ -25,7 +34,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Log\SystemLoggerInterface
+     * @var SystemLoggerInterface
      */
     protected $systemLogger;
 
@@ -103,10 +112,10 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
     }
 
     /**
-     * @param \Doctrine\Common\Persistence\ObjectManager $entityManager
+     * @param ObjectManager $entityManager
      * @return void
      */
-    public function injectEntityManager(\Doctrine\Common\Persistence\ObjectManager $entityManager)
+    public function injectEntityManager(ObjectManager $entityManager)
     {
         $this->entityManager = $entityManager;
         $this->queryBuilder = $entityManager->createQueryBuilder()->select('e')->from($this->entityClassName, 'e');
@@ -139,13 +148,13 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * Executes the query and returns the result.
      *
      * @param bool $cacheResult If the Doctrine result cache should be used
-     * @return \TYPO3\Flow\Persistence\QueryResultInterface The query result
+     * @return QueryResultInterface The query result
      * @api
      */
     public function execute($cacheResult = false)
     {
         $this->cacheResult = $cacheResult;
-        return new \TYPO3\Flow\Persistence\Doctrine\QueryResult($this);
+        return new QueryResult($this);
     }
 
     /**
@@ -155,9 +164,9 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * This should only ever be executed from the QueryResult class.
      *
      * @return array result set
-     * @throws \TYPO3\Flow\Persistence\Doctrine\Exception\DatabaseException
-     * @throws \TYPO3\Flow\Persistence\Doctrine\Exception\DatabaseConnectionException
-     * @throws \TYPO3\Flow\Persistence\Doctrine\Exception\DatabaseStructureException
+     * @throws Exception\DatabaseException
+     * @throws Exception\DatabaseConnectionException
+     * @throws Exception\DatabaseStructureException
      */
     public function getResult()
     {
@@ -169,7 +178,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
             return $query->getResult();
         } catch (\Doctrine\ORM\ORMException $ormException) {
             $this->systemLogger->logException($ormException);
-            return array();
+            return [];
         } catch (\Doctrine\DBAL\DBALException $dbalException) {
             $this->systemLogger->logException($dbalException);
 
@@ -218,7 +227,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
             $originalQuery = $this->queryBuilder->getQuery();
             $dqlQuery = clone $originalQuery;
             $dqlQuery->setParameters($originalQuery->getParameters());
-            $dqlQuery->setHint(\Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array('TYPO3\Flow\Persistence\Doctrine\CountWalker'));
+            $dqlQuery->setHint(\Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, [CountWalker::class]);
             $offset = $dqlQuery->getFirstResult();
             $limit = $dqlQuery->getMaxResults();
             if ($offset !== null) {
@@ -248,7 +257,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * )
      *
      * @param array $orderings The property names to order by
-     * @return \TYPO3\Flow\Persistence\QueryInterface
+     * @return QueryInterface
      * @api
      */
     public function setOrderings(array $orderings)
@@ -281,7 +290,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * for chaining (fluid interface)
      *
      * @param integer $limit
-     * @return \TYPO3\Flow\Persistence\QueryInterface
+     * @return QueryInterface
      * @api
      */
     public function setLimit($limit)
@@ -306,7 +315,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * Sets the DISTINCT flag for this query.
      *
      * @param boolean $distinct
-     * @return \TYPO3\Flow\Persistence\QueryInterface
+     * @return QueryInterface
      * @api
      */
     public function setDistinct($distinct = true)
@@ -332,7 +341,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * allow for chaining (fluid interface)
      *
      * @param integer $offset
-     * @return \TYPO3\Flow\Persistence\QueryInterface
+     * @return QueryInterface
      * @api
      */
     public function setOffset($offset)
@@ -358,7 +367,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * for chaining (fluid interface)
      *
      * @param object $constraint Some constraint, depending on the backend
-     * @return \TYPO3\Flow\Persistence\QueryInterface
+     * @return QueryInterface
      * @api
      */
     public function matching($constraint)
@@ -371,7 +380,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
     /**
      * Gets the constraint for this query.
      *
-     * @return \TYPO3\Flow\Persistence\Generic\Qom\Constraint the constraint, or null if none
+     * @return Constraint the constraint, or null if none
      * @api
     */
     public function getConstraint()
@@ -395,7 +404,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
         } else {
             $constraints = func_get_args();
         }
-        return call_user_func_array(array($this->queryBuilder->expr(), 'andX'), $constraints);
+        return call_user_func_array([$this->queryBuilder->expr(), 'andX'], $constraints);
     }
 
     /**
@@ -414,7 +423,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
         } else {
             $constraints = func_get_args();
         }
-        return call_user_func_array(array($this->queryBuilder->expr(), 'orX'), $constraints);
+        return call_user_func_array([$this->queryBuilder->expr(), 'orX'], $constraints);
     }
 
     /**
@@ -470,7 +479,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * @param string $operand The value to compare with
      * @param boolean $caseSensitive Whether the matching should be done case-sensitive
      * @return object
-     * @throws \TYPO3\Flow\Persistence\Exception\InvalidQueryException if used on a non-string property
+     * @throws InvalidQueryException if used on a non-string property
      * @api
      */
     public function like($propertyName, $operand, $caseSensitive = true)
@@ -492,7 +501,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * @param string $propertyName The name of the multivalued property to compare against
      * @param mixed $operand The value to compare with
      * @return object
-     * @throws \TYPO3\Flow\Persistence\Exception\InvalidQueryException if used on a single-valued property
+     * @throws InvalidQueryException if used on a single-valued property
      * @api
      */
     public function contains($propertyName, $operand)
@@ -506,7 +515,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      *
      * @param string $propertyName The name of the multivalued property to compare against
      * @return boolean
-     * @throws \TYPO3\Flow\Persistence\Exception\InvalidQueryException if used on a single-valued property
+     * @throws InvalidQueryException if used on a single-valued property
      * @api
      */
     public function isEmpty($propertyName)
@@ -521,7 +530,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * @param string $propertyName The name of the property to compare against
      * @param mixed $operand The value to compare with, multivalued
      * @return object
-     * @throws \TYPO3\Flow\Persistence\Exception\InvalidQueryException if used on a multi-valued property
+     * @throws InvalidQueryException if used on a multi-valued property
      * @api
      */
     public function in($propertyName, $operand)
@@ -537,7 +546,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * @param string $propertyName The name of the property to compare against
      * @param mixed $operand The value to compare with
      * @return object
-     * @throws \TYPO3\Flow\Persistence\Exception\InvalidQueryException if used on a multi-valued property or with a non-literal/non-DateTime operand
+     * @throws InvalidQueryException if used on a multi-valued property or with a non-literal/non-DateTime operand
      * @api
      */
     public function lessThan($propertyName, $operand)
@@ -551,7 +560,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * @param string $propertyName The name of the property to compare against
      * @param mixed $operand The value to compare with
      * @return object
-     * @throws \TYPO3\Flow\Persistence\Exception\InvalidQueryException if used on a multi-valued property or with a non-literal/non-DateTime operand
+     * @throws InvalidQueryException if used on a multi-valued property or with a non-literal/non-DateTime operand
      * @api
      */
     public function lessThanOrEqual($propertyName, $operand)
@@ -565,7 +574,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * @param string $propertyName The name of the property to compare against
      * @param mixed $operand The value to compare with
      * @return object
-     * @throws \TYPO3\Flow\Persistence\Exception\InvalidQueryException if used on a multi-valued property or with a non-literal/non-DateTime operand
+     * @throws InvalidQueryException if used on a multi-valued property or with a non-literal/non-DateTime operand
      * @api
      */
     public function greaterThan($propertyName, $operand)
@@ -579,7 +588,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
      * @param string $propertyName The name of the property to compare against
      * @param mixed $operand The value to compare with
      * @return object
-     * @throws \TYPO3\Flow\Persistence\Exception\InvalidQueryException if used on a multi-valued property or with a non-literal/non-DateTime operand
+     * @throws InvalidQueryException if used on a multi-valued property or with a non-literal/non-DateTime operand
      * @api
      */
     public function greaterThanOrEqual($propertyName, $operand)
@@ -669,7 +678,7 @@ class Query implements \TYPO3\Flow\Persistence\QueryInterface
     public function __sleep()
     {
         $this->parameters = $this->queryBuilder->getParameters();
-        return array('entityClassName', 'constraint', 'orderings', 'parameterIndex', 'limit', 'offset', 'distinct', 'parameters', 'joins');
+        return ['entityClassName', 'constraint', 'orderings', 'parameterIndex', 'limit', 'offset', 'distinct', 'parameters', 'joins'];
     }
 
     /**

@@ -1,16 +1,21 @@
 <?php
 namespace TYPO3\Flow\Mvc\Controller;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 
 use TYPO3\Flow\Http\Response;
+use TYPO3\Flow\Mvc\FlashMessageContainer;
 use TYPO3\Flow\Mvc\RequestInterface;
+use TYPO3\Flow\Mvc\ResponseInterface;
 use TYPO3\Flow\Mvc\Routing\UriBuilder;
 use TYPO3\Flow\Annotations as Flow;
 
@@ -25,38 +30,38 @@ use TYPO3\Flow\Annotations as Flow;
 class ControllerContext
 {
     /**
-     * @var \TYPO3\Flow\Mvc\RequestInterface
+     * @var RequestInterface
      */
     protected $request;
 
     /**
-     * @var \TYPO3\Flow\Http\Response
+     * @var Response
      */
     protected $response;
 
     /**
-     * @var \TYPO3\Flow\Mvc\Controller\Arguments
+     * @var Arguments
      */
     protected $arguments;
 
     /**
-     * @var \TYPO3\Flow\Mvc\Routing\UriBuilder
+     * @var UriBuilder
      */
     protected $uriBuilder;
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Mvc\FlashMessageContainer
+     * @var FlashMessageContainer
      */
     protected $flashMessageContainer;
 
     /**
      * Constructs this context
      *
-     * @param \TYPO3\Flow\Mvc\RequestInterface $request
-     * @param \TYPO3\Flow\Http\Response $response
-     * @param \TYPO3\Flow\Mvc\Controller\Arguments $arguments
-     * @param \TYPO3\Flow\Mvc\Routing\UriBuilder $uriBuilder
+     * @param RequestInterface $request
+     * @param Response $response
+     * @param Arguments $arguments
+     * @param UriBuilder $uriBuilder
      */
     public function __construct(RequestInterface $request, Response $response, Arguments $arguments, UriBuilder $uriBuilder)
     {
@@ -69,7 +74,7 @@ class ControllerContext
     /**
      * Get the request of the controller
      *
-     * @return \TYPO3\Flow\Mvc\RequestInterface
+     * @return RequestInterface
      * @api
      */
     public function getRequest()
@@ -80,7 +85,7 @@ class ControllerContext
     /**
      * Get the response of the controller
      *
-     * @return \TYPO3\Flow\Mvc\ResponseInterface
+     * @return ResponseInterface
      * @api
      */
     public function getResponse()
@@ -91,7 +96,7 @@ class ControllerContext
     /**
      * Get the arguments of the controller
      *
-     * @return \TYPO3\Flow\Mvc\Controller\Arguments
+     * @return Arguments
      * @api
      */
     public function getArguments()
@@ -102,7 +107,7 @@ class ControllerContext
     /**
      * Returns the URI Builder bound to this context
      *
-     * @return \TYPO3\Flow\Mvc\Routing\UriBuilder
+     * @return UriBuilder
      * @api
      */
     public function getUriBuilder()
@@ -113,7 +118,7 @@ class ControllerContext
     /**
      * Get the flash message container
      *
-     * @return \TYPO3\Flow\Mvc\FlashMessageContainer A container for flash messages
+     * @return FlashMessageContainer A container for flash messages
      * @api
      */
     public function getFlashMessageContainer()

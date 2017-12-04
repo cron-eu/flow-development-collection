@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Mvc;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Http\Component\ComponentContext;
@@ -65,7 +68,7 @@ class DispatchComponent implements ComponentInterface
     /**
      * @param array $options
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->options = $options;
     }
@@ -90,15 +93,15 @@ class DispatchComponent implements ComponentInterface
     {
         $httpRequest = $componentContext->getHttpRequest();
         /** @var $actionRequest ActionRequest */
-        $actionRequest = $this->objectManager->get('TYPO3\Flow\Mvc\ActionRequest', $httpRequest);
+        $actionRequest = $this->objectManager->get(ActionRequest::class, $httpRequest);
         $this->securityContext->setRequest($actionRequest);
 
-        $routingMatchResults = $componentContext->getParameter('TYPO3\Flow\Mvc\Routing\RoutingComponent', 'matchResults');
+        $routingMatchResults = $componentContext->getParameter(Routing\RoutingComponent::class, 'matchResults');
 
         $actionRequest->setArguments($this->mergeArguments($httpRequest, $routingMatchResults));
         $this->setDefaultControllerAndActionNameIfNoneSpecified($actionRequest);
 
-        $componentContext->setParameter('TYPO3\Flow\Mvc\DispatchComponent', 'actionRequest', $actionRequest);
+        $componentContext->setParameter(DispatchComponent::class, 'actionRequest', $actionRequest);
         $this->dispatcher->dispatch($actionRequest, $componentContext->getHttpResponse());
     }
 
@@ -110,7 +113,7 @@ class DispatchComponent implements ComponentInterface
     protected function mergeArguments(HttpRequest $httpRequest, array $routingMatchResults = null)
     {
         // HTTP body arguments
-        $this->propertyMappingConfiguration->setTypeConverterOption('TYPO3\Flow\Property\TypeConverter\MediaTypeConverterInterface', MediaTypeConverterInterface::CONFIGURATION_MEDIA_TYPE, $httpRequest->getHeader('Content-Type'));
+        $this->propertyMappingConfiguration->setTypeConverterOption(MediaTypeConverterInterface::class, MediaTypeConverterInterface::CONFIGURATION_MEDIA_TYPE, $httpRequest->getHeader('Content-Type'));
         $arguments = $this->propertyMapper->convert($httpRequest->getContent(), 'array', $this->propertyMappingConfiguration);
 
         // HTTP arguments (e.g. GET parameters)

@@ -1,14 +1,19 @@
 <?php
 namespace TYPO3\Flow\Session\Aspect;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Aop\JoinPointInterface;
+use TYPO3\Flow\Log\SystemLoggerInterface;
 
 /**
  * An aspect which centralizes the logging of important session actions.
@@ -19,7 +24,7 @@ use TYPO3\Flow\Annotations as Flow;
 class LoggingAspect
 {
     /**
-     * @var \TYPO3\Flow\Log\SystemLoggerInterface
+     * @var SystemLoggerInterface
      * @Flow\Inject
      */
     protected $systemLogger;
@@ -28,10 +33,10 @@ class LoggingAspect
      * Logs calls of start()
      *
      * @Flow\After("within(TYPO3\Flow\Session\SessionInterface) && method(.*->start())")
-     * @param \TYPO3\Flow\Aop\JoinPointInterface $joinPoint The current joinpoint
+     * @param JoinPointInterface $joinPoint The current joinpoint
      * @return mixed The result of the target method if it has not been intercepted
      */
-    public function logStart(\TYPO3\Flow\Aop\JoinPointInterface $joinPoint)
+    public function logStart(JoinPointInterface $joinPoint)
     {
         $session = $joinPoint->getProxy();
         if ($session->isStarted()) {
@@ -43,10 +48,10 @@ class LoggingAspect
      * Logs calls of resume()
      *
      * @Flow\After("within(TYPO3\Flow\Session\SessionInterface) && method(.*->resume())")
-     * @param \TYPO3\Flow\Aop\JoinPointInterface $joinPoint The current joinpoint
+     * @param JoinPointInterface $joinPoint The current joinpoint
      * @return mixed The result of the target method if it has not been intercepted
      */
-    public function logResume(\TYPO3\Flow\Aop\JoinPointInterface $joinPoint)
+    public function logResume(JoinPointInterface $joinPoint)
     {
         $session = $joinPoint->getProxy();
         if ($session->isStarted()) {
@@ -70,10 +75,10 @@ class LoggingAspect
      * Logs calls of destroy()
      *
      * @Flow\Before("within(TYPO3\Flow\Session\SessionInterface) && method(.*->destroy())")
-     * @param \TYPO3\Flow\Aop\JoinPointInterface $joinPoint The current joinpoint
+     * @param JoinPointInterface $joinPoint The current joinpoint
      * @return mixed The result of the target method if it has not been intercepted
      */
-    public function logDestroy(\TYPO3\Flow\Aop\JoinPointInterface $joinPoint)
+    public function logDestroy(JoinPointInterface $joinPoint)
     {
         $session = $joinPoint->getProxy();
         if ($session->isStarted()) {
@@ -86,10 +91,10 @@ class LoggingAspect
      * Logs calls of renewId()
      *
      * @Flow\Around("within(TYPO3\Flow\Session\SessionInterface) && method(.*->renewId())")
-     * @param \TYPO3\Flow\Aop\JoinPointInterface $joinPoint The current joinpoint
+     * @param JoinPointInterface $joinPoint The current joinpoint
      * @return mixed The result of the target method if it has not been intercepted
      */
-    public function logRenewId(\TYPO3\Flow\Aop\JoinPointInterface $joinPoint)
+    public function logRenewId(JoinPointInterface $joinPoint)
     {
         $session = $joinPoint->getProxy();
         $oldId = $session->getId();
@@ -104,10 +109,10 @@ class LoggingAspect
      * Logs calls of collectGarbage()
      *
      * @Flow\AfterReturning("within(TYPO3\Flow\Session\SessionInterface) && method(.*->collectGarbage())")
-     * @param \TYPO3\Flow\Aop\JoinPointInterface $joinPoint The current joinpoint
+     * @param JoinPointInterface $joinPoint The current joinpoint
      * @return void
      */
-    public function logCollectGarbage(\TYPO3\Flow\Aop\JoinPointInterface $joinPoint)
+    public function logCollectGarbage(JoinPointInterface $joinPoint)
     {
         $sessionRemovalCount = $joinPoint->getResult();
         if ($sessionRemovalCount > 0) {
@@ -122,10 +127,10 @@ class LoggingAspect
     /**
      * Determines the short or full class name of the session implementation
      *
-     * @param \TYPO3\Flow\Aop\JoinPointInterface $joinPoint
+     * @param JoinPointInterface $joinPoint
      * @return string
      */
-    protected function getClassName(\TYPO3\Flow\Aop\JoinPointInterface $joinPoint)
+    protected function getClassName(JoinPointInterface $joinPoint)
     {
         $className = $joinPoint->getClassName();
         if (substr($className, 0, 18) === 'TYPO3\Flow\Session') {

@@ -4,9 +4,9 @@
 Routing
 =======
 
-.. sectionauthor:: Bastian Waidelich <bastian@typo3.org>
+.. sectionauthor:: Bastian Waidelich <bastian@neos.io>
 
-As explained in the Model View Controller chapter, in TYPO3 Flow the dispatcher passes the
+As explained in the Model View Controller chapter, in Flow the dispatcher passes the
 request to a controller which then calls the respective action. But how to tell, what
 controller of what package is the right one for the current request? This is were the
 Routing Framework comes into play.
@@ -62,7 +62,7 @@ But let's start with an easy example:
 
 If you insert these lines at the beginning of the file ``Configurations/Routes.yaml``,
 the ``indexAction`` of the ``StandardController`` in your *My.Demo* package will be called
-when you open up the homepage of your TYPO3 Flow installation (``http://localhost/``).
+when you open up the homepage of your Flow installation (``http://localhost/``).
 
 URI patterns
 ============
@@ -309,7 +309,7 @@ and the method ``resolveValue()`` needs to return an URL segment when being pass
 
  .. code-block:: yaml
 
-  Flow_Mvc_Routing_FindMatchResults:
+  Flow_Mvc_Routing_Route:
     backend: TYPO3\Flow\Cache\Backend\NullBackend
   Flow_Mvc_Routing_Resolve:
     backend: TYPO3\Flow\Cache\Backend\NullBackend
@@ -416,7 +416,7 @@ Now route values that are neither defined in the ``uriPattern`` nor specified in
 appended to the resulting URI: ``http://localhost/foo/dynamicValue?someOtherArgument=argumentValue``
 
 This setting is mostly useful for *fallback routes* and it is enabled for the default action route provided
-with TYPO3 Flow, so that most links will work out of the box.
+with Flow, so that most links will work out of the box.
 
 .. note::
 
@@ -462,7 +462,7 @@ Subroutes
 =========
 
 For security reasons and to avoid confusion, only routes configured in your global
-configuration folder are active. But TYPO3 Flow supports what we call *SubRoutes* enabling you to
+configuration folder are active. But Flow supports what we call *SubRoutes* enabling you to
 provide custom routes with your package and reference them in the global routing setup.
 
 Imagine following routes in the ``Routes.yaml`` file inside your demo package:
@@ -549,7 +549,8 @@ This will load the SubRoutes from a file ``Routes.Foo.yaml`` in the ``My.Demo`` 
 With that feature you can include multiple Routes with your package (for example providing different URI styles).
 Furthermore you can nest routes in order to minimize duplication in your configuration. You nest SubRoutes by including
 different SubRoutes from within a SubRoute, using the same syntax as before.
-Additionally you can specify a set of ``variables`` that will be replaced in ``name`` and ``uriPattern`` of merged routes:
+Additionally you can specify a set of ``variables`` that will be replaced in ``name``, ``uriPattern`` and ``defaults``
+of merged routes:
 
 Imagine the following setup:
 
@@ -689,8 +690,8 @@ This will result in a merged configuration like this:
 		                                          TYPO3 :: Fallback rule – for when no site has been defined yet
 
 
-Route Loading Order and the TYPO3 Flow Application Context
-==========================================================
+Route Loading Order and the Flow Application Context
+====================================================
 
 - routes inside more specific contexts are loaded *first*
 - and *after* that, global ones, so you can specify context-specific routes

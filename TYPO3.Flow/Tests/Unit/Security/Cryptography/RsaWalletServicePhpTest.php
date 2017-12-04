@@ -1,24 +1,29 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Security\Cryptography;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use org\bovigo\vfs\vfsStream;
+use TYPO3\Flow\Security\Cryptography\RsaWalletServicePhp;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for for the PHP (OpenSSL) based RSAWalletService
  *
  * @requires function openssl_pkey_new
  */
-class RsaWalletServicePhpTest extends \TYPO3\Flow\Tests\UnitTestCase
+class RsaWalletServicePhpTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\Security\Cryptography\RsaWalletServicePhp
+     * @var RsaWalletServicePhp
      */
     protected $rsaWalletService;
 
@@ -38,7 +43,7 @@ class RsaWalletServicePhpTest extends \TYPO3\Flow\Tests\UnitTestCase
         vfsStream::setup('Foo');
         $settings['security']['cryptography']['RSAWalletServicePHP']['keystorePath'] = 'vfs://Foo/EncryptionKey';
 
-        $this->rsaWalletService = $this->getAccessibleMock('TYPO3\Flow\Security\Cryptography\RsaWalletServicePhp', array('dummy'));
+        $this->rsaWalletService = $this->getAccessibleMock(RsaWalletServicePhp::class, ['dummy']);
         $this->rsaWalletService->injectSettings($settings);
 
         $this->keyPairUuid = $this->rsaWalletService->generateNewKeypair();

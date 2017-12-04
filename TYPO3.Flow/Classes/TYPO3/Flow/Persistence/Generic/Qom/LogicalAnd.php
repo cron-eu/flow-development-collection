@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Persistence\Generic\Qom;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 
 /**
@@ -17,24 +20,24 @@ namespace TYPO3\Flow\Persistence\Generic\Qom;
  *
  * @api
  */
-class LogicalAnd extends \TYPO3\Flow\Persistence\Generic\Qom\Constraint
+class LogicalAnd extends Constraint
 {
     /**
-     * @var \TYPO3\Flow\Persistence\Generic\Qom\Constraint
+     * @var Constraint
      */
     protected $constraint1;
 
     /**
-     * @var \TYPO3\Flow\Persistence\Generic\Qom\Constraint
+     * @var Constraint
      */
     protected $constraint2;
 
     /**
      *
-     * @param \TYPO3\Flow\Persistence\Generic\Qom\Constraint $constraint1
-     * @param \TYPO3\Flow\Persistence\Generic\Qom\Constraint $constraint2
+     * @param Constraint $constraint1
+     * @param Constraint $constraint2
      */
-    public function __construct(\TYPO3\Flow\Persistence\Generic\Qom\Constraint $constraint1, \TYPO3\Flow\Persistence\Generic\Qom\Constraint $constraint2)
+    public function __construct(Constraint $constraint1, Constraint $constraint2)
     {
         $this->constraint1 = $constraint1;
         $this->constraint2 = $constraint2;
@@ -43,7 +46,7 @@ class LogicalAnd extends \TYPO3\Flow\Persistence\Generic\Qom\Constraint
     /**
      * Gets the first constraint.
      *
-     * @return \TYPO3\Flow\Persistence\Generic\Qom\Constraint the constraint; non-null
+     * @return Constraint the constraint; non-null
      * @api
      */
     public function getConstraint1()
@@ -54,7 +57,7 @@ class LogicalAnd extends \TYPO3\Flow\Persistence\Generic\Qom\Constraint
     /**
      * Gets the second constraint.
      *
-     * @return \TYPO3\Flow\Persistence\Generic\Qom\Constraint the constraint; non-null
+     * @return Constraint the constraint; non-null
      * @api
      */
     public function getConstraint2()

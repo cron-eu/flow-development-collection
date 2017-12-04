@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Http;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -21,17 +24,17 @@ class Headers
     /**
      * @var array
      */
-    protected $fields = array();
+    protected $fields = [];
 
     /**
      * @var array
      */
-    protected $cookies = array();
+    protected $cookies = [];
 
     /**
      * @var array
      */
-    protected $cacheDirectives = array(
+    protected $cacheDirectives = [
         'visibility' => '',
         'max-age' => '',
         's-maxage' => '',
@@ -39,14 +42,14 @@ class Headers
         'proxy-revalidate' => '',
         'no-store' => '',
         'no-transform' => ''
-    );
+    ];
 
     /**
      * Constructs a new Headers object.
      *
      * @param array $fields Field names and their values (either as single value or array of values)
      */
-    public function __construct(array $fields = array())
+    public function __construct(array $fields = [])
     {
         foreach ($fields as $name => $values) {
             $this->set($name, $values);
@@ -57,11 +60,11 @@ class Headers
      * Creates a new Headers instance from the given $_SERVER-superglobal-like array.
      *
      * @param array $server An array similar or equal to $_SERVER, containing headers in the form of "HTTP_FOO_BAR"
-     * @return \TYPO3\Flow\Http\Headers
+     * @return Headers
      */
     public static function createFromServer(array $server)
     {
-        $headerFields = array();
+        $headerFields = [];
         if (isset($server['PHP_AUTH_USER']) && isset($server['PHP_AUTH_PW'])) {
             $headerFields['Authorization'] = 'Basic ' . base64_encode($server['PHP_AUTH_USER'] . ':' . $server['PHP_AUTH_PW']);
         }
@@ -72,7 +75,7 @@ class Headers
                 $headerFields[$name] = $value;
             } elseif ($name == 'REDIRECT_REMOTE_AUTHORIZATION' && !isset($headerFields['Authorization'])) {
                 $headerFields['Authorization'] = $value;
-            } elseif (in_array($name, array('CONTENT_TYPE', 'CONTENT_LENGTH'))) {
+            } elseif (in_array($name, ['CONTENT_TYPE', 'CONTENT_LENGTH'])) {
                 $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', $name))));
                 $headerFields[$name] = $value;
             }
@@ -106,7 +109,7 @@ class Headers
         if ($values instanceof \DateTime) {
             $date = clone $values;
             $date->setTimezone(new \DateTimeZone('GMT'));
-            $values = array($date->format('D, d M Y H:i:s') . ' GMT');
+            $values = [$date->format('D, d M Y H:i:s') . ' GMT'];
         } else {
             $values = (array) $values;
         }
@@ -151,7 +154,7 @@ class Headers
             return null;
         }
 
-        $convertedValues = array();
+        $convertedValues = [];
         foreach ($this->fields[$name] as $index => $value) {
             $convertedValues[$index] = \DateTime::createFromFormat(DATE_RFC2822, $value);
             if ($convertedValues[$index] === false) {
@@ -176,7 +179,7 @@ class Headers
         $fields = $this->fields;
         $cacheControlHeader = $this->getCacheControlHeader();
         if (!empty($cacheControlHeader)) {
-            $fields['Cache-Control'] = array($cacheControlHeader);
+            $fields['Cache-Control'] = [$cacheControlHeader];
         }
         return $fields;
     }
@@ -211,7 +214,7 @@ class Headers
     /**
      * Sets a cookie
      *
-     * @param \TYPO3\Flow\Http\Cookie $cookie
+     * @param Cookie $cookie
      * @return void
      * @api
      */
@@ -224,7 +227,7 @@ class Headers
      * Returns a cookie specified by the given name
      *
      * @param string $name Name of the cookie
-     * @return \TYPO3\Flow\Http\Cookie The cookie or NULL if no such cookie exists
+     * @return Cookie The cookie or NULL if no such cookie exists
      * @api
      */
     public function getCookie($name)
@@ -443,9 +446,14 @@ class Headers
     {
         $cookiePairs = explode(';', $rawFieldValue);
         foreach ($cookiePairs as $cookiePair) {
+            if (strpos($cookiePair, '=') === false) {
+                continue;
+            }
             list($name, $value) = explode('=', $cookiePair, 2);
-            if (trim($name) !== '') {
-                $this->setCookie(new Cookie(trim($name), urldecode(trim($value, "\t ;\""))));
+            $trimmedName = trim($name);
+
+            if ($trimmedName !== '' && preg_match(Cookie::PATTERN_TOKEN, $trimmedName) === 1) {
+                $this->setCookie(new Cookie($trimmedName, urldecode(trim($value, "\t ;\""))));
             }
         }
     }

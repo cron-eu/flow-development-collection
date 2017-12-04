@@ -1,13 +1,17 @@
 <?php
 namespace TYPO3\Flow\Aop;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Aop\Exception\InvalidArgumentException;
 
 /**
  * In Flow the join point object contains context information when a point cut
@@ -15,7 +19,7 @@ namespace TYPO3\Flow\Aop;
  *
  * @api
  */
-class JoinPoint implements \TYPO3\Flow\Aop\JoinPointInterface
+class JoinPoint implements JoinPointInterface
 {
     /**
      * A reference to the proxy object
@@ -136,7 +140,7 @@ class JoinPoint implements \TYPO3\Flow\Aop\JoinPointInterface
     public function getMethodArgument($argumentName)
     {
         if (!array_key_exists($argumentName, $this->methodArguments)) {
-            throw new \TYPO3\Flow\Aop\Exception\InvalidArgumentException('The argument "' . $argumentName . '" does not exist in method ' . $this->className . '->' . $this->methodName, 1172750905);
+            throw new InvalidArgumentException('The argument "' . $argumentName . '" does not exist in method ' . $this->className . '->' . $this->methodName, 1172750905);
         }
         return $this->methodArguments[$argumentName];
     }
@@ -153,7 +157,7 @@ class JoinPoint implements \TYPO3\Flow\Aop\JoinPointInterface
     public function setMethodArgument($argumentName, $argumentValue)
     {
         if (!array_key_exists($argumentName, $this->methodArguments)) {
-            throw new \TYPO3\Flow\Aop\Exception\InvalidArgumentException('The argument "' . $argumentName . '" does not exist in method ' . $this->className . '->' . $this->methodName, 1309260269);
+            throw new InvalidArgumentException('The argument "' . $argumentName . '" does not exist in method ' . $this->className . '->' . $this->methodName, 1309260269);
         }
         $this->methodArguments[$argumentName] = $argumentValue;
     }

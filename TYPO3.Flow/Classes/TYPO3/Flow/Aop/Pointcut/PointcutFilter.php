@@ -1,21 +1,27 @@
 <?php
 namespace TYPO3\Flow\Aop\Pointcut;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Aop\Builder\ClassNameIndex;
+use TYPO3\Flow\Aop\Builder\ProxyClassBuilder;
+use TYPO3\Flow\Aop\Exception\UnknownPointcutException;
 
 /**
  * A filter which refers to another pointcut.
  *
  * @Flow\Proxy(false)
  */
-class PointcutFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
+class PointcutFilter implements PointcutFilterInterface
 {
     /**
      * Name of the aspect class where the pointcut was declared
@@ -37,7 +43,7 @@ class PointcutFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
 
     /**
      * A reference to the AOP Proxy ClassBuilder
-     * @var \TYPO3\Flow\Aop\Builder\ProxyClassBuilder
+     * @var ProxyClassBuilder
      */
     protected $proxyClassBuilder;
 
@@ -56,10 +62,10 @@ class PointcutFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
     /**
      * Injects the AOP Proxy Class Builder
      *
-     * @param \TYPO3\Flow\Aop\Builder\ProxyClassBuilder $proxyClassBuilder
+     * @param ProxyClassBuilder $proxyClassBuilder
      * @return void
      */
-    public function injectProxyClassBuilder(\TYPO3\Flow\Aop\Builder\ProxyClassBuilder $proxyClassBuilder)
+    public function injectProxyClassBuilder(ProxyClassBuilder $proxyClassBuilder)
     {
         $this->proxyClassBuilder = $proxyClassBuilder;
     }
@@ -72,7 +78,7 @@ class PointcutFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
      * @param string $methodDeclaringClassName Name of the class the method was originally declared in
      * @param mixed $pointcutQueryIdentifier Some identifier for this query - must at least differ from a previous identifier. Used for circular reference detection.
      * @return boolean TRUE if the class matches, otherwise FALSE
-     * @throws \TYPO3\Flow\Aop\Exception\UnknownPointcutException
+     * @throws UnknownPointcutException
      */
     public function matches($className, $methodName, $methodDeclaringClassName, $pointcutQueryIdentifier)
     {
@@ -80,7 +86,7 @@ class PointcutFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
             $this->pointcut = $this->proxyClassBuilder->findPointcut($this->aspectClassName, $this->pointcutMethodName);
         }
         if ($this->pointcut === false) {
-            throw new \TYPO3\Flow\Aop\Exception\UnknownPointcutException('No pointcut "' . $this->pointcutMethodName . '" found in aspect class "' . $this->aspectClassName . '" .', 1172223694);
+            throw new UnknownPointcutException('No pointcut "' . $this->pointcutMethodName . '" found in aspect class "' . $this->aspectClassName . '" .', 1172223694);
         }
         return $this->pointcut->matches($className, $methodName, $methodDeclaringClassName, $pointcutQueryIdentifier);
     }
@@ -106,7 +112,7 @@ class PointcutFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
             $this->pointcut = $this->proxyClassBuilder->findPointcut($this->aspectClassName, $this->pointcutMethodName);
         }
         if ($this->pointcut === false) {
-            return array();
+            return [];
         }
 
         return $this->pointcut->getRuntimeEvaluationsDefinition();
@@ -115,10 +121,10 @@ class PointcutFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
     /**
      * This method is used to optimize the matching process.
      *
-     * @param \TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex
-     * @return \TYPO3\Flow\Aop\Builder\ClassNameIndex
+     * @param ClassNameIndex $classNameIndex
+     * @return ClassNameIndex
      */
-    public function reduceTargetClassNames(\TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex)
+    public function reduceTargetClassNames(ClassNameIndex $classNameIndex)
     {
         if ($this->pointcut === null) {
             $this->pointcut = $this->proxyClassBuilder->findPointcut($this->aspectClassName, $this->pointcutMethodName);

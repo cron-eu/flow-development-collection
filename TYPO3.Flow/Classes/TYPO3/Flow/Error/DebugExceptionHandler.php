@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Error;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Exception as FlowException;
@@ -24,10 +27,10 @@ class DebugExceptionHandler extends AbstractExceptionHandler
     /**
      * Formats and echoes the exception as XHTML.
      *
-     * @param \Exception $exception The exception object
+     * @param object $exception \Exception or \Throwable
      * @return void
      */
-    protected function echoExceptionWeb(\Exception $exception)
+    protected function echoExceptionWeb($exception)
     {
         $statusCode = 500;
         if ($exception instanceof FlowException) {
@@ -39,7 +42,13 @@ class DebugExceptionHandler extends AbstractExceptionHandler
         }
 
         if (isset($this->renderingOptions['templatePathAndFilename'])) {
-            echo $this->buildCustomFluidView($exception, $this->renderingOptions)->render();
+            try {
+                echo $this->buildCustomFluidView($exception, $this->renderingOptions)->render();
+            } catch (\Throwable $throwable) {
+                $this->renderStatically($statusCode, $throwable);
+            } catch (\Exception $exception) {
+                $this->renderStatically($statusCode, $exception);
+            }
         } else {
             $this->renderStatically($statusCode, $exception);
         }
@@ -49,10 +58,10 @@ class DebugExceptionHandler extends AbstractExceptionHandler
      * Returns the statically rendered exception message
      *
      * @param integer $statusCode
-     * @param \Exception $exception
+     * @param object $exception \Exception or \Throwable
      * @return void
      */
-    protected function renderStatically($statusCode, \Exception $exception)
+    protected function renderStatically($statusCode, $exception)
     {
         $statusMessage = Response::getStatusMessageByCode($statusCode);
         $exceptionHeader = '';
@@ -61,14 +70,13 @@ class DebugExceptionHandler extends AbstractExceptionHandler
             $filePathAndName = ($pathPosition !== false) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
             $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
 
-            $moreInformationLink = ($exceptionCodeNumber != '') ? '<p><a href="http://typo3.org/go/exception/' . $exception->getCode() . '">More information</a></p>' : '';
             $exceptionMessageParts = $this->splitExceptionMessage($exception->getMessage());
 
             $exceptionHeader .= '<h2 class="ExceptionSubject">' . $exceptionCodeNumber . htmlspecialchars($exceptionMessageParts['subject']) . '</h2>';
             if ($exceptionMessageParts['body'] !== '') {
                 $exceptionHeader .= '<p class="ExceptionBody">' . nl2br(htmlspecialchars($exceptionMessageParts['body'])) . '</p>';
             }
-            $exceptionHeader .= $moreInformationLink . '
+            $exceptionHeader .= '
 				<span class="ExceptionProperty">' . get_class($exception) . '</span> thrown in file<br />
 				<span class="ExceptionProperty">' . $filePathAndName . '</span> in line
 				<span class="ExceptionProperty">' . $exception->getLine() . '</span>.<br />';

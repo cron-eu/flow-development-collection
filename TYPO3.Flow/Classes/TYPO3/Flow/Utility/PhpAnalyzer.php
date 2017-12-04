@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Utility;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * This utility class can be used to extract information about PHP files without having to instantiate/reflect classes.
@@ -62,7 +65,7 @@ class PhpAnalyzer
      */
     public function extractNamespace()
     {
-        $namespaceParts = array();
+        $namespaceParts = [];
         $tokens = token_get_all($this->phpCode);
         $numberOfTokens = count($tokens);
         for ($i = 0; $i < $numberOfTokens; $i++) {
@@ -86,7 +89,7 @@ class PhpAnalyzer
             }
             break;
         }
-        if ($namespaceParts === array()) {
+        if ($namespaceParts === []) {
             return null;
         }
         return implode('\\', $namespaceParts);

@@ -1,18 +1,23 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\I18n\Xliff;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\I18n;
 
 /**
  * Testcase for the XliffParser
- *
  */
-class XliffParserTest extends \TYPO3\Flow\Tests\UnitTestCase
+class XliffParserTest extends UnitTestCase
 {
     /**
      * @test
@@ -22,7 +27,7 @@ class XliffParserTest extends \TYPO3\Flow\Tests\UnitTestCase
         $mockFilenamePath = __DIR__ . '/../Fixtures/MockXliffData.xlf';
         $mockParsedData = require(__DIR__ . '/../Fixtures/MockParsedXliffData.php');
 
-        $parser = new \TYPO3\Flow\I18n\Xliff\XliffParser();
+        $parser = new I18n\Xliff\XliffParser();
         $result = $parser->getParsedData($mockFilenamePath);
         $this->assertEquals($mockParsedData, $result);
     }
@@ -35,7 +40,7 @@ class XliffParserTest extends \TYPO3\Flow\Tests\UnitTestCase
     {
         $mockFilenamePath = __DIR__ . '/../Fixtures/MockInvalidXliffData.xlf';
 
-        $parser = new \TYPO3\Flow\I18n\Xliff\XliffParser();
+        $parser = new I18n\Xliff\XliffParser();
         $parser->getParsedData($mockFilenamePath);
     }
 
@@ -47,7 +52,7 @@ class XliffParserTest extends \TYPO3\Flow\Tests\UnitTestCase
     {
         $mockFilenamePath = __DIR__ . '/../Fixtures/MockInvalidPluralXliffData.xlf';
 
-        $parser = new \TYPO3\Flow\I18n\Xliff\XliffParser();
+        $parser = new I18n\Xliff\XliffParser();
         $parser->getParsedData($mockFilenamePath);
     }
 }

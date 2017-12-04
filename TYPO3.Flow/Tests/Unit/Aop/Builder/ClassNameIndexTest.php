@@ -1,30 +1,36 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Aop\Builder;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\Aop;
 
 /**
  * Testcase for the ClassNameIndex
  */
-class ClassNameIndexTest extends \TYPO3\Flow\Tests\UnitTestCase
+class ClassNameIndexTest extends UnitTestCase
 {
     /**
      * @test
      */
     public function intersectOfTwoIndicesWorks()
     {
-        $index1 = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
-        $index1->setClassNames(array('\Foo\Bar', '\Foo\Baz'));
-        $index2 = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
-        $index2->setClassNames(array('\Foo\Baz', '\Foo\Blubb'));
+        $index1 = new Aop\Builder\ClassNameIndex();
+        $index1->setClassNames(['\Foo\Bar', '\Foo\Baz']);
+        $index2 = new Aop\Builder\ClassNameIndex();
+        $index2->setClassNames(['\Foo\Baz', '\Foo\Blubb']);
         $intersectedIndex = $index1->intersect($index2);
 
-        $this->assertEquals(array('\Foo\Baz'), $intersectedIndex->getClassNames());
+        $this->assertEquals(['\Foo\Baz'], $intersectedIndex->getClassNames());
     }
 
     /**
@@ -32,13 +38,13 @@ class ClassNameIndexTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function applyIntersectWorks()
     {
-        $index1 = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
-        $index1->setClassNames(array('\Foo\Bar', '\Foo\Baz'));
-        $index2 = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
-        $index2->setClassNames(array('\Foo\Baz', '\Foo\Blubb'));
+        $index1 = new Aop\Builder\ClassNameIndex();
+        $index1->setClassNames(['\Foo\Bar', '\Foo\Baz']);
+        $index2 = new Aop\Builder\ClassNameIndex();
+        $index2->setClassNames(['\Foo\Baz', '\Foo\Blubb']);
         $index1->applyIntersect($index2);
 
-        $this->assertEquals(array('\Foo\Baz'), $index1->getClassNames());
+        $this->assertEquals(['\Foo\Baz'], $index1->getClassNames());
     }
 
     /**
@@ -46,14 +52,14 @@ class ClassNameIndexTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function unionOfTwoIndicesWorks()
     {
-        $index1 = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
-        $index1->setClassNames(array('\Foo\Bar', '\Foo\Baz'));
-        $index2 = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
-        $index2->setClassNames(array('\Foo\Baz', '\Foo\Blubb'));
+        $index1 = new Aop\Builder\ClassNameIndex();
+        $index1->setClassNames(['\Foo\Bar', '\Foo\Baz']);
+        $index2 = new Aop\Builder\ClassNameIndex();
+        $index2->setClassNames(['\Foo\Baz', '\Foo\Blubb']);
         $intersectedIndex = $index1->union($index2);
         $intersectedIndex->sort();
 
-        $this->assertEquals(array('\Foo\Bar', '\Foo\Baz', '\Foo\Blubb'), $intersectedIndex->getClassNames());
+        $this->assertEquals(['\Foo\Bar', '\Foo\Baz', '\Foo\Blubb'], $intersectedIndex->getClassNames());
     }
 
     /**
@@ -61,14 +67,14 @@ class ClassNameIndexTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function applyUnionWorks()
     {
-        $index1 = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
-        $index1->setClassNames(array('\Foo\Bar', '\Foo\Baz'));
-        $index2 = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
-        $index2->setClassNames(array('\Foo\Baz', '\Foo\Blubb'));
+        $index1 = new Aop\Builder\ClassNameIndex();
+        $index1->setClassNames(['\Foo\Bar', '\Foo\Baz']);
+        $index2 = new Aop\Builder\ClassNameIndex();
+        $index2->setClassNames(['\Foo\Baz', '\Foo\Blubb']);
         $index1->applyUnion($index2);
         $index1->sort();
 
-        $this->assertEquals(array('\Foo\Bar', '\Foo\Baz', '\Foo\Blubb'), $index1->getClassNames());
+        $this->assertEquals(['\Foo\Bar', '\Foo\Baz', '\Foo\Blubb'], $index1->getClassNames());
     }
 
     /**
@@ -76,13 +82,13 @@ class ClassNameIndexTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function filterByPrefixWork()
     {
-        $index1 = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
-        $index1->setClassNames(array('\Foo\Bar', '\Foo\Baz', '\Bar\Baz', '\Foo\Blubb'));
+        $index1 = new Aop\Builder\ClassNameIndex();
+        $index1->setClassNames(['\Foo\Bar', '\Foo\Baz', '\Bar\Baz', '\Foo\Blubb']);
         // We need to call sort manually!
         $index1->sort();
 
         $filteredIndex = $index1->filterByPrefix('\Foo');
 
-        $this->assertEquals(array('\Foo\Bar', '\Foo\Baz', '\Foo\Blubb'), $filteredIndex->getClassNames());
+        $this->assertEquals(['\Foo\Bar', '\Foo\Baz', '\Foo\Blubb'], $filteredIndex->getClassNames());
     }
 }

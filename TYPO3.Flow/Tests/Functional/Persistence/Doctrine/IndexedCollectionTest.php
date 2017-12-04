@@ -1,24 +1,27 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Persistence\Doctrine;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Doctrine\ORM\Mapping as ORM;
 use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Tests\Functional\Persistence\Fixtures\AnnotatedIdentitiesEntity;
-use TYPO3\Flow\Tests\Functional\Persistence\Fixtures\EntityWithIndexedRelation;
-use TYPO3\Flow\Tests\Functional\Persistence\Fixtures\RelatedIndexEntity;
+use TYPO3\Flow\Persistence\Doctrine\PersistenceManager;
+use TYPO3\Flow\Tests\Functional\Persistence\Fixtures;
+use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
  * Test for Doctrine indexed Collections
  * @Flow\Scope("prototype")
  */
-class IndexedCollectionTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class IndexedCollectionTest extends FunctionalTestCase
 {
     protected static $testablePersistenceEnabled = true;
 
@@ -28,7 +31,7 @@ class IndexedCollectionTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     public function setUp()
     {
         parent::setUp();
-        if (!$this->persistenceManager instanceof \TYPO3\Flow\Persistence\Doctrine\PersistenceManager) {
+        if (!$this->persistenceManager instanceof PersistenceManager) {
             $this->markTestSkipped('Doctrine persistence is not enabled');
         }
     }
@@ -40,15 +43,15 @@ class IndexedCollectionTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function collectionsWithIndexAttributeAreIndexed()
     {
-        $entityWithIndexedRelation = new EntityWithIndexedRelation();
+        $entityWithIndexedRelation = new Fixtures\EntityWithIndexedRelation();
         for ($i = 0; $i < 3; $i++) {
-            $annotatedIdentitiesEntity = new AnnotatedIdentitiesEntity();
+            $annotatedIdentitiesEntity = new Fixtures\AnnotatedIdentitiesEntity();
             $annotatedIdentitiesEntity->setAuthor('Author' . ((string) $i));
             $annotatedIdentitiesEntity->setTitle('Author' . ((string) $i));
             $entityWithIndexedRelation->getAnnotatedIdentitiesEntities()->add($annotatedIdentitiesEntity);
         }
 
-        $entityWithIndexedRelation->setRelatedIndexEntity('test', new RelatedIndexEntity());
+        $entityWithIndexedRelation->setRelatedIndexEntity('test', new Fixtures\RelatedIndexEntity());
 
         $this->persistenceManager->add($entityWithIndexedRelation);
         $this->persistenceManager->persistAll();
@@ -58,7 +61,7 @@ class IndexedCollectionTest extends \TYPO3\Flow\Tests\FunctionalTestCase
         $this->persistenceManager->clearState();
         unset($entityWithIndexedRelation);
 
-        $entityWithIndexedRelation = $this->persistenceManager->getObjectByIdentifier($id, 'TYPO3\Flow\Tests\Functional\Persistence\Fixtures\EntityWithIndexedRelation');
+        $entityWithIndexedRelation = $this->persistenceManager->getObjectByIdentifier($id, Fixtures\EntityWithIndexedRelation::class);
         for ($i = 0; $i < 3; $i++) {
             $this->assertArrayHasKey('Author' . (string) $i, $entityWithIndexedRelation->getAnnotatedIdentitiesEntities());
         }
@@ -66,6 +69,6 @@ class IndexedCollectionTest extends \TYPO3\Flow\Tests\FunctionalTestCase
 
         $this->assertArrayHasKey('test', $entityWithIndexedRelation->getRelatedIndexEntities());
         $this->assertArrayNotHasKey(0, $entityWithIndexedRelation->getRelatedIndexEntities());
-        $this->assertInstanceOf('TYPO3\Flow\Tests\Functional\Persistence\Fixtures\RelatedIndexEntity', $entityWithIndexedRelation->getRelatedIndexEntities()->get('test'));
+        $this->assertInstanceOf(Fixtures\RelatedIndexEntity::class, $entityWithIndexedRelation->getRelatedIndexEntities()->get('test'));
     }
 }

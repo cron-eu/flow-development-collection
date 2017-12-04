@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Cache\Frontend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Cache\Backend\IterableBackendInterface;
 use TYPO3\Flow\Cache\Exception\NotSupportedByBackendException;
@@ -49,7 +52,7 @@ class VariableFrontend extends AbstractFrontend
      * @throws \InvalidArgumentException
      * @api
      */
-    public function set($entryIdentifier, $variable, array $tags = array(), $lifetime = null)
+    public function set($entryIdentifier, $variable, array $tags = [], $lifetime = null)
     {
         if (!$this->isValidEntryIdentifier($entryIdentifier)) {
             throw new \InvalidArgumentException('"' . $entryIdentifier . '" is not a valid cache entry identifier.', 1233058264);
@@ -102,7 +105,7 @@ class VariableFrontend extends AbstractFrontend
             throw new \InvalidArgumentException('"' . $tag . '" is not a valid tag for a cache entry.', 1233058312);
         }
 
-        $entries = array();
+        $entries = [];
         $identifiers = $this->backend->findIdentifiersByTag($tag);
         foreach ($identifiers as $identifier) {
             $rawResult = $this->backend->get($identifier);

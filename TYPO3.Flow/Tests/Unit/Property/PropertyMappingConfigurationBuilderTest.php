@@ -1,12 +1,19 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Property;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Property\PropertyMappingConfigurationBuilder;
+use TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 require_once(__DIR__ . '/../Fixtures/ClassWithSetters.php');
 
@@ -15,17 +22,17 @@ require_once(__DIR__ . '/../Fixtures/ClassWithSetters.php');
  *
  * @covers \TYPO3\Flow\Property\PropertyMappingConfigurationBuilder
  */
-class PropertyMappingConfigurationBuilderTest extends \TYPO3\Flow\Tests\UnitTestCase
+class PropertyMappingConfigurationBuilderTest extends UnitTestCase
 {
     /**
      *
-     * @var \TYPO3\Flow\Property\PropertyMappingConfigurationBuilder
+     * @var PropertyMappingConfigurationBuilder
      */
     protected $propertyMappingConfigurationBuilder;
 
     public function setUp()
     {
-        $this->propertyMappingConfigurationBuilder = new \TYPO3\Flow\Property\PropertyMappingConfigurationBuilder();
+        $this->propertyMappingConfigurationBuilder = new PropertyMappingConfigurationBuilder();
     }
 
     /**
@@ -34,10 +41,10 @@ class PropertyMappingConfigurationBuilderTest extends \TYPO3\Flow\Tests\UnitTest
     public function getTargetPropertyNameShouldReturnTheUnmodifiedPropertyNameWithoutConfiguration()
     {
         $defaultConfiguration = $this->propertyMappingConfigurationBuilder->build();
-        $this->assertTrue($defaultConfiguration->getConfigurationValue('TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter', \TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED));
-        $this->assertTrue($defaultConfiguration->getConfigurationValue('TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter', \TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter::CONFIGURATION_MODIFICATION_ALLOWED));
+        $this->assertTrue($defaultConfiguration->getConfigurationValue(PersistentObjectConverter::class, PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED));
+        $this->assertTrue($defaultConfiguration->getConfigurationValue(PersistentObjectConverter::class, PersistentObjectConverter::CONFIGURATION_MODIFICATION_ALLOWED));
 
-        $this->assertNull($defaultConfiguration->getConfigurationFor('foo')->getConfigurationValue('TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter', \TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED));
-        $this->assertNull($defaultConfiguration->getConfigurationFor('foo')->getConfigurationValue('TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter', \TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter::CONFIGURATION_MODIFICATION_ALLOWED));
+        $this->assertNull($defaultConfiguration->getConfigurationFor('foo')->getConfigurationValue(PersistentObjectConverter::class, PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED));
+        $this->assertNull($defaultConfiguration->getConfigurationFor('foo')->getConfigurationValue(PersistentObjectConverter::class, PersistentObjectConverter::CONFIGURATION_MODIFICATION_ALLOWED));
     }
 }

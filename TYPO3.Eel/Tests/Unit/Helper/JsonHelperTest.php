@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel\Tests\Unit;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Eel\Helper\JsonHelper;
 
@@ -17,20 +20,20 @@ class JsonHelperTest extends \TYPO3\Flow\Tests\UnitTestCase
 {
     public function stringifyExamples()
     {
-        return array(
-            'string value' => array(
+        return [
+            'string value' => [
                 'Foo', '"Foo"'
-            ),
-            'null value' => array(
+            ],
+            'null value' => [
                 null, 'null'
-            ),
-            'numeric value' => array(
+            ],
+            'numeric value' => [
                 42, '42'
-            ),
-            'array value' => array(
-                array('Foo', 'Bar'), '["Foo","Bar"]'
-            )
-        );
+            ],
+            'array value' => [
+                ['Foo', 'Bar'], '["Foo","Bar"]'
+            ]
+        ];
     }
 
     /**
@@ -46,26 +49,26 @@ class JsonHelperTest extends \TYPO3\Flow\Tests\UnitTestCase
 
     public function parseExamples()
     {
-        return array(
-            'string value' => array(
-                array('"Foo"'), 'Foo'
-            ),
-            'null value' => array(
-                array('null'), null
-            ),
-            'numeric value' => array(
-                array('42'), 42
-            ),
-            'array value' => array(
-                array('["Foo","Bar"]'), array('Foo', 'Bar')
-            ),
-            'object value is parsed as associative array by default' => array(
-                array('{"name":"Foo"}'), array('name' => 'Foo')
-            ),
-            'object value without associative array' => array(
-                array('{"name":"Foo"}', false), (object)array('name' => 'Foo')
-            )
-        );
+        return [
+            'string value' => [
+                ['"Foo"'], 'Foo'
+            ],
+            'null value' => [
+                ['null'], null
+            ],
+            'numeric value' => [
+                ['42'], 42
+            ],
+            'array value' => [
+                ['["Foo","Bar"]'], ['Foo', 'Bar']
+            ],
+            'object value is parsed as associative array by default' => [
+                ['{"name":"Foo"}'], ['name' => 'Foo']
+            ],
+            'object value without associative array' => [
+                ['{"name":"Foo"}', false], (object)['name' => 'Foo']
+            ]
+        ];
     }
 
     /**
@@ -75,7 +78,7 @@ class JsonHelperTest extends \TYPO3\Flow\Tests\UnitTestCase
     public function parseWorks($arguments, $expected)
     {
         $helper = new JsonHelper();
-        $result = call_user_func_array(array($helper, 'parse'), $arguments);
+        $result = call_user_func_array([$helper, 'parse'], $arguments);
         $this->assertEquals($expected, $result);
     }
 }

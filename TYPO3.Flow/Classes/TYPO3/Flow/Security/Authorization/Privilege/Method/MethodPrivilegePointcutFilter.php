@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Security\Authorization\Privilege\Method;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Aop\Builder\ClassNameIndex;
@@ -33,7 +36,7 @@ class MethodPrivilegePointcutFilter implements PointcutFilterInterface
     /**
      * @var array
      */
-    protected $methodPermissions = array();
+    protected $methodPermissions = [];
 
     /**
      * @var VariableFrontend
@@ -129,7 +132,7 @@ class MethodPrivilegePointcutFilter implements PointcutFilterInterface
      */
     public function getRuntimeEvaluationsDefinition()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -158,7 +161,7 @@ class MethodPrivilegePointcutFilter implements PointcutFilterInterface
      */
     protected function buildPointcutFilters()
     {
-        $this->filters = array();
+        $this->filters = [];
         /** @var PolicyService $policyService */
         $policyService = $this->objectManager->get(PolicyService::class);
         /** @var MethodPrivilegeInterface[] $methodPrivileges */
@@ -175,7 +178,7 @@ class MethodPrivilegePointcutFilter implements PointcutFilterInterface
      */
     public function savePolicyCache()
     {
-        $tags = array('TYPO3_Flow_Aop');
+        $tags = ['TYPO3_Flow_Aop'];
         if (!$this->methodPermissionCache->has('methodPermission')) {
             $this->methodPermissionCache->set('methodPermission', $this->methodPermissions, $tags);
         }

@@ -1,41 +1,49 @@
 <?php
 namespace TYPO3\Flow\Security\Authorization;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Mvc\ActionRequest;
+use TYPO3\Flow\Object\ObjectManagerInterface;
+use TYPO3\Flow\Security\Exception\AccessDeniedException;
+use TYPO3\Flow\Security\RequestPatternInterface;
+use TYPO3\Flow\Security\RequestPatternResolver;
 
 /**
  * Default Firewall which analyzes the request with a RequestFilter chain.
  *
  * @Flow\Scope("singleton")
  */
-class FilterFirewall implements \TYPO3\Flow\Security\Authorization\FirewallInterface
+class FilterFirewall implements FirewallInterface
 {
     /**
-     * @var \TYPO3\Flow\Object\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $objectManager = null;
 
     /**
-     * @var \TYPO3\Flow\Security\RequestPatternResolver
+     * @var RequestPatternResolver
      */
     protected $requestPatternResolver = null;
 
     /**
-     * @var \TYPO3\Flow\Security\Authorization\InterceptorResolver
+     * @var InterceptorResolver
      */
     protected $interceptorResolver = null;
 
     /**
-     * @var array of \TYPO3\Flow\Security\Authorization\RequestFilter instances
+     * @var array<RequestFilter>
      */
-    protected $filters = array();
+    protected $filters = [];
 
     /**
      * If set to TRUE the firewall will reject any request except the ones explicitly
@@ -47,13 +55,13 @@ class FilterFirewall implements \TYPO3\Flow\Security\Authorization\FirewallInter
     /**
      * Constructor.
      *
-     * @param \TYPO3\Flow\Object\ObjectManagerInterface $objectManager The object manager
-     * @param \TYPO3\Flow\Security\RequestPatternResolver $requestPatternResolver The request pattern resolver
-     * @param \TYPO3\Flow\Security\Authorization\InterceptorResolver $interceptorResolver The interceptor resolver
+     * @param ObjectManagerInterface $objectManager The object manager
+     * @param RequestPatternResolver $requestPatternResolver The request pattern resolver
+     * @param InterceptorResolver $interceptorResolver The interceptor resolver
      */
-    public function __construct(\TYPO3\Flow\Object\ObjectManagerInterface $objectManager,
-            \TYPO3\Flow\Security\RequestPatternResolver $requestPatternResolver,
-            \TYPO3\Flow\Security\Authorization\InterceptorResolver $interceptorResolver)
+    public function __construct(ObjectManagerInterface $objectManager,
+                                RequestPatternResolver $requestPatternResolver,
+                                InterceptorResolver $interceptorResolver)
     {
         $this->objectManager = $objectManager;
         $this->requestPatternResolver = $requestPatternResolver;
@@ -76,21 +84,21 @@ class FilterFirewall implements \TYPO3\Flow\Security\Authorization\FirewallInter
      * Analyzes a request against the configured firewall rules and blocks
      * any illegal request.
      *
-     * @param \TYPO3\Flow\Mvc\ActionRequest $request The request to be analyzed
+     * @param ActionRequest $request The request to be analyzed
      * @return void
-     * @throws \TYPO3\Flow\Security\Exception\AccessDeniedException if the
+     * @throws AccessDeniedException if the
      */
-    public function blockIllegalRequests(\TYPO3\Flow\Mvc\ActionRequest $request)
+    public function blockIllegalRequests(ActionRequest $request)
     {
         $filterMatched = false;
-        /** @var $filter \TYPO3\Flow\Security\Authorization\RequestFilter */
+        /** @var $filter RequestFilter */
         foreach ($this->filters as $filter) {
             if ($filter->filterRequest($request)) {
                 $filterMatched = true;
             }
         }
         if ($this->rejectAll && !$filterMatched) {
-            throw new \TYPO3\Flow\Security\Exception\AccessDeniedException('The request was blocked, because no request filter explicitly allowed it.', 1216923741);
+            throw new AccessDeniedException('The request was blocked, because no request filter explicitly allowed it.', 1216923741);
         }
     }
 
@@ -103,12 +111,12 @@ class FilterFirewall implements \TYPO3\Flow\Security\Authorization\FirewallInter
     protected function buildFiltersFromSettings(array $filterSettings)
     {
         foreach ($filterSettings as $singleFilterSettings) {
-            /** @var $requestPattern \TYPO3\Flow\Security\RequestPatternInterface */
+            /** @var $requestPattern RequestPatternInterface */
             $requestPattern = $this->objectManager->get($this->requestPatternResolver->resolveRequestPatternClass($singleFilterSettings['patternType']));
             $requestPattern->setPattern($singleFilterSettings['patternValue']);
             $interceptor = $this->objectManager->get($this->interceptorResolver->resolveInterceptorClass($singleFilterSettings['interceptor']));
 
-            $this->filters[] = $this->objectManager->get('TYPO3\Flow\Security\Authorization\RequestFilter', $requestPattern, $interceptor);
+            $this->filters[] = $this->objectManager->get(RequestFilter::class, $requestPattern, $interceptor);
         }
     }
 }

@@ -1,22 +1,29 @@
 <?php
 namespace TYPO3\Flow\Command;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Cli\CommandController;
+use TYPO3\Flow\Error\Message;
 use TYPO3\Flow\Exception;
 use TYPO3\Flow\Object\ObjectManagerInterface;
 use TYPO3\Flow\Package\PackageManagerInterface;
 use TYPO3\Flow\Persistence\PersistenceManagerInterface;
 use TYPO3\Flow\Resource\CollectionInterface;
+use TYPO3\Flow\Resource\Publishing\MessageCollector;
+use TYPO3\Flow\Resource\Resource;
 use TYPO3\Flow\Resource\ResourceManager;
 use TYPO3\Flow\Resource\ResourceRepository;
+use TYPO3\Media\Domain\Repository\AssetRepository;
 
 /**
  * Resource command controller for the TYPO3.Flow package
@@ -56,6 +63,12 @@ class ResourceCommandController extends CommandController
     protected $objectManager;
 
     /**
+     * @Flow\Inject
+     * @var MessageCollector
+     */
+    protected $messageCollector;
+
+    /**
      * Publish resources
      *
      * This command publishes the resources of the given or - if none was specified, all - resource collections
@@ -70,23 +83,31 @@ class ResourceCommandController extends CommandController
             if ($collection === null) {
                 $collections = $this->resourceManager->getCollections();
             } else {
-                $collections = array();
+                $collections = [];
                 $collections[$collection] = $this->resourceManager->getCollection($collection);
                 if ($collections[$collection] === null) {
-                    $this->outputLine('Collection "%s" does not exist.', array($collection));
+                    $this->outputLine('Collection "%s" does not exist.', [$collection]);
                     $this->quit(1);
                 }
             }
 
             foreach ($collections as $collection) {
                 /** @var CollectionInterface $collection */
-                $this->outputLine('Publishing resources of collection "%s"', array($collection->getName()));
+                $this->outputLine('Publishing resources of collection "%s"', [$collection->getName()]);
                 $collection->publish();
+            }
+
+            if ($this->messageCollector->hasMessages()) {
+                $this->outputLine();
+                $this->outputLine('The resources were published, but a few inconsistencies were detected. You can check and probably fix the integrity of the resource registry by using the resource:clean command.');
+                $this->messageCollector->flush(function (Message $notification) {
+                    $this->outputLine($notification->getSeverity() . ': ' . $notification->getMessage());
+                });
             }
         } catch (Exception $exception) {
             $this->outputLine();
             $this->outputLine('An error occurred while publishing resources (see full description below). You can check and probably fix the integrity of the resource registry by using the resource:clean command.');
-            $this->outputLine('%s (Exception code: %s)', array(get_class($exception), $exception->getCode()));
+            $this->outputLine('%s (Exception code: %s)', [get_class($exception), $exception->getCode()]);
             $this->outputLine($exception->getMessage());
             $this->quit(1);
         }
@@ -116,11 +137,11 @@ class ResourceCommandController extends CommandController
         $resourcesCount = $this->resourceRepository->countAll();
         $this->output->progressStart($resourcesCount);
 
-        $brokenResources = array();
+        $brokenResources = [];
         $relatedAssets = new \SplObjectStorage();
         foreach ($this->resourceRepository->findAll() as $resource) {
             $this->output->progressAdvance(1);
-            /* @var \TYPO3\Flow\Resource\Resource $resource */
+            /* @var Resource $resource */
             $stream = $resource->getStream();
             if (!is_resource($stream)) {
                 $brokenResources[] = $resource;
@@ -131,8 +152,8 @@ class ResourceCommandController extends CommandController
         $this->outputLine();
 
         if ($mediaPackagePresent && count($brokenResources) > 0) {
-            $assetRepository = $this->objectManager->get('TYPO3\Media\Domain\Repository\AssetRepository');
-            /* @var \TYPO3\Media\Domain\Repository\AssetRepository $assetRepository */
+            $assetRepository = $this->objectManager->get(AssetRepository::class);
+            /* @var AssetRepository $assetRepository */
 
             foreach ($brokenResources as $resource) {
                 $assets = $assetRepository->findByResource($resource);
@@ -143,19 +164,19 @@ class ResourceCommandController extends CommandController
         }
 
         if (count($brokenResources) > 0) {
-            $this->outputLine('<b>Found %s broken resource(s):</b>', array(count($brokenResources)));
+            $this->outputLine('<b>Found %s broken resource(s):</b>', [count($brokenResources)]);
             $this->outputLine();
 
             foreach ($brokenResources as $resource) {
-                $this->outputLine('%s (%s) %s', array($resource->getFilename(), $resource->getSha1(), $resource->getCollectionName()));
+                $this->outputLine('%s (%s) %s', [$resource->getFilename(), $resource->getSha1(), $resource->getCollectionName()]);
                 if (isset($relatedAssets[$resource])) {
                     foreach ($relatedAssets[$resource] as $asset) {
-                        $this->outputLine(' -> %s (%s)', array(get_class($asset), $asset->getIdentifier()));
+                        $this->outputLine(' -> %s (%s)', [get_class($asset), $asset->getIdentifier()]);
                     }
                 }
             }
             $response = null;
-            while (!in_array($response, array('y', 'n', 'c'))) {
+            while (!in_array($response, ['y', 'n', 'c'])) {
                 $response = $this->output->ask('<comment>Do you want to remove all broken resource objects and related assets from the database? (y/n/c) </comment>');
             }
 
@@ -170,7 +191,7 @@ class ResourceCommandController extends CommandController
                             }
                         }
                     }
-                    $this->outputLine('Removed %s resource object(s) from the database.', array(count($brokenResources)));
+                    $this->outputLine('Removed %s resource object(s) from the database.', [count($brokenResources)]);
                 break;
                 case 'n':
                     $this->outputLine('Did not delete any resource objects.');

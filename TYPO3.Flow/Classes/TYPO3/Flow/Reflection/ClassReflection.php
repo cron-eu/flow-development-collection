@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Reflection;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -38,16 +41,16 @@ class ClassReflection extends \ReflectionClass
     }
 
     /**
-     * @var \TYPO3\Flow\Reflection\DocCommentParser Holds an instance of the doc comment parser for this class
+     * @var DocCommentParser Holds an instance of the doc comment parser for this class
      */
     protected $docCommentParser;
 
     /**
      * Replacement for the original getConstructor() method which makes sure
-     * that \TYPO3\Flow\Reflection\MethodReflection objects are returned instead of the
+     * that MethodReflection objects are returned instead of the
      * original ReflectionMethod instances.
      *
-     * @return \TYPO3\Flow\Reflection\MethodReflection Method reflection object of the constructor method
+     * @return MethodReflection Method reflection object of the constructor method
      */
     public function getConstructor()
     {
@@ -57,14 +60,14 @@ class ClassReflection extends \ReflectionClass
 
     /**
      * Replacement for the original getInterfaces() method which makes sure
-     * that \TYPO3\Flow\Reflection\ClassReflection objects are returned instead of the
+     * that ClassReflection objects are returned instead of the
      * original ReflectionClass instances.
      *
-     * @return array of \TYPO3\Flow\Reflection\ClassReflection Class reflection objects of the properties in this class
+     * @return array<ClassReflection> Class reflection objects of the properties in this class
      */
     public function getInterfaces()
     {
-        $extendedInterfaces = array();
+        $extendedInterfaces = [];
         $interfaces = parent::getInterfaces();
         foreach ($interfaces as $interface) {
             $extendedInterfaces[] = new ClassReflection($interface->getName());
@@ -74,11 +77,11 @@ class ClassReflection extends \ReflectionClass
 
     /**
      * Replacement for the original getMethod() method which makes sure
-     * that \TYPO3\Flow\Reflection\MethodReflection objects are returned instead of the
+     * that MethodReflection objects are returned instead of the
      * orginal ReflectionMethod instances.
      *
      * @param string $name
-     * @return \TYPO3\Flow\Reflection\MethodReflection Method reflection object of the named method
+     * @return MethodReflection Method reflection object of the named method
      */
     public function getMethod($name)
     {
@@ -87,15 +90,15 @@ class ClassReflection extends \ReflectionClass
 
     /**
      * Replacement for the original getMethods() method which makes sure
-     * that \TYPO3\Flow\Reflection\MethodReflection objects are returned instead of the
+     * that MethodReflection objects are returned instead of the
      * original ReflectionMethod instances.
      *
      * @param integer $filter A filter mask
-     * @return \TYPO3\Flow\Reflection\MethodReflection Method reflection objects of the methods in this class
+     * @return MethodReflection Method reflection objects of the methods in this class
      */
     public function getMethods($filter = null)
     {
-        $extendedMethods = array();
+        $extendedMethods = [];
 
         $methods = ($filter === null ? parent::getMethods() : parent::getMethods($filter));
         foreach ($methods as $method) {
@@ -106,10 +109,10 @@ class ClassReflection extends \ReflectionClass
 
     /**
      * Replacement for the original getParentClass() method which makes sure
-     * that a \TYPO3\Flow\Reflection\ClassReflection object is returned instead of the
+     * that a ClassReflection object is returned instead of the
      * orginal ReflectionClass instance.
      *
-     * @return \TYPO3\Flow\Reflection\ClassReflection Reflection of the parent class - if any
+     * @return ClassReflection Reflection of the parent class - if any
      */
     public function getParentClass()
     {
@@ -119,15 +122,15 @@ class ClassReflection extends \ReflectionClass
 
     /**
      * Replacement for the original getProperties() method which makes sure
-     * that \TYPO3\Flow\Reflection\PropertyReflection objects are returned instead of the
+     * that PropertyReflection objects are returned instead of the
      * orginal ReflectionProperty instances.
      *
      * @param integer $filter A filter mask
-     * @return array of \TYPO3\Flow\Reflection\PropertyReflection Property reflection objects of the properties in this class
+     * @return array<PropertyReflection> Property reflection objects of the properties in this class
      */
     public function getProperties($filter = null)
     {
-        $extendedProperties = array();
+        $extendedProperties = [];
         $properties = ($filter === null ? parent::getProperties() : parent::getProperties($filter));
         foreach ($properties as $property) {
             $extendedProperties[] = new PropertyReflection($this->getName(), $property->getName());
@@ -137,11 +140,11 @@ class ClassReflection extends \ReflectionClass
 
     /**
      * Replacement for the original getProperty() method which makes sure
-     * that a \TYPO3\Flow\Reflection\PropertyReflection object is returned instead of the
+     * that a PropertyReflection object is returned instead of the
      * orginal ReflectionProperty instance.
      *
      * @param string $name Name of the property
-     * @return \TYPO3\Flow\Reflection\PropertyReflection Property reflection object of the specified property in this class
+     * @return PropertyReflection Property reflection object of the specified property in this class
      */
     public function getProperty($name)
     {
@@ -203,7 +206,7 @@ class ClassReflection extends \ReflectionClass
     {
         $instance = parent::newInstanceWithoutConstructor();
 
-        if (method_exists($instance, '__wakeup') && is_callable(array($instance, '__wakeup'))) {
+        if (method_exists($instance, '__wakeup') && is_callable([$instance, '__wakeup'])) {
             $instance->__wakeup();
         }
 
@@ -214,7 +217,7 @@ class ClassReflection extends \ReflectionClass
      * Returns an instance of the doc comment parser and
      * runs the parse() method.
      *
-     * @return \TYPO3\Flow\Reflection\DocCommentParser
+     * @return DocCommentParser
      */
     protected function getDocCommentParser()
     {

@@ -1,17 +1,21 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Utility;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Tests\UnitTestCase;
 use TYPO3\Flow\Utility\PositionalArraySorter;
 
 /**
+ * Tests for the PositionalArraySorter utility class
  */
 class PositionalArraySorterTest extends UnitTestCase
 {
@@ -20,8 +24,8 @@ class PositionalArraySorterTest extends UnitTestCase
      */
     public function toArraySortsNumericKeysIfNoPositionMetaDataIsSet()
     {
-        $array = array(2 => 'foo', 1 => 'bar', 'z' => 'baz', 'a' => 'quux');
-        $expectedResult = array('z' => 'baz', 'a' => 'quux', 1 => 'bar', 2 => 'foo');
+        $array = [2 => 'foo', 1 => 'bar', 'z' => 'baz', 'a' => 'quux'];
+        $expectedResult = ['z' => 'baz', 'a' => 'quux', 1 => 'bar', 2 => 'foo'];
 
         $positionalArraySorter = new PositionalArraySorter($array);
         $sortedArray = $positionalArraySorter->toArray();
@@ -33,13 +37,12 @@ class PositionalArraySorterTest extends UnitTestCase
      */
     public function invalidPositions()
     {
-        return array(
-            array('subject' => array('foo' => array('position' => 'invalid'), 'first' => array())),
-            array('subject' => array('foo' => array('position' => 'start123'), 'first' => array())),
-            array('subject' => array('foo' => array('position' => 'start 12 34'), 'first' => array())),
-            array('subject' => array('foo' => array('position' => 'after 12 34 56'), 'first' => array())),
-            array('subject' => array('foo' => array('position' => 'after foo-bar'), 'first' => array())),
-        );
+        return [
+            ['subject' => ['foo' => ['position' => 'invalid'], 'first' => []]],
+            ['subject' => ['foo' => ['position' => 'start123'], 'first' => []]],
+            ['subject' => ['foo' => ['position' => 'start 12 34'], 'first' => []]],
+            ['subject' => ['foo' => ['position' => 'after 12 34 56'], 'first' => []]],
+        ];
     }
 
     /**
@@ -52,7 +55,7 @@ class PositionalArraySorterTest extends UnitTestCase
     public function toArrayThrowsExceptionForInvalidPositions(array $subject)
     {
         $positionalArraySorter = new PositionalArraySorter($subject);
-        $sortedArray = $positionalArraySorter->toArray();
+        $positionalArraySorter->toArray();
     }
 
     /**
@@ -60,86 +63,92 @@ class PositionalArraySorterTest extends UnitTestCase
      */
     public function sampleArrays()
     {
-        return array(
-            array(
+        return [
+            [
                 'message' => 'Position end should put element to end',
-                'subject' => array('second' => array('__meta' => array('position' => 'end')), 'first' => array()),
+                'subject' => ['second' => ['__meta' => ['position' => 'end']], 'first' => []],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second']
+            ],
+            [
                 'message' => 'Position start should put element to start',
-                'subject' => array('second' => array(), 'first' => array('__meta' => array('position' => 'start'))),
+                'subject' => ['second' => [], 'first' => ['__meta' => ['position' => 'start']]],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second']
+            ],
+            [
                 'message' => 'Position start should respect priority',
-                'subject' => array('second' => array('__meta' => array('position' => 'start 50')), 'first' => array('__meta' => array('position' => 'start 52'))),
+                'subject' => ['second' => ['__meta' => ['position' => 'start 50']], 'first' => ['__meta' => ['position' => 'start 52']]],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second']
+            ],
+            [
                 'message' => 'Position end should respect priority',
-                'subject' => array('second' => array('__meta' => array('position' => 'end 17')), 'first' => array('__meta' => array('position' => 'end'))),
+                'subject' => ['second' => ['__meta' => ['position' => 'end 17']], 'first' => ['__meta' => ['position' => 'end']]],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second']
+            ],
+            [
                 'Positional numbers are in the middle',
-                'subject' => array('last' => array('__meta' => array('position' => 'end')), 'second' => array('__meta' => array('position' => '17')), 'first' => array('__meta' => array('position' => '5')), 'third' => array('__meta' => array('position' => '18'))),
+                'subject' => ['last' => ['__meta' => ['position' => 'end']], 'second' => ['__meta' => ['position' => '17']], 'first' => ['__meta' => ['position' => '5']], 'third' => ['__meta' => ['position' => '18']]],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second', 'third', 'last')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second', 'third', 'last']
+            ],
+            [
                 'message' => 'Position before adds before named element if present',
-                'subject' => array('second' => array(), 'first' => array('__meta' => array('position' => 'before second'))),
+                'subject' => ['second' => [], 'first' => ['__meta' => ['position' => 'before second']]],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second']
+            ],
+            [
                 'message' => 'Position before adds after start if named element not present',
-                'subject' => array('third' => array(), 'second' => array('__meta' => array('position' => 'before third')), 'first' => array('__meta' => array('position' => 'before unknown'))),
+                'subject' => ['third' => [], 'second' => ['__meta' => ['position' => 'before third']], 'first' => ['__meta' => ['position' => 'before unknown']]],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second', 'third')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second', 'third']
+            ],
+            [
                 'message' => 'Position before uses priority when referencing the same element; The higher the priority the closer before the element gets added.',
-                'subject' => array('third' => array(), 'second' => array('__meta' => array('position' => 'before third')), 'first' => array('__meta' => array('position' => 'before third 12'))),
+                'subject' => ['third' => [], 'second' => ['__meta' => ['position' => 'before third']], 'first' => ['__meta' => ['position' => 'before third 12']]],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('second', 'first', 'third')
-            ),
-            array(
+                'expectedArrayKeys' => ['second', 'first', 'third']
+            ],
+            [
                 'message' => 'Position before works recursively',
-                'subject' => array('third' => array(), 'second' => array('__meta' => array('position' => 'before third')), 'first' => array('__meta' => array('position' => 'before second'))),
+                'subject' => ['third' => [], 'second' => ['__meta' => ['position' => 'before third']], 'first' => ['__meta' => ['position' => 'before second']]],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second', 'third')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second', 'third']
+            ],
+            [
                 'Position after adds after named element if present',
-                'subject' => array('second' => array('__meta' => array('position' => 'after first')), 'first' => array()),
+                'subject' => ['second' => ['__meta' => ['position' => 'after first']], 'first' => []],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second']
+            ],
+            [
                 'message' => 'Position after adds before end if named element not present',
-                'subject' => array('second' => array('__meta' => array('position' => 'after unknown')), 'third' => array('__meta' => array('position' => 'end')), 'first' => array()),
+                'subject' => ['second' => ['__meta' => ['position' => 'after unknown']], 'third' => ['__meta' => ['position' => 'end']], 'first' => []],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second', 'third')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second', 'third']
+            ],
+            [
                 'message' => 'Position after uses priority when referencing the same element; The higher the priority the closer after the element gets added.',
-                'subject' => array('third' => array('__meta' => array('position' => 'after first')), 'second' => array('__meta' => array('position' => 'after first 12')), 'first' => array()),
+                'subject' => ['third' => ['__meta' => ['position' => 'after first']], 'second' => ['__meta' => ['position' => 'after first 12']], 'first' => []],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second', 'third')
-            ),
-            array(
+                'expectedArrayKeys' => ['first', 'second', 'third']
+            ],
+            [
                 'message' => 'Position after works recursively',
-                'subject' => array('third' => array('__meta' => array('position' => 'after second')), 'second' => array('__meta' => array('position' => 'after first')), 'first' => array()),
+                'subject' => ['third' => ['__meta' => ['position' => 'after second']], 'second' => ['__meta' => ['position' => 'after first']], 'first' => []],
                 'positionPropertyPath' => '__meta.position',
-                'expectedArrayKeys' => array('first', 'second', 'third')
-            )
-        );
+                'expectedArrayKeys' => ['first', 'second', 'third']
+            ],
+            [
+                'message' => 'Array keys may contain special characters',
+                'subject' => ['thi:rd' => ['position' => 'end'], 'sec.ond' => ['position' => 'before thi:rd'], 'fir-st' => ['position' => 'before sec.ond']],
+                'positionPropertyPath' => 'position',
+                'expectedArrayKeys' => ['fir-st', 'sec.ond', 'thi:rd']
+            ],
+        ];
     }
 
     /**
