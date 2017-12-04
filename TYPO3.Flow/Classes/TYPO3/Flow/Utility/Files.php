@@ -1,12 +1,17 @@
 <?php
 namespace TYPO3\Flow\Utility;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Error\Exception as ErrorException;
 
 /**
  * File and directory functions
@@ -24,9 +29,9 @@ class Files
     public static function getUnixStylePath($path)
     {
         if (strpos($path, ':') === false) {
-            return str_replace(array('//', '\\'), '/', $path);
+            return str_replace(['//', '\\'], '/', $path);
         } else {
-            return preg_replace('/^([a-z]{2,}):\//', '$1://', str_replace(array('//', '\\'), '/', $path));
+            return preg_replace('/^([a-z]{2,}):\//', '$1://', str_replace(['//', '\\'], '/', $path));
         }
     }
 
@@ -83,7 +88,7 @@ class Files
      * @throws Exception
      * @api
      */
-    public static function readDirectoryRecursively($path, $suffix = null, $returnRealPath = false, $returnDotFiles = false, &$filenames = array())
+    public static function readDirectoryRecursively($path, $suffix = null, $returnRealPath = false, $returnDotFiles = false, &$filenames = [])
     {
         if (!is_dir($path)) {
             throw new Exception('"' . $path . '" is no directory.', 1207253462);
@@ -266,7 +271,7 @@ class Files
         foreach ($sourceFilenames as $filename) {
             $relativeFilename = str_replace($sourceDirectory, '', $filename);
             self::createDirectoryRecursively($targetDirectory . dirname($relativeFilename));
-            $targetPathAndFilename = self::concatenatePaths(array($targetDirectory, $relativeFilename));
+            $targetPathAndFilename = self::concatenatePaths([$targetDirectory, $relativeFilename]);
             if ($keepExistingFiles === false || !file_exists($targetPathAndFilename)) {
                 copy($filename, $targetPathAndFilename);
             }
@@ -296,7 +301,7 @@ class Files
             } else {
                 $content = file_get_contents($pathAndFilename, $flags, $context, $offset);
             }
-        } catch (\TYPO3\Flow\Error\Exception $ignoredException) {
+        } catch (ErrorException $ignoredException) {
             $content = false;
         }
         return $content;
@@ -361,9 +366,10 @@ class Files
     /**
      * A version of unlink() that works on Windows regardless on the symlink type (file/directory).
      *
-     * If this method could not unlink the specified file, it will clear the stat cache for its filename and check if
-     * the file still exist. If it does not exist, this method assumes that the file has been deleted by another process
-     * and will return TRUE. If the file still exists though, this method will return FALSE.
+     * If this method could not unlink the specified file or it doesn't exist anymore (e.g. because of a concurrent
+     * deletion), it will clear the stat cache for its filename and check if the file still exist. If it does not exist,
+     * this method assumes that the file has been deleted by another process and will return TRUE. If the file still
+     * exists though, this method will return FALSE.
      *
      * @param string $pathAndFilename Path and name of the file or directory
      * @return boolean TRUE if file/directory was removed successfully
@@ -374,7 +380,11 @@ class Files
         try {
             // if not on Windows, call PHPs own unlink() function
             if (DIRECTORY_SEPARATOR === '/' || is_file($pathAndFilename)) {
-                return @\unlink($pathAndFilename);
+                if (!@\unlink($pathAndFilename)) {
+                    clearstatcache();
+                    return !file_exists($pathAndFilename);
+                }
+                return true;
             }
         } catch (\Exception $exception) {
             clearstatcache();
@@ -393,7 +403,7 @@ class Files
      *
      * @var array
      */
-    protected static $sizeUnits = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+    protected static $sizeUnits = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
     /**
      * Converts an integer with a byte count into human-readable form

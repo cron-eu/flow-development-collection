@@ -1,19 +1,21 @@
 <?php
 namespace TYPO3\Flow\Resource\Target;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * Interface for a resource publishing target
  */
-use TYPO3\Flow\Resource\Collection;
 use TYPO3\Flow\Resource\CollectionInterface;
-use TYPO3\Flow\Resource\Resource;
+use TYPO3\Flow\Resource\Resource as PersistentResource;
 
 interface TargetInterface
 {
@@ -27,28 +29,28 @@ interface TargetInterface
     /**
      * Publishes the whole collection to this target
      *
-     * @param Collection $collection The collection to publish
+     * @param CollectionInterface $collection The collection to publish
      * @return void
      */
-    public function publishCollection(Collection $collection);
+    public function publishCollection(CollectionInterface $collection);
 
     /**
      * Publishes the given persistent resource from the given storage
      *
-     * @param Resource $resource The resource to publish
+     * @param PersistentResource $resource The resource to publish
      * @param CollectionInterface $collection The collection the given resource belongs to
      * @return void
      * @throws Exception
      */
-    public function publishResource(Resource $resource, CollectionInterface $collection);
+    public function publishResource(PersistentResource $resource, CollectionInterface $collection);
 
     /**
      * Unpublishes the given persistent resource
      *
-     * @param Resource $resource The resource to unpublish
+     * @param PersistentResource $resource The resource to unpublish
      * @return void
      */
-    public function unpublishResource(Resource $resource);
+    public function unpublishResource(PersistentResource $resource);
 
     /**
      * Returns the web accessible URI pointing to the given static resource
@@ -61,9 +63,9 @@ interface TargetInterface
     /**
      * Returns the web accessible URI pointing to the specified persistent resource
      *
-     * @param Resource $resource Resource object
+     * @param PersistentResource $resource Resource object
      * @return string The URI
      * @throws Exception
      */
-    public function getPublicPersistentResourceUri(Resource $resource);
+    public function getPublicPersistentResourceUri(PersistentResource $resource);
 }

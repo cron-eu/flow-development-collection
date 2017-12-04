@@ -1,15 +1,24 @@
 <?php
 namespace TYPO3\Flow\Cache;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Cache\Backend\FileBackend;
+use TYPO3\Flow\Cache\Exception\DuplicateIdentifierException;
+use TYPO3\Flow\Cache\Exception\NoSuchCacheException;
 use TYPO3\Flow\Cache\Frontend\FrontendInterface;
+use TYPO3\Flow\Cache\Frontend\VariableFrontend;
+use TYPO3\Flow\Configuration\ConfigurationManager;
+use TYPO3\Flow\Log\SystemLoggerInterface;
 use TYPO3\Flow\Utility\Environment;
 use TYPO3\Flow\Utility\Files;
 use TYPO3\Flow\Utility\PhpAnalyzer;
@@ -23,17 +32,17 @@ use TYPO3\Flow\Utility\PhpAnalyzer;
 class CacheManager
 {
     /**
-     * @var \TYPO3\Flow\Cache\CacheFactory
+     * @var CacheFactory
      */
     protected $cacheFactory;
 
     /**
-     * @var \TYPO3\Flow\Configuration\ConfigurationManager
+     * @var ConfigurationManager
      */
     protected $configurationManager;
 
     /**
-     * @var \TYPO3\Flow\Log\SystemLoggerInterface
+     * @var SystemLoggerInterface
      */
     protected $systemLogger;
 
@@ -45,48 +54,48 @@ class CacheManager
     /**
      * @var array
      */
-    protected $caches = array();
+    protected $caches = [];
 
     /**
      * @var array
      */
-    protected $persistentCaches = array();
+    protected $persistentCaches = [];
 
     /**
      * @var array
      */
-    protected $cacheConfigurations = array(
-        'Default' => array(
-            'frontend' => 'TYPO3\Flow\Cache\Frontend\VariableFrontend',
-            'backend' => 'TYPO3\Flow\Cache\Backend\FileBackend',
-            'backendOptions' => array(),
+    protected $cacheConfigurations = [
+        'Default' => [
+            'frontend' => VariableFrontend::class,
+            'backend' => FileBackend::class,
+            'backendOptions' => [],
             'persistent' => false
-        )
-    );
+        ]
+    ];
 
     /**
-     * @param \TYPO3\Flow\Log\SystemLoggerInterface $systemLogger
+     * @param SystemLoggerInterface $systemLogger
      * @return void
      */
-    public function injectSystemLogger(\TYPO3\Flow\Log\SystemLoggerInterface $systemLogger)
+    public function injectSystemLogger(SystemLoggerInterface $systemLogger)
     {
         $this->systemLogger = $systemLogger;
     }
 
     /**
-     * @param \TYPO3\Flow\Cache\CacheFactory $cacheFactory
+     * @param CacheFactory $cacheFactory
      * @return void
      */
-    public function injectCacheFactory(\TYPO3\Flow\Cache\CacheFactory $cacheFactory)
+    public function injectCacheFactory(CacheFactory $cacheFactory)
     {
         $this->cacheFactory = $cacheFactory;
     }
 
     /**
-     * @param \TYPO3\Flow\Configuration\ConfigurationManager $configurationManager
+     * @param ConfigurationManager $configurationManager
      * @return void
      */
-    public function injectConfigurationManager(\TYPO3\Flow\Configuration\ConfigurationManager $configurationManager)
+    public function injectConfigurationManager(ConfigurationManager $configurationManager)
     {
         $this->configurationManager = $configurationManager;
     }
@@ -130,16 +139,16 @@ class CacheManager
     /**
      * Registers a cache so it can be retrieved at a later point.
      *
-     * @param \TYPO3\Flow\Cache\Frontend\FrontendInterface $cache The cache frontend to be registered
+     * @param FrontendInterface $cache The cache frontend to be registered
      * @return void
-     * @throws \TYPO3\Flow\Cache\Exception\DuplicateIdentifierException if a cache with the given identifier has already been registered.
+     * @throws DuplicateIdentifierException if a cache with the given identifier has already been registered.
      * @api
      */
-    public function registerCache(\TYPO3\Flow\Cache\Frontend\FrontendInterface $cache, $persistent = false)
+    public function registerCache(FrontendInterface $cache, $persistent = false)
     {
         $identifier = $cache->getIdentifier();
         if (isset($this->caches[$identifier])) {
-            throw new \TYPO3\Flow\Cache\Exception\DuplicateIdentifierException('A cache with identifier "' . $identifier . '" has already been registered.', 1203698223);
+            throw new DuplicateIdentifierException('A cache with identifier "' . $identifier . '" has already been registered.', 1203698223);
         }
         $this->caches[$identifier] = $cache;
         if ($persistent === true) {
@@ -152,13 +161,13 @@ class CacheManager
      *
      * @param string $identifier Identifies which cache to return
      * @return \TYPO3\Flow\Cache\Frontend\FrontendInterface The specified cache frontend
-     * @throws \TYPO3\Flow\Cache\Exception\NoSuchCacheException
+     * @throws NoSuchCacheException
      * @api
      */
     public function getCache($identifier)
     {
         if ($this->hasCache($identifier) === false) {
-            throw new \TYPO3\Flow\Cache\Exception\NoSuchCacheException('A cache with identifier "' . $identifier . '" does not exist.', 1203699034);
+            throw new NoSuchCacheException('A cache with identifier "' . $identifier . '" does not exist.', 1203699034);
         }
         if (!isset($this->caches[$identifier])) {
             $this->createCache($identifier);
@@ -261,13 +270,13 @@ class CacheManager
     public function flushSystemCachesByChangedFiles($fileMonitorIdentifier, array $changedFiles)
     {
         switch ($fileMonitorIdentifier) {
-            case 'Flow_ClassFiles' :
+            case 'Flow_ClassFiles':
                 $this->flushClassCachesByChangedFiles($changedFiles);
                 break;
-            case 'Flow_ConfigurationFiles' :
+            case 'Flow_ConfigurationFiles':
                 $this->flushConfigurationCachesByChangedFiles($changedFiles);
                 break;
-            case 'Flow_TranslationFiles' :
+            case 'Flow_TranslationFiles':
                 $this->flushTranslationCachesByChangedFiles($changedFiles);
                 break;
         }
@@ -284,8 +293,8 @@ class CacheManager
     {
         $objectClassesCache = $this->getCache('Flow_Object_Classes');
         $objectConfigurationCache = $this->getCache('Flow_Object_Configuration');
-        $modifiedAspectClassNamesWithUnderscores = array();
-        $modifiedClassNamesWithUnderscores = array();
+        $modifiedAspectClassNamesWithUnderscores = [];
+        $modifiedClassNamesWithUnderscores = [];
         foreach ($changedFiles as $pathAndFilename => $status) {
             if (!file_exists($pathAndFilename)) {
                 continue;
@@ -353,12 +362,12 @@ class CacheManager
 
         $objectClassesCache = $this->getCache('Flow_Object_Classes');
         $objectConfigurationCache = $this->getCache('Flow_Object_Configuration');
-        $caches = array(
-            '/Policy\.yaml/' => array('Flow_Security_Authorization_Privilege_Method', 'Flow_Persistence_Doctrine', 'Flow_Persistence_Doctrine_Results', 'Flow_Aop_RuntimeExpressions'),
-            '/Routes([^\/]*)\.yaml/' => array('Flow_Mvc_Routing_Route', 'Flow_Mvc_Routing_Resolve'),
-            '/Views\.yaml/' => array('Flow_Mvc_ViewConfigurations')
-        );
-        $cachesToFlush = array();
+        $caches = [
+            '/Policy\.yaml/' => ['Flow_Security_Authorization_Privilege_Method', 'Flow_Persistence_Doctrine', 'Flow_Persistence_Doctrine_Results', 'Flow_Aop_RuntimeExpressions'],
+            '/Routes([^\/]*)\.yaml/' => ['Flow_Mvc_Routing_Route', 'Flow_Mvc_Routing_Resolve'],
+            '/Views\.yaml/' => ['Flow_Mvc_ViewConfigurations']
+        ];
+        $cachesToFlush = [];
         foreach (array_keys($changedFiles) as $pathAndFilename) {
             foreach ($caches as $cacheFilePattern => $cacheNames) {
                 if (preg_match($aopProxyClassInfluencers, $pathAndFilename) === 1) {

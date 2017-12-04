@@ -1,16 +1,22 @@
 <?php
 namespace TYPO3\Flow\Resource;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Resource\Storage\StorageInterface;
 use TYPO3\Flow\Resource\Target\TargetInterface;
+use TYPO3\Flow\Resource\Exception as ResourceException;
+use TYPO3\Flow\Resource\Resource as PersistentResource;
+use TYPO3\Flow\Resource\Storage\Object as StorageObject;
 
 /**
  * Interface for a resource collection
@@ -47,8 +53,8 @@ interface CollectionInterface
      * Note that this collection must have a writable storage in order to import resources.
      *
      * @param string | resource $source The URI (or local path and filename) or the PHP resource stream to import the resource from
-     * @return Resource A resource object representing the imported resource
-     * @throws Exception
+     * @return PersistentResource A resource object representing the imported resource
+     * @throws ResourceException
      */
     public function importResource($source);
 
@@ -61,8 +67,8 @@ interface CollectionInterface
      * Note that this collection must have a writable storage in order to import resources.
      *
      * @param string $content The actual content to import
-     * @return Resource A resource object representing the imported resource
-     * @throws Exception
+     * @return PersistentResource A resource object representing the imported resource
+     * @throws ResourceException
      */
     public function importResourceFromContent($content);
 
@@ -76,7 +82,7 @@ interface CollectionInterface
     /**
      * Returns all internal data objects of the storage attached to this collection.
      *
-     * @return array<\TYPO3\Flow\Resource\Storage\Object>
+     * @return array<StorageObject>
      */
     public function getObjects();
 
@@ -85,8 +91,8 @@ interface CollectionInterface
      * Returns a stream handle of the given persistent resource which allows for opening / copying the resource's
      * data. Note that this stream handle may only be used read-only.
      *
-     * @param Resource $resource The resource to retrieve the stream for
+     * @param PersistentResource $resource The resource to retrieve the stream for
      * @return resource | boolean The resource stream or FALSE if the stream could not be obtained
      */
-    public function getStreamByResource(Resource $resource);
+    public function getStreamByResource(PersistentResource $resource);
 }

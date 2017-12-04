@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Security\Authorization\Privilege\Entity\Doctrine;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -56,7 +59,7 @@ class PropertyConditionGenerator implements SqlGeneratorInterface
      * @Flow\InjectConfiguration("aop.globalObjects")
      * @var array
      */
-    protected $globalObjects = array();
+    protected $globalObjects = [];
 
     /**
      * @Flow\Inject
@@ -93,7 +96,7 @@ class PropertyConditionGenerator implements SqlGeneratorInterface
      *
      * @var array
      */
-    protected $parameters = array();
+    protected $parameters = [];
 
     /**
      * @param string $path Property path the currently parsed expression relates to
@@ -273,7 +276,7 @@ class PropertyConditionGenerator implements SqlGeneratorInterface
     {
         $associationMapping = $targetEntity->getAssociationMapping($targetEntityPropertyName);
 
-        $constraints = array();
+        $constraints = [];
         foreach ($associationMapping['joinColumns'] as $joinColumn) {
             $quotedColumnName = $quoteStrategy->getJoinColumnName($joinColumn, $targetEntity, $this->entityManager->getConnection()->getDatabasePlatform());
             $propertyPointer = $targetTableAlias . '.' . $quotedColumnName;
@@ -320,7 +323,7 @@ class PropertyConditionGenerator implements SqlGeneratorInterface
 
         $associationMapping = $targetEntity->getAssociationMapping($targetEntityPropertyName);
 
-        $subselectConstraintQueries = array();
+        $subselectConstraintQueries = [];
         foreach ($associationMapping['joinColumns'] as $joinColumn) {
             $rootAliases = $subselectQuery->getQueryBuilder()->getRootAliases();
             $subselectQuery->getQueryBuilder()->select($rootAliases[0] . '.' . $targetEntity->getFieldForColumn($joinColumn['referencedColumnName']));
@@ -394,7 +397,7 @@ class PropertyConditionGenerator implements SqlGeneratorInterface
         $addNullExpression = false;
         try {
             if (is_array($this->operandDefinition)) {
-                $parameters = array();
+                $parameters = [];
                 foreach ($this->operandDefinition as $operandIterator => $singleOperandValue) {
                     if ($singleOperandValue !== null) {
                         $parameters[] = $sqlFilter->getParameter($operandIterator);
@@ -452,7 +455,7 @@ class PropertyConditionGenerator implements SqlGeneratorInterface
     public function getValueForOperand($expression)
     {
         if (is_array($expression)) {
-            $result = array();
+            $result = [];
             foreach ($expression as $expressionEntry) {
                 $result[] = $this->getValueForOperand($expressionEntry);
             }
@@ -469,7 +472,11 @@ class PropertyConditionGenerator implements SqlGeneratorInterface
             $objectAccess = explode('.', $expression, 3);
             $globalObjectsRegisteredClassName = $this->globalObjects[$objectAccess[1]];
             $globalObject = $this->objectManager->get($globalObjectsRegisteredClassName);
-            return $this->getObjectValueByPath($globalObject, $objectAccess[2]);
+            $this->securityContext->withoutAuthorizationChecks(function () use ($globalObject, $objectAccess, &$globalObjectValue) {
+                $globalObjectValue = $this->getObjectValueByPath($globalObject, $objectAccess[2]);
+            });
+
+            return $globalObjectValue;
         } else {
             return trim($expression, '"\'');
         }

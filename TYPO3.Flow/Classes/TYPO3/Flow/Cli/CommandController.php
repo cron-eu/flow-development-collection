@@ -1,14 +1,18 @@
 <?php
 namespace TYPO3\Flow\Cli;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Command\HelpCommandController;
 use TYPO3\Flow\Mvc\Controller\Argument;
 use TYPO3\Flow\Mvc\Controller\ControllerInterface;
 use TYPO3\Flow\Mvc\Controller\Arguments;
@@ -70,7 +74,7 @@ class CommandController implements ControllerInterface
      */
     public function __construct()
     {
-        $this->arguments = new Arguments(array());
+        $this->arguments = new Arguments([]);
         $this->output = new ConsoleOutput();
     }
 
@@ -121,7 +125,7 @@ class CommandController implements ControllerInterface
     protected function resolveCommandMethodName()
     {
         $commandMethodName = $this->request->getControllerCommandName() . 'Command';
-        if (!is_callable(array($this, $commandMethodName))) {
+        if (!is_callable([$this, $commandMethodName])) {
             throw new NoSuchCommandException(sprintf('A command method "%s()" does not exist in controller "%s".', $commandMethodName, get_class($this)), 1300902143);
         }
         return $commandMethodName;
@@ -179,7 +183,7 @@ class CommandController implements ControllerInterface
 
             if ($argumentValue === null) {
                 $exception = new CommandException(sprintf('Required argument "%s" is not set.', $argumentName), 1306755520);
-                $this->forward('error', 'TYPO3\Flow\Command\HelpCommandController', array('exception' => $exception));
+                $this->forward('error', HelpCommandController::class, ['exception' => $exception]);
             }
             $argument->setValue($argumentValue);
         }
@@ -197,7 +201,7 @@ class CommandController implements ControllerInterface
      * @return void
      * @throws StopActionException
      */
-    protected function forward($commandName, $controllerObjectName = null, array $arguments = array())
+    protected function forward($commandName, $controllerObjectName = null, array $arguments = [])
     {
         $this->request->setDispatched(false);
         $this->request->setControllerCommandName($commandName);
@@ -221,7 +225,7 @@ class CommandController implements ControllerInterface
      */
     protected function callCommandMethod()
     {
-        $preparedArguments = array();
+        $preparedArguments = [];
         /** @var Argument $argument */
         foreach ($this->arguments as $argument) {
             $preparedArguments[] = $argument->getValue();
@@ -232,17 +236,17 @@ class CommandController implements ControllerInterface
             $suggestedCommandMessage = '';
 
             $relatedCommandIdentifiers = $command->getRelatedCommandIdentifiers();
-            if ($relatedCommandIdentifiers !== array()) {
+            if ($relatedCommandIdentifiers !== []) {
                 $suggestedCommandMessage = sprintf(
                     ', use the following command%s instead: %s',
                     count($relatedCommandIdentifiers) > 1 ? 's' : '',
                     implode(', ', $relatedCommandIdentifiers)
                 );
             }
-            $this->outputLine('<b>Warning:</b> This command is <b>DEPRECATED</b>%s%s', array($suggestedCommandMessage, PHP_EOL));
+            $this->outputLine('<b>Warning:</b> This command is <b>DEPRECATED</b>%s%s', [$suggestedCommandMessage, PHP_EOL]);
         }
 
-        $commandResult = call_user_func_array(array($this, $this->commandMethodName), $preparedArguments);
+        $commandResult = call_user_func_array([$this, $this->commandMethodName], $preparedArguments);
 
         if (is_string($commandResult) && strlen($commandResult) > 0) {
             $this->response->appendContent($commandResult);
@@ -275,7 +279,7 @@ class CommandController implements ControllerInterface
      * @return void
      * @api
      */
-    protected function output($text, array $arguments = array())
+    protected function output($text, array $arguments = [])
     {
         $this->output->output($text, $arguments);
     }
@@ -290,7 +294,7 @@ class CommandController implements ControllerInterface
      * @see outputLines()
      * @api
      */
-    protected function outputLine($text = '', array $arguments = array())
+    protected function outputLine($text = '', array $arguments = [])
     {
         $this->output->outputLine($text, $arguments);
     }
@@ -306,7 +310,7 @@ class CommandController implements ControllerInterface
      * @see outputLine()
      * @api
      */
-    protected function outputFormatted($text = '', array $arguments = array(), $leftPadding = 0)
+    protected function outputFormatted($text = '', array $arguments = [], $leftPadding = 0)
     {
         $this->output->outputFormatted($text, $arguments, $leftPadding);
     }
@@ -318,7 +322,7 @@ class CommandController implements ControllerInterface
      * shutdown (such as the persistence framework), you must use quit() instead of exit().
      *
      * @param integer $exitCode Exit code to return on exit (see http://www.php.net/exit)
-     * @throws \TYPO3\Flow\Mvc\Exception\StopActionException
+     * @throws StopActionException
      * @return void
      */
     protected function quit($exitCode = 0)

@@ -1,16 +1,19 @@
 <?php
 namespace TYPO3\Flow\Resource\Publishing;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Log\SystemLoggerInterface;
-use TYPO3\Flow\Resource\Resource;
+use TYPO3\Flow\Resource\Resource as PersistentResource;
 use TYPO3\Flow\Resource\ResourceManager;
 
 /**
@@ -43,11 +46,11 @@ class ResourcePublisher
     /**
      * Returns the URI pointing to the published persistent resource
      *
-     * @param \TYPO3\Flow\Resource\Resource $resource The resource to publish
+     * @param PersistentResource $resource The resource to publish
      * @return mixed Either the web URI of the published resource or FALSE if the resource source file doesn't exist or the resource could not be published for other reasons
      * @deprecated since Flow 3.0. Use ResourceManager->getPublicPersistentResourceUri($resource) instead
      */
-    public function getPersistentResourceWebUri(Resource $resource)
+    public function getPersistentResourceWebUri(PersistentResource $resource)
     {
         $this->systemLogger->log('The deprecated method ResourcePublisher->getPersistentResourceWebUri() has been called' . $this->getCallee() . '. Please use ResourceManager->getPublicPersistentResourceUri() instead!', LOG_WARNING);
         return $this->resourceManager->getPublicPersistentResourceUri($resource);

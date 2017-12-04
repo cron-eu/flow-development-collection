@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Http\Client;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Http\Headers;
+use TYPO3\Flow\Http\Response;
 use TYPO3\Flow\Http\Uri;
 use TYPO3\Flow\Http\Request;
 use Symfony\Component\DomCrawler\Crawler;
@@ -23,12 +27,12 @@ use Symfony\Component\DomCrawler\Form;
 class Browser
 {
     /**
-     * @var \TYPO3\Flow\Http\Request
+     * @var Request
      */
     protected $lastRequest;
 
     /**
-     * @var \TYPO3\Flow\Http\Response
+     * @var Response
      */
     protected $lastResponse;
 
@@ -53,7 +57,7 @@ class Browser
      *
      * @var array
      */
-    protected $redirectionStack = array();
+    protected $redirectionStack = [];
 
     /**
      * @var Headers
@@ -61,7 +65,7 @@ class Browser
     protected $automaticRequestHeaders;
 
     /**
-     * @var \TYPO3\Flow\Http\Client\RequestEngineInterface
+     * @var RequestEngineInterface
      */
     protected $requestEngine;
 
@@ -76,7 +80,7 @@ class Browser
     /**
      * Inject the request engine
      *
-     * @param \TYPO3\Flow\Http\Client\RequestEngineInterface $requestEngine
+     * @param RequestEngineInterface $requestEngine
      * @return void
      */
     public function setRequestEngine(RequestEngineInterface $requestEngine)
@@ -113,18 +117,18 @@ class Browser
      * If a Location header was given and the status code is of response type 3xx
      * (see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html, 14.30 Location)
      *
-     * @param string|\TYPO3\Flow\Http\Uri $uri
+     * @param string|Uri $uri
      * @param string $method Request method, for example "GET"
      * @param array $arguments Arguments to send in the request body
      * @param array $files
      * @param array $server
      * @param string $content
-     * @return \TYPO3\Flow\Http\Response The HTTP response
+     * @return Response The HTTP response
      * @throws \InvalidArgumentException
-     * @throws \TYPO3\Flow\Http\Client\InfiniteRedirectionException
+     * @throws InfiniteRedirectionException
      * @api
      */
-    public function request($uri, $method = 'GET', array $arguments = array(), array $files = array(), array $server = array(), $content = null)
+    public function request($uri, $method = 'GET', array $arguments = [], array $files = [], array $server = [], $content = null)
     {
         if (is_string($uri)) {
             $uri = new Uri($uri);
@@ -148,7 +152,7 @@ class Browser
             $this->redirectionStack[] = $location;
             return $this->request($location);
         }
-        $this->redirectionStack = array();
+        $this->redirectionStack = [];
         return $response;
     }
 
@@ -166,8 +170,8 @@ class Browser
     /**
      * Sends a prepared request and returns the respective response.
      *
-     * @param \TYPO3\Flow\Http\Request $request
-     * @return \TYPO3\Flow\Http\Response
+     * @param Request $request
+     * @return Response
      * @api
      */
     public function sendRequest(Request $request)
@@ -184,7 +188,7 @@ class Browser
     /**
      * Returns the response received after the last request.
      *
-     * @return \TYPO3\Flow\Http\Response The HTTP response or NULL if there wasn't a response yet
+     * @return Response The HTTP response or NULL if there wasn't a response yet
      * @api
      */
     public function getLastResponse()
@@ -195,7 +199,7 @@ class Browser
     /**
      * Returns the last request executed.
      *
-     * @return \TYPO3\Flow\Http\Request The HTTP request or NULL if there wasn't a request yet
+     * @return Request The HTTP request or NULL if there wasn't a request yet
      * @api
      */
     public function getLastRequest()
@@ -250,7 +254,7 @@ class Browser
      * Submit a form
      *
      * @param \Symfony\Component\DomCrawler\Form $form
-     * @return \TYPO3\Flow\Http\Response
+     * @return Response
      * @api
      */
     public function submit(Form $form)

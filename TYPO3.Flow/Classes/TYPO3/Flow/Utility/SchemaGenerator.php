@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Utility;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -31,7 +34,7 @@ class SchemaGenerator
      */
     public function generate($value)
     {
-        $schema = array();
+        $schema = [];
         switch (gettype($value)) {
             case 'NULL':
                 $schema['type'] = 'null';
@@ -68,7 +71,7 @@ class SchemaGenerator
      */
     protected function generateDictionarySchema(array $dictionaryValue)
     {
-        $schema = array('type' => 'dictionary', 'properties' => array());
+        $schema = ['type' => 'dictionary', 'properties' => []];
         ksort($dictionaryValue);
         foreach ($dictionaryValue as $name => $subvalue) {
             $schema['properties'][$name] = $this->generate($subvalue);
@@ -84,8 +87,8 @@ class SchemaGenerator
      */
     protected function generateArraySchema(array $arrayValue)
     {
-        $schema = array('type' => 'array');
-        $subSchemas = array();
+        $schema = ['type' => 'array'];
+        $subSchemas = [];
         foreach ($arrayValue as $subValue) {
             $subSchemas[] = $this->generate($subValue);
         }
@@ -101,13 +104,13 @@ class SchemaGenerator
      */
     protected function generateStringSchema($stringValue)
     {
-        $schema = array('type' => 'string');
-        $schemaValidator = new \TYPO3\Flow\Utility\SchemaValidator();
+        $schema = ['type' => 'string'];
+        $schemaValidator = new SchemaValidator();
         $detectedFormat = null;
 
-        $detectableFormats = array('uri','email','ip-address','class-name','interface-name');
+        $detectableFormats = ['uri','email','ip-address','class-name','interface-name'];
         foreach ($detectableFormats as $testFormat) {
-            $testSchema = array('type' => 'string', 'format' => $testFormat);
+            $testSchema = ['type' => 'string', 'format' => $testFormat];
             $result = $schemaValidator->validate($stringValue, $testSchema);
             if ($result->hasErrors() === false) {
                 $detectedFormat = $testFormat;
@@ -128,7 +131,7 @@ class SchemaGenerator
      */
     protected function filterDuplicatesFromArray(array $values)
     {
-        $uniqueItems = array();
+        $uniqueItems = [];
         foreach ($values as $value) {
             $uniqueItems[md5(serialize($value))] = $value;
         }

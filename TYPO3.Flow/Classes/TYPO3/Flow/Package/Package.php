@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Package;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Core\Bootstrap;
 use TYPO3\Flow\Utility\Files;
@@ -75,7 +78,7 @@ class Package implements PackageInterface
 
     /**
      * Meta information about this package
-     * @var \TYPO3\Flow\Package\MetaData
+     * @var MetaData
      */
     protected $packageMetaData;
 
@@ -101,21 +104,21 @@ class Package implements PackageInterface
     protected $objectManagementEnabled = true;
 
     /**
-     * @var \TYPO3\Flow\Package\PackageManager
+     * @var PackageManager
      */
     protected $packageManager;
 
     /**
      * Constructor
      *
-     * @param \TYPO3\Flow\Package\PackageManager $packageManager the package manager which knows this package
+     * @param PackageManager $packageManager the package manager which knows this package
      * @param string $packageKey Key of this package
      * @param string $packagePath Absolute path to the location of the package's composer manifest
      * @param string $classesPath Path the classes of the package are in, relative to $packagePath. Optional, PSR-0/PSR-4 mappings of the composer manifest overrule this argument, if present
      * @param string $manifestPath Path the composer manifest of the package, relative to $packagePath. Optional, defaults to ''
-     * @throws \TYPO3\Flow\Package\Exception\InvalidPackageKeyException if an invalid package key was passed
-     * @throws \TYPO3\Flow\Package\Exception\InvalidPackagePathException if an invalid package path was passed
-     * @throws \TYPO3\Flow\Package\Exception\InvalidPackageManifestException if no composer manifest file could be found
+     * @throws Exception\InvalidPackageKeyException if an invalid package key was passed
+     * @throws Exception\InvalidPackagePathException if an invalid package path was passed
+     * @throws Exception\InvalidPackageManifestException if no composer manifest file could be found
      */
     public function __construct(PackageManager $packageManager, $packageKey, $packagePath, $classesPath = null, $manifestPath = '')
     {
@@ -165,7 +168,7 @@ class Package implements PackageInterface
     /**
      * Returns the package meta data object of this package.
      *
-     * @return \TYPO3\Flow\Package\MetaData
+     * @return MetaData
      */
     public function getPackageMetaData()
     {
@@ -244,7 +247,6 @@ class Package implements PackageInterface
      * Returns the PHP namespace of classes in this package.
      *
      * @return string
-     * @throws \TYPO3\Flow\Package\Exception\InvalidPackageStateException
      * @api
      */
     public function getNamespace()
@@ -424,7 +426,7 @@ class Package implements PackageInterface
     /**
      * Returns the available documentations for this package
      *
-     * @return array Array of \TYPO3\Flow\Package\Documentation
+     * @return array<Documentation>
      * @api
      */
     public function getPackageDocumentations()
@@ -473,7 +475,7 @@ class Package implements PackageInterface
      * @param string $subDirectory Used internally
      * @param integer $recursionLevel Used internally
      * @return array
-     * @throws \TYPO3\Flow\Package\Exception if recursion into directories was too deep or another error occurred
+     * @throws Exception if recursion into directories was too deep or another error occurred
      */
     protected function buildArrayOfClassFiles($classesPath, $extraNamespaceSegment = '', $subDirectory = '', $recursionLevel = 0)
     {

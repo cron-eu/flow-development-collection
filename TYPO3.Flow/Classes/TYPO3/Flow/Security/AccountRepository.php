@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Security;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Log\SystemLoggerInterface;
+use TYPO3\Flow\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\Flow\Persistence\QueryInterface;
 use TYPO3\Flow\Persistence\Repository;
 use TYPO3\Flow\Session\SessionInterface;
@@ -25,12 +29,12 @@ class AccountRepository extends Repository
     /**
      * @var string
      */
-    const ENTITY_CLASSNAME = 'TYPO3\Flow\Security\Account';
+    const ENTITY_CLASSNAME = Account::class;
 
     /**
      * @var array
      */
-    protected $defaultOrderings = array('creationDate' => QueryInterface::ORDER_DESCENDING);
+    protected $defaultOrderings = ['creationDate' => QueryInterface::ORDER_DESCENDING];
 
     /**
      * @Flow\Inject
@@ -49,7 +53,7 @@ class AccountRepository extends Repository
      *
      * @param object $object The account to remove
      * @return void
-     * @throws \TYPO3\Flow\Persistence\Exception\IllegalObjectTypeException
+     * @throws IllegalObjectTypeException
      */
     public function remove($object)
     {
@@ -64,7 +68,7 @@ class AccountRepository extends Repository
      *
      * @param string $accountIdentifier The account identifier
      * @param string $authenticationProviderName The authentication provider name
-     * @return \TYPO3\Flow\Security\Account
+     * @return Account
      */
     public function findByAccountIdentifierAndAuthenticationProviderName($accountIdentifier, $authenticationProviderName)
     {
@@ -82,7 +86,7 @@ class AccountRepository extends Repository
      *
      * @param string $accountIdentifier The account identifier
      * @param string $authenticationProviderName The authentication provider name
-     * @return \TYPO3\Flow\Security\Account
+     * @return Account
      */
     public function findActiveByAccountIdentifierAndAuthenticationProviderName($accountIdentifier, $authenticationProviderName)
     {

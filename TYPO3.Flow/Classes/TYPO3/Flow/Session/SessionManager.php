@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Session;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Cache\Frontend\VariableFrontend;
@@ -77,12 +80,12 @@ class SessionManager implements SessionManagerInterface
     /**
      * Returns all active sessions, even remote ones.
      *
-     * @return array<\TYPO3\Flow\Session\SessionInterface>
+     * @return array<SessionInterface>
      * @api
      */
     public function getActiveSessions()
     {
-        $activeSessions = array();
+        $activeSessions = [];
         foreach ($this->metaDataCache->getByTag('session') as $sessionIdentifier => $sessionInfo) {
             $session = new Session($sessionIdentifier, $sessionInfo['storageIdentifier'], $sessionInfo['lastActivityTimestamp'], $sessionInfo['tags']);
             $activeSessions[] = $session;
@@ -99,7 +102,7 @@ class SessionManager implements SessionManagerInterface
      */
     public function getSessionsByTag($tag)
     {
-        $taggedSessions = array();
+        $taggedSessions = [];
         foreach ($this->metaDataCache->getByTag(Session::TAG_PREFIX . $tag) as $sessionIdentifier => $sessionInfo) {
             $session = new Session($sessionIdentifier, $sessionInfo['storageIdentifier'], $sessionInfo['lastActivityTimestamp'], $sessionInfo['tags']);
             $taggedSessions[] = $session;

@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Command;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
@@ -28,7 +31,7 @@ class DatabaseCommandController extends CommandController
      * @Flow\InjectConfiguration(path="persistence")
      * @var array
      */
-    protected $persistenceSettings = array();
+    protected $persistenceSettings = [];
 
     /**
      * @var Connection
@@ -85,7 +88,7 @@ class DatabaseCommandController extends CommandController
      */
     public function setCharsetCommand($characterSet = 'utf8', $collation = 'utf8_unicode_ci', $output = null, $verbose = false)
     {
-        if (!in_array($this->persistenceSettings['backendOptions']['driver'], array('pdo_mysql', 'mysqli'))) {
+        if (!in_array($this->persistenceSettings['backendOptions']['driver'], ['pdo_mysql', 'mysqli'])) {
             $this->outputLine('Database charset/collation fixing is only supported on MySQL.');
             $this->quit(1);
         }
@@ -117,7 +120,7 @@ class DatabaseCommandController extends CommandController
      */
     protected function convertToCharacterSetAndCollation($characterSet = 'utf8', $collation = 'utf8_unicode_ci', $outputPathAndFilename = null, $verbose = false)
     {
-        $statements = array('SET foreign_key_checks = 0');
+        $statements = ['SET foreign_key_checks = 0'];
 
         $statements[] = 'ALTER DATABASE ' . $this->connection->quoteIdentifier($this->persistenceSettings['backendOptions']['dbname']) . ' CHARACTER SET ' . $characterSet . ' COLLATE ' . $collation;
 

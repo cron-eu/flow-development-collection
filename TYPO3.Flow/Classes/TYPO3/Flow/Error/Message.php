@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Error;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * An object representation of a generic message. Usually, you will use Error, Warning or Notice instead of this one.
@@ -42,7 +45,7 @@ class Message
      * The message arguments. Will be replaced in the message body.
      * @var array
      */
-    protected $arguments = array();
+    protected $arguments = [];
 
     /**
      * The severity of this message ('OK'), overwrite in your own implementation.
@@ -59,7 +62,7 @@ class Message
      * @param string $title optional title for the message
      * @api
      */
-    public function __construct($message, $code = null, array $arguments = array(), $title = '')
+    public function __construct($message, $code = null, array $arguments = [], $title = '')
     {
         $this->message = $message;
         $this->code = $code;
@@ -121,7 +124,7 @@ class Message
      */
     public function render()
     {
-        if ($this->arguments !== array()) {
+        if ($this->arguments !== []) {
             return vsprintf($this->message, $this->arguments);
         } else {
             return $this->message;

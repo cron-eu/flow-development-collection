@@ -1,17 +1,22 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Mvc\ViewsConfiguration;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
  * Functional tests for the ActionController
  */
-class ViewsConfigurationTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class ViewsConfigurationTest extends FunctionalTestCase
 {
     /**
      * @var boolean
@@ -30,28 +35,28 @@ class ViewsConfigurationTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     {
         parent::setUp();
 
-        $this->registerRoute('viewsconfigurationa', 'test/mvc/viewsconfigurationa(/{@action})', array(
+        $this->registerRoute('viewsconfigurationa', 'test/mvc/viewsconfigurationa(/{@action})', [
             '@package' => 'TYPO3.Flow',
             '@subpackage' => 'Tests\Functional\Mvc\ViewsConfiguration\Fixtures',
             '@controller' => 'ViewsConfigurationTestA',
             '@format' => 'html'
-        ));
+        ]);
 
-        $this->registerRoute('viewsconfigurationb', 'test/mvc/viewsconfigurationb(/{@action})', array(
+        $this->registerRoute('viewsconfigurationb', 'test/mvc/viewsconfigurationb(/{@action})', [
             '@package' => 'TYPO3.Flow',
             '@subpackage' => 'Tests\Functional\Mvc\ViewsConfiguration\Fixtures',
             '@controller' => 'ViewsConfigurationTestB',
             '@action' => 'first',
             '@format' => 'html'
-        ));
+        ]);
 
-        $this->registerRoute('viewsconfigurationc', 'test/mvc/viewsconfigurationc(/{@action})', array(
+        $this->registerRoute('viewsconfigurationc', 'test/mvc/viewsconfigurationc(/{@action})', [
             '@package' => 'TYPO3.Flow',
             '@subpackage' => 'Tests\Functional\Mvc\ViewsConfiguration\Fixtures',
             '@controller' => 'ViewsConfigurationTestC',
             '@action' => 'index',
             '@format' => 'html'
-        ));
+        ]);
     }
 
     /**
@@ -75,7 +80,7 @@ class ViewsConfigurationTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     public function viewObjectNameChanged()
     {
         $response = $this->browser->request('http://localhost/test/mvc/viewsconfigurationc/index');
-        $this->assertEquals('TYPO3\Flow\Tests\Functional\Mvc\ViewsConfiguration\Fixtures\TemplateView', $response->getContent());
+        $this->assertEquals(Fixtures\TemplateView::class, $response->getContent());
     }
 
     /**

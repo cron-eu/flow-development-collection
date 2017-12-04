@@ -1,26 +1,34 @@
 <?php
 namespace TYPO3\Flow\Aop\Pointcut;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Aop\Builder\ClassNameIndex;
+use TYPO3\Flow\Aop\Exception;
+use TYPO3\Flow\Aop\Exception\InvalidPointcutExpressionException;
+use TYPO3\Flow\Log\SystemLoggerInterface;
+use TYPO3\Flow\Reflection\ReflectionService;
 
 /**
  * A little filter which filters for method names
  *
  * @Flow\Proxy(false)
  */
-class PointcutMethodNameFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
+class PointcutMethodNameFilter implements PointcutFilterInterface
 {
     const PATTERN_MATCHVISIBILITYMODIFIER = '/^(|public|protected)$/';
 
     /**
-     * @var \TYPO3\Flow\Reflection\ReflectionService
+     * @var ReflectionService
      */
     protected $reflectionService;
 
@@ -35,14 +43,14 @@ class PointcutMethodNameFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilte
     protected $methodVisibility = null;
 
     /**
-     * @var \TYPO3\Flow\Log\SystemLoggerInterface
+     * @var SystemLoggerInterface
      */
     protected $systemLogger;
 
     /**
      * @var array Array with constraints for method arguments
      */
-    protected $methodArgumentConstraints = array();
+    protected $methodArgumentConstraints = [];
 
     /**
      * Constructor - initializes the filter with the name filter pattern
@@ -50,13 +58,13 @@ class PointcutMethodNameFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilte
      * @param string $methodNameFilterExpression A regular expression which filters method names
      * @param string $methodVisibility The method visibility modifier (public, protected or private). Specifiy NULL if you don't care.
      * @param array $methodArgumentConstraints array of method constraints
-     * @throws \TYPO3\Flow\Aop\Exception\InvalidPointcutExpressionException
+     * @throws InvalidPointcutExpressionException
      */
-    public function __construct($methodNameFilterExpression, $methodVisibility = null, array $methodArgumentConstraints = array())
+    public function __construct($methodNameFilterExpression, $methodVisibility = null, array $methodArgumentConstraints = [])
     {
         $this->methodNameFilterExpression = $methodNameFilterExpression;
         if (preg_match(self::PATTERN_MATCHVISIBILITYMODIFIER, $methodVisibility) !== 1) {
-            throw new \TYPO3\Flow\Aop\Exception\InvalidPointcutExpressionException('Invalid method visibility modifier "' . $methodVisibility . '".', 1172494794);
+            throw new InvalidPointcutExpressionException('Invalid method visibility modifier "' . $methodVisibility . '".', 1172494794);
         }
         $this->methodVisibility = $methodVisibility;
         $this->methodArgumentConstraints = $methodArgumentConstraints;
@@ -65,19 +73,19 @@ class PointcutMethodNameFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilte
     /**
      * Injects the reflection service
      *
-     * @param \TYPO3\Flow\Reflection\ReflectionService $reflectionService The reflection service
+     * @param ReflectionService $reflectionService The reflection service
      * @return void
      */
-    public function injectReflectionService(\TYPO3\Flow\Reflection\ReflectionService $reflectionService)
+    public function injectReflectionService(ReflectionService $reflectionService)
     {
         $this->reflectionService = $reflectionService;
     }
 
     /**
-     * @param \TYPO3\Flow\Log\SystemLoggerInterface $systemLogger
+     * @param SystemLoggerInterface $systemLogger
      * @return void
      */
-    public function injectSystemLogger(\TYPO3\Flow\Log\SystemLoggerInterface $systemLogger)
+    public function injectSystemLogger(SystemLoggerInterface $systemLogger)
     {
         $this->systemLogger = $systemLogger;
     }
@@ -94,25 +102,25 @@ class PointcutMethodNameFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilte
      * @param string $methodDeclaringClassName Name of the class the method was originally declared in
      * @param mixed $pointcutQueryIdentifier Some identifier for this query - must at least differ from a previous identifier. Used for circular reference detection.
      * @return boolean TRUE if the class matches, otherwise FALSE
-     * @throws \TYPO3\Flow\Aop\Exception
+     * @throws Exception
      */
     public function matches($className, $methodName, $methodDeclaringClassName, $pointcutQueryIdentifier)
     {
         $matchResult = preg_match('/^' . $this->methodNameFilterExpression . '$/', $methodName);
 
         if ($matchResult === false) {
-            throw new \TYPO3\Flow\Aop\Exception('Error in regular expression', 1168876915);
+            throw new Exception('Error in regular expression', 1168876915);
         } elseif ($matchResult !== 1) {
             return false;
         }
 
         switch ($this->methodVisibility) {
-            case 'public' :
+            case 'public':
                 if (!($methodDeclaringClassName !== null && $this->reflectionService->isMethodPublic($methodDeclaringClassName, $methodName))) {
                     return false;
                 }
                 break;
-            case 'protected' :
+            case 'protected':
                 if (!($methodDeclaringClassName !== null && $this->reflectionService->isMethodProtected($methodDeclaringClassName, $methodName))) {
                     return false;
                 }
@@ -123,7 +131,7 @@ class PointcutMethodNameFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilte
             return false;
         }
 
-        $methodArguments = ($methodDeclaringClassName === null ? array() : $this->reflectionService->getMethodParameters($methodDeclaringClassName, $methodName));
+        $methodArguments = ($methodDeclaringClassName === null ? [] : $this->reflectionService->getMethodParameters($methodDeclaringClassName, $methodName));
         foreach (array_keys($this->methodArgumentConstraints) as $argumentName) {
             $objectAccess = explode('.', $argumentName, 2);
             $argumentName = $objectAccess[0];
@@ -152,9 +160,9 @@ class PointcutMethodNameFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilte
      */
     public function getRuntimeEvaluationsDefinition()
     {
-        return array(
+        return [
             'methodArgumentConstraints' => $this->methodArgumentConstraints
-        );
+        ];
     }
 
     /**
@@ -190,10 +198,10 @@ class PointcutMethodNameFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilte
     /**
      * This method is used to optimize the matching process.
      *
-     * @param \TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex
-     * @return \TYPO3\Flow\Aop\Builder\ClassNameIndex
+     * @param ClassNameIndex $classNameIndex
+     * @return ClassNameIndex
      */
-    public function reduceTargetClassNames(\TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex)
+    public function reduceTargetClassNames(ClassNameIndex $classNameIndex)
     {
         return $classNameIndex;
     }

@@ -1,13 +1,19 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Package;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Package\PackageManager;
+use TYPO3\Flow\Package\PackageManagerInterface;
+use TYPO3\Flow\Security\Account;
 use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
@@ -18,7 +24,7 @@ class PackageManagerTest extends FunctionalTestCase
 {
     /**
      *
-     * @var \TYPO3\Flow\Package\PackageManager
+     * @var PackageManager
      */
     protected $packageManager;
 
@@ -28,7 +34,7 @@ class PackageManagerTest extends FunctionalTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->packageManager = $this->objectManager->get('TYPO3\Flow\Package\PackageManagerInterface');
+        $this->packageManager = $this->objectManager->get(PackageManagerInterface::class);
     }
 
     /**
@@ -45,7 +51,7 @@ class PackageManagerTest extends FunctionalTestCase
      */
     public function getPackageOfObjectReturnsCorrectPackageForAnExistingProxyObject()
     {
-        $account = new \TYPO3\Flow\Security\Account();
+        $account = new Account();
         $package = $this->packageManager->getPackageOfObject($account);
         $this->assertSame('TYPO3.Flow', $package->getPackageKey());
     }

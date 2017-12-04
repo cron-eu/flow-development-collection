@@ -1,17 +1,21 @@
 <?php
 namespace TYPO3\Flow\Command;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Cache\CacheManager;
 use TYPO3\Flow\Cache\Frontend\VariableFrontend;
 use TYPO3\Flow\Cli\CommandController;
+use TYPO3\Flow\Mvc\Controller\AbstractController;
 use TYPO3\Flow\Object\ObjectManagerInterface;
 use TYPO3\Flow\Reflection\ReflectionService;
 use TYPO3\Flow\Security\Cryptography\RsaWalletServicePhp;
@@ -88,9 +92,9 @@ class SecurityCommandController extends CommandController
         }
         fclose($fp);
 
-        $uuid = $this->rsaWalletService->registerPublicKeyFromString($keyData);
+        $fingerprint = $this->rsaWalletService->registerPublicKeyFromString($keyData);
 
-        $this->outputLine('The public key has been successfully imported. Use the following uuid to refer to it in the RSAWalletService: ' . PHP_EOL . PHP_EOL . $uuid . PHP_EOL);
+        $this->outputLine('The public key has been successfully imported. Use the following fingerprint to refer to it in the RSAWalletService: ' . PHP_EOL . PHP_EOL . $fingerprint . PHP_EOL);
     }
 
     /**
@@ -99,6 +103,20 @@ class SecurityCommandController extends CommandController
      * Read a PEM formatted private key from stdin and import it into the
      * RSAWalletService. The public key will be automatically extracted and stored
      * together with the private key as a key pair.
+     *
+     * You can generate the same fingerprint returned from this using these commands:
+     *
+     *  ssh-keygen -yf my-key.pem > my-key.pub
+     *  ssh-keygen -lf my-key.pub
+     *
+     * To create a private key to import using this method, you can use:
+     *
+     *  ssh-keygen -t rsa -f my-key
+     *  ./flow security:importprivatekey < my-key
+     *
+     * Again, the fingerprint can also be generated using:
+     *
+     *  ssh-keygen -lf my-key.pub
      *
      * @param boolean $usedForPasswords If the private key should be used for passwords
      * @return void
@@ -114,9 +132,9 @@ class SecurityCommandController extends CommandController
         }
         fclose($fp);
 
-        $uuid = $this->rsaWalletService->registerKeyPairFromPrivateKeyString($keyData, $usedForPasswords);
+        $fingerprint = $this->rsaWalletService->registerKeyPairFromPrivateKeyString($keyData, $usedForPasswords);
 
-        $this->outputLine('The keypair has been successfully imported. Use the following uuid to refer to it in the RSAWalletService: ' . PHP_EOL . PHP_EOL . $uuid . PHP_EOL);
+        $this->outputLine('The keypair has been successfully imported. Use the following fingerprint to refer to it in the RSAWalletService: ' . PHP_EOL . PHP_EOL . $fingerprint . PHP_EOL);
     }
 
     /**
@@ -127,21 +145,21 @@ class SecurityCommandController extends CommandController
      */
     public function showEffectivePolicyCommand($privilegeType, $roles = '')
     {
-        $systemRoleIdentifiers = array('TYPO3.Flow:Everybody', 'TYPO3.Flow:Anonymous', 'TYPO3.Flow:AuthenticatedUser');
+        $systemRoleIdentifiers = ['TYPO3.Flow:Everybody', 'TYPO3.Flow:Anonymous', 'TYPO3.Flow:AuthenticatedUser'];
 
         if (strpos($privilegeType, '\\') === false) {
             $privilegeType = sprintf('\TYPO3\Flow\Security\Authorization\Privilege\%s\%sPrivilegeInterface', ucfirst($privilegeType), ucfirst($privilegeType));
         }
         if (!class_exists($privilegeType) && !interface_exists($privilegeType)) {
-            $this->outputLine('The privilege type "%s" was not defined.', array($privilegeType));
+            $this->outputLine('The privilege type "%s" was not defined.', [$privilegeType]);
             $this->quit(1);
         }
         if (!is_subclass_of($privilegeType, PrivilegeInterface::class)) {
-            $this->outputLine('"%s" does not refer to a valid Privilege', array($privilegeType));
+            $this->outputLine('"%s" does not refer to a valid Privilege', [$privilegeType]);
             $this->quit(1);
         }
 
-        $requestedRoles = array();
+        $requestedRoles = [];
         foreach (Arrays::trimExplode(',', $roles) as $roleIdentifier) {
             try {
                 if (in_array($roleIdentifier, $systemRoleIdentifiers)) {
@@ -155,7 +173,7 @@ class SecurityCommandController extends CommandController
                     }
                 }
             } catch (NoSuchRoleException $exception) {
-                $this->outputLine('The role %s was not defined.', array($roleIdentifier));
+                $this->outputLine('The role %s was not defined.', [$roleIdentifier]);
                 $this->quit(1);
             }
         }
@@ -166,11 +184,11 @@ class SecurityCommandController extends CommandController
         }
         $requestedRoles['TYPO3.Flow:Everybody'] = $this->policyService->getRole('TYPO3.Flow:Everybody');
 
-        $this->outputLine('Effective Permissions for the roles <b>%s</b> ', array(implode(', ', $requestedRoles)));
+        $this->outputLine('Effective Permissions for the roles <b>%s</b> ', [implode(', ', $requestedRoles)]);
         $this->outputLine(str_repeat('-', $this->output->getMaximumLineLength()));
 
         $definedPrivileges = $this->policyService->getAllPrivilegesByType($privilegeType);
-        $permissions = array();
+        $permissions = [];
 
         /** @var PrivilegeInterface $definedPrivilege */
         foreach ($definedPrivileges as $definedPrivilege) {
@@ -208,7 +226,7 @@ class SecurityCommandController extends CommandController
 
         foreach ($permissions as $privilegeTargetIdentifier => $permission) {
             $formattedPrivilegeTargetIdentifier = wordwrap($privilegeTargetIdentifier, $this->output->getMaximumLineLength() - 10, PHP_EOL . str_repeat(' ', 10), true);
-            $this->outputLine('%-70s %s', array($formattedPrivilegeTargetIdentifier, $permission));
+            $this->outputLine('%-70s %s', [$formattedPrivilegeTargetIdentifier, $permission]);
         }
     }
 
@@ -219,12 +237,12 @@ class SecurityCommandController extends CommandController
      */
     public function showUnprotectedActionsCommand()
     {
-        $methodPrivileges = array();
+        $methodPrivileges = [];
         foreach ($this->policyService->getRoles(true) as $role) {
-            $methodPrivileges = array_merge($methodPrivileges, $role->getPrivilegesByType('TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilegeInterface'));
+            $methodPrivileges = array_merge($methodPrivileges, $role->getPrivilegesByType(MethodPrivilegeInterface::class));
         }
 
-        $controllerClassNames = $this->reflectionService->getAllSubClassNamesForClass('TYPO3\Flow\Mvc\Controller\AbstractController');
+        $controllerClassNames = $this->reflectionService->getAllSubClassNamesForClass(AbstractController::class);
         $allActionsAreProtected = true;
         foreach ($controllerClassNames as $controllerClassName) {
             if ($this->reflectionService->isClassAbstract($controllerClassName)) {
@@ -272,21 +290,21 @@ class SecurityCommandController extends CommandController
     {
         $privilegeTargetInstance = $this->policyService->getPrivilegeTargetByIdentifier($privilegeTarget);
         if ($privilegeTargetInstance === null) {
-            $this->outputLine('The privilegeTarget "%s" is not defined', array($privilegeTarget));
+            $this->outputLine('The privilegeTarget "%s" is not defined', [$privilegeTarget]);
             $this->quit(1);
         }
-        $privilegeParameters = array();
+        $privilegeParameters = [];
         foreach ($this->request->getExceedingArguments() as $argument) {
             list($argumentName, $argumentValue) = explode(':', $argument, 2);
             $privilegeParameters[$argumentName] = $argumentValue;
         }
         $privilege = $privilegeTargetInstance->createPrivilege(PrivilegeInterface::GRANT, $privilegeParameters);
         if (!$privilege instanceof MethodPrivilegeInterface) {
-            $this->outputLine('The privilegeTarget "%s" does not refer to a MethodPrivilege but to a privilege of type "%s"', array($privilegeTarget, $privilege->getPrivilegeTarget()->getPrivilegeClassName()));
+            $this->outputLine('The privilegeTarget "%s" does not refer to a MethodPrivilege but to a privilege of type "%s"', [$privilegeTarget, $privilege->getPrivilegeTarget()->getPrivilegeClassName()]);
             $this->quit(1);
         }
 
-        $matchedClassesAndMethods = array();
+        $matchedClassesAndMethods = [];
         foreach ($this->reflectionService->getAllClassNames() as $className) {
             try {
                 $reflectionClass = new \ReflectionClass($className);

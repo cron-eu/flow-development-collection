@@ -5,6 +5,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types;
 use Doctrine\DBAL\Types\JsonArrayType as DoctrineJsonArrayType;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Core\Bootstrap;
 use TYPO3\Flow\Object\DependencyInjection\DependencyProxy;
 use TYPO3\Flow\Persistence\PersistenceManagerInterface;
 use TYPO3\Flow\Reflection\ReflectionService;
@@ -54,6 +55,23 @@ class JsonArrayType extends DoctrineJsonArrayType
     }
 
     /**
+     * Use jsonb for PostgreSQL, this means we require PostgreSQL 9.4
+     *
+     * @param array $fieldDeclaration The field declaration
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform The currently used database platform
+     * @return string
+     */
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    {
+        switch ($platform->getName()) {
+            case 'postgresql':
+                return 'jsonb';
+            default:
+                return $platform->getJsonTypeDeclarationSQL($fieldDeclaration);
+        }
+    }
+
+    /**
      * We map jsonb fields to our datatype by default. Doctrine doesn't use jsonb at all.
      *
      * @param AbstractPlatform $platform
@@ -61,7 +79,7 @@ class JsonArrayType extends DoctrineJsonArrayType
      */
     public function getMappedDatabaseTypes(AbstractPlatform $platform)
     {
-        return array('jsonb');
+        return ['jsonb'];
     }
 
     /**
@@ -101,13 +119,12 @@ class JsonArrayType extends DoctrineJsonArrayType
      */
     public function convertToDatabaseValue($array, AbstractPlatform $platform)
     {
-        $this->initializeDependencies();
-
-        $this->encodeObjectReferences($array);
-
         if ($array === null) {
             return null;
         }
+
+        $this->initializeDependencies();
+        $this->encodeObjectReferences($array);
 
         return json_encode($array, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE);
     }
@@ -122,8 +139,8 @@ class JsonArrayType extends DoctrineJsonArrayType
     protected function initializeDependencies()
     {
         if ($this->persistenceManager === null) {
-            $this->persistenceManager = \TYPO3\Flow\Core\Bootstrap::$staticObjectManager->get('TYPO3\Flow\Persistence\PersistenceManagerInterface');
-            $this->reflectionService = \TYPO3\Flow\Core\Bootstrap::$staticObjectManager->get('TYPO3\Flow\Reflection\ReflectionService');
+            $this->persistenceManager = Bootstrap::$staticObjectManager->get(PersistenceManagerInterface::class);
+            $this->reflectionService = Bootstrap::$staticObjectManager->get(ReflectionService::class);
         }
     }
 
@@ -170,11 +187,11 @@ class JsonArrayType extends DoctrineJsonArrayType
             $propertyClassName = TypeHandling::getTypeForValue($value);
 
             if ($value instanceof \DateTime) {
-                $value = array(
+                $value = [
                     'date' => $value->format('Y-m-d H:i:s.u'),
                     'timezone' => $value->format('e'),
                     'dateFormat' => 'Y-m-d H:i:s.u'
-                );
+                ];
             } elseif ($value instanceof \SplObjectStorage) {
                 throw new \RuntimeException('SplObjectStorage in array properties is not supported', 1375196580);
             } elseif ($value instanceof \Doctrine\Common\Collections\Collection) {
@@ -183,15 +200,15 @@ class JsonArrayType extends DoctrineJsonArrayType
                 throw new \RuntimeException('ArrayObject in array properties is not supported', 1375196582);
             } elseif ($this->persistenceManager->isNewObject($value) === false
                 && (
-                    $this->reflectionService->isClassAnnotatedWith($propertyClassName, 'TYPO3\Flow\Annotations\Entity')
-                    || $this->reflectionService->isClassAnnotatedWith($propertyClassName, 'TYPO3\Flow\Annotations\ValueObject')
-                    || $this->reflectionService->isClassAnnotatedWith($propertyClassName, 'Doctrine\ORM\Mapping\Entity')
+                    $this->reflectionService->isClassAnnotatedWith($propertyClassName, Flow\Entity::class)
+                    || $this->reflectionService->isClassAnnotatedWith($propertyClassName, Flow\ValueObject::class)
+                    || $this->reflectionService->isClassAnnotatedWith($propertyClassName, \Doctrine\ORM\Mapping\Entity::class)
                 )
             ) {
-                $value = array(
+                $value = [
                     '__flow_object_type' => $propertyClassName,
                     '__identifier' => $this->persistenceManager->getIdentifierByObject($value)
-                );
+                ];
             }
         }
     }

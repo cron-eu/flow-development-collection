@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Command;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Cli\CommandController;
@@ -107,13 +110,13 @@ class RoutingCommandController extends CommandController
         $package = $packageParts[0];
         $subpackage = isset($packageParts[1]) ? $packageParts[1] : null;
 
-        $routeValues = array(
+        $routeValues = [
             '@package' => $package,
             '@subpackage' => $subpackage,
             '@controller' => $controller,
             '@action' => $action,
             '@format' => $format
-        );
+        ];
 
         $this->outputLine('<b>Resolving:</b>');
         $this->outputLine('  Package: ' . $routeValues['@package']);
@@ -123,7 +126,7 @@ class RoutingCommandController extends CommandController
         $this->outputLine('  Format: ' . $routeValues['@format']);
 
         $controllerObjectName = null;
-        /** @var $route \TYPO3\Flow\Mvc\Routing\Route */
+        /** @var $route Route */
         foreach ($this->router->getRoutes() as $route) {
             try {
                 $resolves = $route->resolves($routeValues);
@@ -165,11 +168,11 @@ class RoutingCommandController extends CommandController
      */
     public function routePathCommand($path, $method = 'GET')
     {
-        $server = array(
+        $server = [
             'REQUEST_URI' => $path,
             'REQUEST_METHOD' => $method
-        );
-        $httpRequest = new Request(array(), array(), array(), $server);
+        ];
+        $httpRequest = new Request([], [], [], $server);
 
         /** @var Route $route */
         foreach ($this->router->getRoutes() as $route) {

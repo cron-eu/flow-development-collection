@@ -1,13 +1,18 @@
 <?php
 namespace TYPO3\Fluid\Tests\Functional\Form\Fixtures\Domain\Model;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use TYPO3\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -47,6 +52,18 @@ class Post
      * @ORM\Column(nullable=true)
      */
     protected $subCategory;
+
+    /**
+     * @var Collection<Tag>
+     * @ORM\ManyToMany
+     * @ORM\JoinTable(inverseJoinColumns={@ORM\JoinColumn(unique=true)})
+     */
+    protected $tags;
+
+    public function __construct()
+    {
+        $this->tags = new ArrayCollection();
+    }
 
     /**
      * @return string
@@ -127,5 +144,29 @@ class Post
     public function getSubCategory()
     {
         return $this->subCategory;
+    }
+
+    /**
+     * @param Tag $tag
+     */
+    public function addTag(Tag $tag)
+    {
+        $this->tags->add($tag);
+    }
+
+    /**
+     * @return Collection<Tag>
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param Collection<Tag> $tags
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
     }
 }

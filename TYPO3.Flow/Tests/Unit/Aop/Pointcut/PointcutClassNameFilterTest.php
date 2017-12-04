@@ -1,21 +1,27 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Aop\Pointcut;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 require_once(FLOW_PATH_FLOW . 'Tests/Unit/Fixtures/DummyClass.php');
 require_once(FLOW_PATH_FLOW . 'Tests/Unit/Fixtures/SecondDummyClass.php');
 
+use TYPO3\Flow\Reflection\ReflectionService;
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\Aop;
+
 /**
  * Testcase for the Pointcut Class Filter
- *
  */
-class PointcutClassNameFilterTest extends \TYPO3\Flow\Tests\UnitTestCase
+class PointcutClassNameFilterTest extends UnitTestCase
 {
     /**
      * Checks if the class filter fires on a concrete and simple class expression
@@ -24,19 +30,19 @@ class PointcutClassNameFilterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function matchesTellsIfTheSpecifiedRegularExpressionMatchesTheGivenClassName()
     {
-        $mockReflectionService = $this->getMock('TYPO3\Flow\Reflection\ReflectionService', array(), array(), '', false);
+        $mockReflectionService = $this->getMockBuilder(ReflectionService::class)->disableOriginalConstructor()->getMock();
 
-        $classFilter = new \TYPO3\Flow\Aop\Pointcut\PointcutClassNameFilter('TYPO3\Virtual\Foo\Bar');
+        $classFilter = new Aop\Pointcut\PointcutClassNameFilter('Neos\Virtual\Foo\Bar');
         $classFilter->injectReflectionService($mockReflectionService);
-        $this->assertTrue($classFilter->matches('TYPO3\Virtual\Foo\Bar', '', '', 1), 'No. 1');
+        $this->assertTrue($classFilter->matches('Neos\Virtual\Foo\Bar', '', '', 1), 'No. 1');
 
-        $classFilter = new \TYPO3\Flow\Aop\Pointcut\PointcutClassNameFilter('.*Virtual.*');
+        $classFilter = new Aop\Pointcut\PointcutClassNameFilter('.*Virtual.*');
         $classFilter->injectReflectionService($mockReflectionService);
-        $this->assertTrue($classFilter->matches('TYPO3\Virtual\Foo\Bar', '', '', 1), 'No. 2');
+        $this->assertTrue($classFilter->matches('Neos\Virtual\Foo\Bar', '', '', 1), 'No. 2');
 
-        $classFilter = new \TYPO3\Flow\Aop\Pointcut\PointcutClassNameFilter('TYPO3\Firtual.*');
+        $classFilter = new Aop\Pointcut\PointcutClassNameFilter('Neos\Firtual.*');
         $classFilter->injectReflectionService($mockReflectionService);
-        $this->assertFalse($classFilter->matches('TYPO3\Virtual\Foo\Bar', '', '', 1), 'No. 3');
+        $this->assertFalse($classFilter->matches('Neos\Virtual\Foo\Bar', '', '', 1), 'No. 3');
     }
 
     /**
@@ -44,24 +50,24 @@ class PointcutClassNameFilterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function reduceTargetClassNamesFiltersAllClassesNotMatchedByAClassNameFilter()
     {
-        $availableClassNames = array(
+        $availableClassNames = [
             'TestPackage\Subpackage\Class1',
             'TestPackage\Class2',
             'TestPackage\Subpackage\SubSubPackage\Class3',
             'TestPackage\Subpackage2\Class4'
-        );
+        ];
         sort($availableClassNames);
-        $availableClassNamesIndex = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
+        $availableClassNamesIndex = new Aop\Builder\ClassNameIndex();
         $availableClassNamesIndex->setClassNames($availableClassNames);
 
-        $expectedClassNames = array(
+        $expectedClassNames = [
             'TestPackage\Subpackage\SubSubPackage\Class3'
-        );
+        ];
         sort($expectedClassNames);
-        $expectedClassNamesIndex = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
+        $expectedClassNamesIndex = new Aop\Builder\ClassNameIndex();
         $expectedClassNamesIndex->setClassNames($expectedClassNames);
 
-        $classNameFilter = new \TYPO3\Flow\Aop\Pointcut\PointcutClassNameFilter('TestPackage\Subpackage\SubSubPackage\Class3');
+        $classNameFilter = new Aop\Pointcut\PointcutClassNameFilter('TestPackage\Subpackage\SubSubPackage\Class3');
         $result = $classNameFilter->reduceTargetClassNames($availableClassNamesIndex);
 
         $this->assertEquals($expectedClassNamesIndex, $result, 'The wrong class names have been filtered');
@@ -72,25 +78,25 @@ class PointcutClassNameFilterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function reduceTargetClassNamesFiltersAllClassesNotMatchedByAClassNameFilterWithRegularExpressions()
     {
-        $availableClassNames = array(
+        $availableClassNames = [
             'TestPackage\Subpackage\Class1',
             'TestPackage\Class2',
             'TestPackage\Subpackage\SubSubPackage\Class3',
             'TestPackage\Subpackage2\Class4'
-        );
+        ];
         sort($availableClassNames);
-        $availableClassNamesIndex = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
+        $availableClassNamesIndex = new Aop\Builder\ClassNameIndex();
         $availableClassNamesIndex->setClassNames($availableClassNames);
 
-        $expectedClassNames = array(
+        $expectedClassNames = [
             'TestPackage\Subpackage\Class1',
             'TestPackage\Subpackage\SubSubPackage\Class3'
-        );
+        ];
         sort($expectedClassNames);
-        $expectedClassNamesIndex = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
+        $expectedClassNamesIndex = new Aop\Builder\ClassNameIndex();
         $expectedClassNamesIndex->setClassNames($expectedClassNames);
 
-        $classNameFilter = new \TYPO3\Flow\Aop\Pointcut\PointcutClassNameFilter('TestPackage\Subpackage\.*');
+        $classNameFilter = new Aop\Pointcut\PointcutClassNameFilter('TestPackage\Subpackage\.*');
         $result = $classNameFilter->reduceTargetClassNames($availableClassNamesIndex);
 
         $this->assertEquals($expectedClassNamesIndex, $result, 'The wrong class names have been filtered');

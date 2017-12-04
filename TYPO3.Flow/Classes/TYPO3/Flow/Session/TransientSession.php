@@ -1,14 +1,19 @@
 <?php
 namespace TYPO3\Flow\Session;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Core\Bootstrap;
+use TYPO3\Flow\Utility\Algorithms;
 
 /**
  * Implementation of a transient session.
@@ -39,7 +44,7 @@ class TransientSession implements SessionInterface
      *
      * @var array
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * @var integer
@@ -68,7 +73,7 @@ class TransientSession implements SessionInterface
      */
     public function start()
     {
-        $this->sessionId = uniqid();
+        $this->sessionId = Algorithms::generateRandomString(13);
         $this->started = true;
     }
 
@@ -102,7 +107,7 @@ class TransientSession implements SessionInterface
      */
     public function renewId()
     {
-        $this->sessionId = uniqid();
+        $this->sessionId = Algorithms::generateRandomString(13);
         return $this->sessionId;
     }
 
@@ -181,7 +186,6 @@ class TransientSession implements SessionInterface
      *
      * @param string $reason A reason for destroying the session – used by the LoggingAspect
      * @return void
-     * @throws \TYPO3\Flow\Session\Exception
      * @throws Exception\SessionNotStartedException
      */
     public function destroy($reason = null)
@@ -189,17 +193,17 @@ class TransientSession implements SessionInterface
         if ($this->started !== true) {
             throw new Exception\SessionNotStartedException('The session has not been started yet.', 1218034663);
         }
-        $this->data = array();
+        $this->data = [];
         $this->started = false;
     }
 
     /**
      * No operation for transient session.
      *
-     * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      * @return void
      */
-    public static function destroyAll(\TYPO3\Flow\Core\Bootstrap $bootstrap)
+    public static function destroyAll(Bootstrap $bootstrap)
     {
     }
 

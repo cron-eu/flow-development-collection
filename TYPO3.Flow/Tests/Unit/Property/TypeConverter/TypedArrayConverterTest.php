@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Property\TypeConverter\TypedArrayConverter;
 use TYPO3\Flow\Tests\UnitTestCase;
@@ -32,7 +35,7 @@ class TypedArrayConverterTest extends UnitTestCase
      */
     public function checkMetadata()
     {
-        $this->assertEquals(array('array'), $this->converter->getSupportedSourceTypes(), 'Source types do not match');
+        $this->assertEquals(['array'], $this->converter->getSupportedSourceTypes(), 'Source types do not match');
         $this->assertEquals('array', $this->converter->getSupportedTargetType(), 'Target type does not match');
         $this->assertEquals(2, $this->converter->getPriority(), 'Priority does not match');
     }
@@ -42,14 +45,14 @@ class TypedArrayConverterTest extends UnitTestCase
      */
     public function canConvertFromDataProvider()
     {
-        return array(
-            array('targetType' => 'SomeTargetType', 'expectedResult' => false),
-            array('targetType' => 'array', 'expectedResult' => false),
+        return [
+            ['targetType' => 'SomeTargetType', 'expectedResult' => false],
+            ['targetType' => 'array', 'expectedResult' => false],
 
-            array('targetType' => 'array<string>', 'expectedResult' => true),
-            array('targetType' => 'array<Some\Element\Type>', 'expectedResult' => true),
-            array('targetType' => '\array<\int>', 'expectedResult' => true),
-        );
+            ['targetType' => 'array<string>', 'expectedResult' => true],
+            ['targetType' => 'array<Some\Element\Type>', 'expectedResult' => true],
+            ['targetType' => '\array<\int>', 'expectedResult' => true],
+        ];
     }
 
     /**
@@ -58,7 +61,7 @@ class TypedArrayConverterTest extends UnitTestCase
      */
     public function canConvertFromTests($targetType, $expectedResult)
     {
-        $actualResult = $this->converter->canConvertFrom(array(), $targetType);
+        $actualResult = $this->converter->canConvertFrom([], $targetType);
         if ($expectedResult === true) {
             $this->assertTrue($actualResult);
         } else {

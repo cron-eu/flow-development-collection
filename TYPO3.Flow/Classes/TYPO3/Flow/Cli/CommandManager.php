@@ -1,14 +1,24 @@
 <?php
 namespace TYPO3\Flow\Cli;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Cli\Command;
+use TYPO3\Flow\Cli\CommandController;
+use TYPO3\Flow\Core\Bootstrap;
+use TYPO3\Flow\Mvc\Exception\AmbiguousCommandIdentifierException;
+use TYPO3\Flow\Mvc\Exception\CommandException;
+use TYPO3\Flow\Mvc\Exception\NoSuchCommandException;
+use TYPO3\Flow\Reflection\ReflectionService;
 
 /**
  * A helper for CLI Commands
@@ -28,29 +38,29 @@ class CommandManager
     protected $shortCommandIdentifiers = null;
 
     /**
-     * @var \TYPO3\Flow\Reflection\ReflectionService
+     * @var ReflectionService
      */
     protected $reflectionService;
 
     /**
-     * @var \TYPO3\Flow\Core\Bootstrap
+     * @var Bootstrap
      */
     protected $bootstrap;
 
     /**
-     * @param \TYPO3\Flow\Reflection\ReflectionService $reflectionService
+     * @param ReflectionService $reflectionService
      * @return void
      */
-    public function injectReflectionService(\TYPO3\Flow\Reflection\ReflectionService $reflectionService)
+    public function injectReflectionService(ReflectionService $reflectionService)
     {
         $this->reflectionService = $reflectionService;
     }
 
     /**
-     * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      * @return void
      */
-    public function injectBootstrap(\TYPO3\Flow\Core\Bootstrap $bootstrap)
+    public function injectBootstrap(Bootstrap $bootstrap)
     {
         $this->bootstrap = $bootstrap;
     }
@@ -64,9 +74,9 @@ class CommandManager
     public function getAvailableCommands()
     {
         if ($this->availableCommands === null) {
-            $this->availableCommands = array();
+            $this->availableCommands = [];
 
-            $commandControllerClassNames = $this->reflectionService->getAllSubClassNamesForClass('TYPO3\Flow\Cli\CommandController');
+            $commandControllerClassNames = $this->reflectionService->getAllSubClassNamesForClass(CommandController::class);
             foreach ($commandControllerClassNames as $className) {
                 if (!class_exists($className)) {
                     continue;
@@ -87,9 +97,9 @@ class CommandManager
      * If more than one Command matches an AmbiguousCommandIdentifierException is thrown that contains the matched Commands
      *
      * @param string $commandIdentifier command identifier in the format foo:bar:baz
-     * @return \TYPO3\Flow\Cli\Command
-     * @throws \TYPO3\Flow\Mvc\Exception\NoSuchCommandException if no matching command is available
-     * @throws \TYPO3\Flow\Mvc\Exception\AmbiguousCommandIdentifierException if more than one Command matches the identifier (the exception contains the matched commands)
+     * @return Command
+     * @throws NoSuchCommandException if no matching command is available
+     * @throws AmbiguousCommandIdentifierException if more than one Command matches the identifier (the exception contains the matched commands)
      * @api
      */
     public function getCommandByIdentifier($commandIdentifier)
@@ -104,10 +114,10 @@ class CommandManager
 
         $matchedCommands = $this->getCommandsByIdentifier($commandIdentifier);
         if (count($matchedCommands) === 0) {
-            throw new \TYPO3\Flow\Mvc\Exception\NoSuchCommandException('No command could be found that matches the command identifier "' . $commandIdentifier . '".', 1310556663);
+            throw new NoSuchCommandException('No command could be found that matches the command identifier "' . $commandIdentifier . '".', 1310556663);
         }
         if (count($matchedCommands) > 1) {
-            throw new \TYPO3\Flow\Mvc\Exception\AmbiguousCommandIdentifierException('More than one command matches the command identifier "' . $commandIdentifier . '"', 1310557169, null, $matchedCommands);
+            throw new AmbiguousCommandIdentifierException('More than one command matches the command identifier "' . $commandIdentifier . '"', 1310557169, null, $matchedCommands);
         }
         return current($matchedCommands);
     }
@@ -117,13 +127,13 @@ class CommandManager
      * If no Command could be found, an empty array is returned
      *
      * @param string $commandIdentifier command identifier in the format foo:bar:baz
-     * @return array<\TYPO3\Flow\Mvc\Cli\Command>
+     * @return array<Command>
      * @api
      */
     public function getCommandsByIdentifier($commandIdentifier)
     {
         $availableCommands = $this->getAvailableCommands();
-        $matchedCommands = array();
+        $matchedCommands = [];
         foreach ($availableCommands as $command) {
             if ($this->commandMatchesIdentifier($command, $commandIdentifier)) {
                 $matchedCommands[] = $command;
@@ -159,14 +169,14 @@ class CommandManager
     protected function getShortCommandIdentifiers()
     {
         if ($this->shortCommandIdentifiers === null) {
-            $commandsByCommandName = array();
+            $commandsByCommandName = [];
             foreach ($this->getAvailableCommands() as $availableCommand) {
                 list($packageKey, $controllerName, $commandName) = explode(':', $availableCommand->getCommandIdentifier());
                 if (!isset($commandsByCommandName[$commandName])) {
-                    $commandsByCommandName[$commandName] = array();
+                    $commandsByCommandName[$commandName] = [];
                 }
                 if (!isset($commandsByCommandName[$commandName][$controllerName])) {
-                    $commandsByCommandName[$commandName][$controllerName] = array();
+                    $commandsByCommandName[$commandName][$controllerName] = [];
                 }
                 $commandsByCommandName[$commandName][$controllerName][] = $packageKey;
             }
@@ -180,7 +190,7 @@ class CommandManager
                             $this->getCommandByIdentifier($shortCommandIdentifier);
                             $this->shortCommandIdentifiers[$availableCommand->getCommandIdentifier()] = $shortCommandIdentifier;
                             break;
-                        } catch (\TYPO3\Flow\Mvc\Exception\CommandException $exception) {
+                        } catch (CommandException $exception) {
                         }
                     }
                 } else {

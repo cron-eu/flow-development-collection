@@ -1,12 +1,17 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Validation\Validator;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Validation\Validator\FloatValidator;
 
 require_once('AbstractValidatorTestcase.php');
 
@@ -14,9 +19,9 @@ require_once('AbstractValidatorTestcase.php');
  * Testcase for the float validator
  *
  */
-class FloatValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\AbstractValidatorTestcase
+class FloatValidatorTest extends AbstractValidatorTestcase
 {
-    protected $validatorClassName = 'TYPO3\Flow\Validation\Validator\FloatValidator';
+    protected $validatorClassName = FloatValidator::class;
 
     /**
      * @test
@@ -41,14 +46,14 @@ class FloatValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\Abs
      */
     public function validFloats()
     {
-        return array(
-            array(1029437.234726),
-            array('123.45'),
-            array('+123.45'),
-            array('-123.45'),
-            array('123.45e3'),
-            array(123.45e3)
-        );
+        return [
+            [1029437.234726],
+            ['123.45'],
+            ['+123.45'],
+            ['-123.45'],
+            ['123.45e3'],
+            [123.45e3]
+        ];
     }
 
     /**
@@ -67,12 +72,12 @@ class FloatValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\Abs
      */
     public function invalidFloats()
     {
-        return array(
-            array(1029437),
-            array('1029437'),
-            array('foo.bar'),
-            array('not a number')
-        );
+        return [
+            [1029437],
+            ['1029437'],
+            ['foo.bar'],
+            ['not a number']
+        ];
     }
 
     /**

@@ -1,17 +1,21 @@
 <?php
 namespace TYPO3\Flow\Security\Authentication\EntryPoint;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Http\Request;
 use TYPO3\Flow\Http\Response;
 use TYPO3\Flow\Mvc\ActionRequest;
+use TYPO3\Flow\Mvc\Routing\UriBuilder;
 use TYPO3\Flow\Security\Exception\MissingConfigurationException;
 
 /**
@@ -22,15 +26,15 @@ class WebRedirect extends AbstractEntryPoint
     /**
      * @Flow\Inject(lazy = FALSE)
      * @Flow\Transient
-     * @var \TYPO3\Flow\Mvc\Routing\UriBuilder
+     * @var UriBuilder
      */
     protected $uriBuilder;
 
     /**
      * Starts the authentication: Redirect to login page
      *
-     * @param \TYPO3\Flow\Http\Request $request The current request
-     * @param \TYPO3\Flow\Http\Response $response The current response
+     * @param Request $request The current request
+     * @param Response $response The current response
      * @return void
      * @throws MissingConfigurationException
      */

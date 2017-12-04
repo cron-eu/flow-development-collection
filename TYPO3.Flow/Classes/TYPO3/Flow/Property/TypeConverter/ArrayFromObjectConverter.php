@@ -1,14 +1,21 @@
 <?php
 namespace TYPO3\Flow\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Error\Error;
+use TYPO3\Flow\Persistence\Aspect\PersistenceMagicInterface;
+use TYPO3\Flow\Persistence\PersistenceManagerInterface;
+use TYPO3\Flow\Property\Exception\TypeConverterException;
 use TYPO3\Flow\Property\PropertyMappingConfigurationInterface;
 use TYPO3\Flow\Reflection\ObjectAccess;
 
@@ -20,14 +27,14 @@ class ArrayFromObjectConverter extends AbstractTypeConverter
 {
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Persistence\PersistenceManagerInterface
+     * @var PersistenceManagerInterface
      */
     protected $persistenceManager;
 
     /**
      * @var array<string>
      */
-    protected $sourceTypes = array('object');
+    protected $sourceTypes = ['object'];
 
     /**
      * @var string
@@ -48,10 +55,10 @@ class ArrayFromObjectConverter extends AbstractTypeConverter
     public function getSourceChildPropertiesToBeConverted($source)
     {
         $gettableProperties = ObjectAccess::getGettableProperties($source);
-        $propertiesToConvert = array();
-        foreach ($gettableProperties as $gettableProperty) {
+        $propertiesToConvert = [];
+        foreach ($gettableProperties as $propertyName => $gettableProperty) {
             if (is_object($gettableProperty)) {
-                $propertiesToConvert[] = $gettableProperty;
+                $propertiesToConvert[$propertyName] = $gettableProperty;
             }
         }
 
@@ -64,7 +71,7 @@ class ArrayFromObjectConverter extends AbstractTypeConverter
      * @param PropertyMappingConfigurationInterface $configuration
      * @return string
      */
-    public function getTypeOfChildProperty($targetType, $propertyName, \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration)
+    public function getTypeOfChildProperty($targetType, $propertyName, PropertyMappingConfigurationInterface $configuration)
     {
         return 'array';
     }
@@ -85,11 +92,11 @@ class ArrayFromObjectConverter extends AbstractTypeConverter
      * @param string $targetType
      * @param array $convertedChildProperties
      * @param PropertyMappingConfigurationInterface $configuration
-     * @return mixed|\TYPO3\Flow\Error\Error the target type, or an error object if a user-error occurred
-     * @throws \TYPO3\Flow\Property\Exception\TypeConverterException thrown in case a developer error occurred
+     * @return mixed|Error the target type, or an error object if a user-error occurred
+     * @throws TypeConverterException thrown in case a developer error occurred
      * @api
      */
-    public function convertFrom($source, $targetType, array $convertedChildProperties = array(), PropertyMappingConfigurationInterface $configuration = null)
+    public function convertFrom($source, $targetType, array $convertedChildProperties = [], PropertyMappingConfigurationInterface $configuration = null)
     {
         $properties = ObjectAccess::getGettableProperties($source);
         if ($source instanceof \Doctrine\ORM\Proxy\Proxy) {
@@ -100,7 +107,7 @@ class ArrayFromObjectConverter extends AbstractTypeConverter
 
         $properties = array_merge($properties, $convertedChildProperties);
 
-        if ($source instanceof \TYPO3\Flow\Persistence\Aspect\PersistenceMagicInterface) {
+        if ($source instanceof PersistenceMagicInterface) {
             $properties['__identity'] = $this->persistenceManager->getIdentifierByObject($source);
         }
 

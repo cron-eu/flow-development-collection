@@ -1,17 +1,22 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Property\Exception\InvalidTargetException;
 use TYPO3\Flow\Property\PropertyMappingConfiguration;
 use TYPO3\Flow\Property\TypeConverter\ObjectConverter;
 use TYPO3\Flow\Reflection\ObjectAccess;
 use TYPO3\Flow\Tests\FunctionalTestCase;
+use TYPO3\Flow\Tests\Functional\Property\Fixtures;
 
 /**
  */
@@ -25,7 +30,7 @@ class ObjectConverterTest extends FunctionalTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->converter = $this->objectManager->get('TYPO3\Flow\Property\TypeConverter\ObjectConverter');
+        $this->converter = $this->objectManager->get(ObjectConverter::class);
     }
 
     /**
@@ -39,7 +44,7 @@ class ObjectConverterTest extends FunctionalTestCase
         $configuration
             ->forProperty($propertyName)
             ->setTypeConverterOption(
-                'TYPO3\Flow\Property\TypeConverter\ObjectConverter',
+                ObjectConverter::class,
                 ObjectConverter::CONFIGURATION_TARGET_TYPE,
                 $expectedTargetType);
 
@@ -53,7 +58,7 @@ class ObjectConverterTest extends FunctionalTestCase
     public function getTypeOfChildPropertyReturnsCorrectTypeIfAConstructorArgumentForThatPropertyIsPresent()
     {
         $actual = $this->converter->getTypeOfChildProperty(
-            'TYPO3\Flow\Tests\Functional\Property\Fixtures\TestClass',
+            Fixtures\TestClass::class,
             'dummy',
             new PropertyMappingConfiguration()
         );
@@ -66,7 +71,7 @@ class ObjectConverterTest extends FunctionalTestCase
     public function getTypeOfChildPropertyReturnsCorrectTypeIfASetterForThatPropertyIsPresent()
     {
         $actual = $this->converter->getTypeOfChildProperty(
-            'TYPO3\Flow\Tests\Functional\Property\Fixtures\TestClass',
+            Fixtures\TestClass::class,
             'attributeWithStringTypeAnnotation',
             new PropertyMappingConfiguration()
         );
@@ -78,9 +83,9 @@ class ObjectConverterTest extends FunctionalTestCase
      */
     public function getTypeOfChildPropertyThrowsExceptionIfThatPropertyIsPubliclyPresentButHasNoProperTypeAnnotation()
     {
-        $this->setExpectedException('TYPO3\Flow\Property\Exception\InvalidTargetException', '', 1406821818);
+        $this->setExpectedException(InvalidTargetException::class, '', 1406821818);
         $this->converter->getTypeOfChildProperty(
-            'TYPO3\Flow\Tests\Functional\Property\Fixtures\TestClass',
+            Fixtures\TestClass::class,
             'somePublicPropertyWithoutVarAnnotation',
             new PropertyMappingConfiguration()
         );
@@ -93,7 +98,7 @@ class ObjectConverterTest extends FunctionalTestCase
     {
         $configuration = new PropertyMappingConfiguration();
         $actual = $this->converter->getTypeOfChildProperty(
-            'TYPO3\Flow\Tests\Functional\Property\Fixtures\TestClass',
+            Fixtures\TestClass::class,
             'somePublicProperty',
             $configuration
         );
@@ -107,12 +112,12 @@ class ObjectConverterTest extends FunctionalTestCase
     {
         $convertedObject = $this->converter->convertFrom(
             'irrelevant',
-            'TYPO3\Flow\Tests\Functional\Property\Fixtures\TestClass',
-            array(
+            Fixtures\TestClass::class,
+            [
                 'propertyMeantForConstructorUsage' => 'theValue',
                 'propertyMeantForSetterUsage' => 'theValue',
                 'propertyMeantForPublicUsage' => 'theValue'
-            ),
+            ],
             new PropertyMappingConfiguration()
         );
 

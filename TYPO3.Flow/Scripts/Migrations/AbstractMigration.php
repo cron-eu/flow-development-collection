@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Core\Migrations;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Configuration\Source\YamlSource;
 use TYPO3\Flow\Utility\Files;
@@ -231,7 +234,6 @@ abstract class AbstractMigration
      * The patterns are used as is, no quoting is done. A closure can be given for
      * the $replacement variable. It should return a string and is given an
      * array of matches as parameter.
-
      *
      * @param string $search
      * @param string|\Closure $replacement
@@ -275,7 +277,7 @@ abstract class AbstractMigration
      */
     protected function renameMethod($className, $oldMethodName, $newMethodName, $withInheritance = true)
     {
-        throw new \LogicException('renameClass is not yet implemented, sorry!', 1335525001);
+        throw new \LogicException('renameMethod is not yet implemented, sorry!', 1479293733);
     }
 
     /**

@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * Utility to reduce boilerplate code needed to set default context variables and evaluate a string that possibly is an EEL expression.
@@ -23,13 +26,13 @@ class Utility
      */
     public static function getDefaultContextVariables(array $configuration)
     {
-        $defaultContextVariables = array();
+        $defaultContextVariables = [];
         foreach ($configuration as $variableName => $objectType) {
             $currentPathBase = & $defaultContextVariables;
             $variablePathNames = explode('.', $variableName);
             foreach ($variablePathNames as $pathName) {
                 if (!isset($currentPathBase[$pathName])) {
-                    $currentPathBase[$pathName] = array();
+                    $currentPathBase[$pathName] = [];
                 }
                 $currentPathBase = & $currentPathBase[$pathName];
             }
@@ -49,7 +52,7 @@ class Utility
      * @return mixed
      * @throws Exception
      */
-    public static function evaluateEelExpression($expression, EelEvaluatorInterface $eelEvaluator, array $contextVariables, array $defaultContextConfiguration = array())
+    public static function evaluateEelExpression($expression, EelEvaluatorInterface $eelEvaluator, array $contextVariables, array $defaultContextConfiguration = [])
     {
         $matches = null;
         if (!preg_match(Package::EelExpressionRecognizer, $expression, $matches)) {
@@ -64,7 +67,7 @@ class Utility
         }
 
         $contextVariables['q'] = function ($element) {
-            return new FlowQuery\FlowQuery(is_array($element) || $element instanceof \Traversable ? $element : array($element));
+            return new FlowQuery\FlowQuery(is_array($element) || $element instanceof \Traversable ? $element : [$element]);
         };
 
         $context = new ProtectedContext($contextVariables);

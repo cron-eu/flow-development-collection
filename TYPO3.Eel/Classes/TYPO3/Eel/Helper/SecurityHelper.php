@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Eel\Helper;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Eel\ProtectedContextAwareInterface;
+use TYPO3\Flow\Security\Account;
 use TYPO3\Flow\Security\Context as SecurityContext;
 
 /**
@@ -27,7 +31,7 @@ class SecurityHelper implements ProtectedContextAwareInterface
     /**
      * Get the account of the first authenticated token.
      *
-     * @return \TYPO3\Flow\Security\Account|NULL
+     * @return Account|NULL
      */
     public function getAccount()
     {

@@ -1,20 +1,24 @@
 <?php
 namespace TYPO3\Flow\Log\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Log\Exception\CouldNotOpenResourceException;
 
 /**
  * A log backend which writes log entries to the console (STDOUT or STDERR)
  *
  * @api
  */
-class ConsoleBackend extends \TYPO3\Flow\Log\Backend\AbstractBackend
+class ConsoleBackend extends AbstractBackend
 {
     /**
      * An array of severity labels, indexed by their integer constant
@@ -38,12 +42,12 @@ class ConsoleBackend extends \TYPO3\Flow\Log\Backend\AbstractBackend
      * the log file or opening a database connection.
      *
      * @return void
-     * @throws \TYPO3\Flow\Log\Exception\CouldNotOpenResourceException
+     * @throws CouldNotOpenResourceException
      * @api
      */
     public function open()
     {
-        $this->severityLabels = array(
+        $this->severityLabels = [
             LOG_EMERG   => 'EMERGENCY',
             LOG_ALERT   => 'ALERT    ',
             LOG_CRIT    => 'CRITICAL ',
@@ -52,11 +56,11 @@ class ConsoleBackend extends \TYPO3\Flow\Log\Backend\AbstractBackend
             LOG_NOTICE  => 'NOTICE   ',
             LOG_INFO    => 'INFO     ',
             LOG_DEBUG   => 'DEBUG    ',
-        );
+        ];
 
         $this->streamHandle = fopen('php://' . $this->streamName, 'w');
         if (!is_resource($this->streamHandle)) {
-            throw new \TYPO3\Flow\Log\Exception\CouldNotOpenResourceException('Could not open stream "' . $this->streamName . '" for write access.', 1310986609);
+            throw new CouldNotOpenResourceException('Could not open stream "' . $this->streamName . '" for write access.', 1310986609);
         }
     }
 

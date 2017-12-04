@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Mvc\Routing;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Configuration\ConfigurationManager;
 use TYPO3\Flow\Http\Component\ComponentContext;
@@ -51,17 +54,17 @@ class RoutingComponentTest extends UnitTestCase
      */
     public function setUp()
     {
-        $this->routingComponent = new RoutingComponent(array());
+        $this->routingComponent = new RoutingComponent([]);
 
-        $this->mockRouter = $this->getMockBuilder('TYPO3\Flow\Mvc\Routing\Router')->getMock();
-        $this->mockConfigurationManager = $this->getMockBuilder('TYPO3\Flow\Configuration\ConfigurationManager')->disableOriginalConstructor()->getMock();
+        $this->mockRouter = $this->getMockBuilder(Router::class)->getMock();
+        $this->mockConfigurationManager = $this->getMockBuilder(ConfigurationManager::class)->disableOriginalConstructor()->getMock();
         $this->inject($this->mockRouter, 'configurationManager', $this->mockConfigurationManager);
 
         $this->inject($this->routingComponent, 'router', $this->mockRouter);
 
-        $this->mockComponentContext = $this->getMockBuilder('TYPO3\Flow\Http\Component\ComponentContext')->disableOriginalConstructor()->getMock();
+        $this->mockComponentContext = $this->getMockBuilder(ComponentContext::class)->disableOriginalConstructor()->getMock();
 
-        $this->mockHttpRequest = $this->getMockBuilder('TYPO3\Flow\Http\Request')->disableOriginalConstructor()->getMock();
+        $this->mockHttpRequest = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $this->mockComponentContext->expects($this->any())->method('getHttpRequest')->will($this->returnValue($this->mockHttpRequest));
     }
 
@@ -70,10 +73,10 @@ class RoutingComponentTest extends UnitTestCase
      */
     public function handleStoresRouterMatchResultsInTheComponentContext()
     {
-        $mockMatchResults = array('someRouterMatchResults');
+        $mockMatchResults = ['someRouterMatchResults'];
 
         $this->mockRouter->expects($this->atLeastOnce())->method('route')->with($this->mockHttpRequest)->will($this->returnValue($mockMatchResults));
-        $this->mockComponentContext->expects($this->atLeastOnce())->method('setParameter')->with('TYPO3\Flow\Mvc\Routing\RoutingComponent', 'matchResults', $mockMatchResults);
+        $this->mockComponentContext->expects($this->atLeastOnce())->method('setParameter')->with(RoutingComponent::class, 'matchResults', $mockMatchResults);
 
         $this->routingComponent->handle($this->mockComponentContext);
     }

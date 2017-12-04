@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Persistence\Generic\Qom;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 
 /**
@@ -54,10 +57,10 @@ namespace TYPO3\Flow\Persistence\Generic\Qom;
  *
  * @api
  */
-class Comparison extends \TYPO3\Flow\Persistence\Generic\Qom\Constraint
+class Comparison extends Constraint
 {
     /**
-     * @var \TYPO3\Flow\Persistence\Generic\Qom\DynamicOperand
+     * @var DynamicOperand
      */
     protected $operand1;
 
@@ -74,11 +77,11 @@ class Comparison extends \TYPO3\Flow\Persistence\Generic\Qom\Constraint
     /**
      * Constructs this Comparison instance
      *
-     * @param \TYPO3\Flow\Persistence\Generic\Qom\DynamicOperand $operand1
+     * @param DynamicOperand $operand1
      * @param integer $operator one of \TYPO3\Flow\Persistence\QueryInterface.OPERATOR_*
      * @param mixed $operand2
      */
-    public function __construct(\TYPO3\Flow\Persistence\Generic\Qom\DynamicOperand $operand1, $operator, $operand2 = null)
+    public function __construct(DynamicOperand $operand1, $operator, $operand2 = null)
     {
         $this->operand1 = $operand1;
         $this->operator = $operator;
@@ -89,7 +92,7 @@ class Comparison extends \TYPO3\Flow\Persistence\Generic\Qom\Constraint
      *
      * Gets the first operand.
      *
-     * @return \TYPO3\Flow\Persistence\Generic\Qom\DynamicOperand the operand; non-null
+     * @return DynamicOperand the operand; non-null
      * @api
      */
     public function getOperand1()

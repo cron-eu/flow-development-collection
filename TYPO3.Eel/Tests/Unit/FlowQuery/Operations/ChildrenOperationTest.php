@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel\Tests\Unit\FlowQuery\Operations;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Eel\FlowQuery\Operations\Object\ChildrenOperation;
 
@@ -17,20 +20,20 @@ class ChildrenOperationTest extends \TYPO3\Flow\Tests\UnitTestCase
 {
     public function childrenExamples()
     {
-        $object1 = (object) array('a' => 'b');
-        $object2 = (object) array('c' => 'd');
+        $object1 = (object) ['a' => 'b'];
+        $object2 = (object) ['c' => 'd'];
 
-        $exampleArray = array(
-            'keyTowardsObject' => ((object) array()),
-            'keyTowardsArray' => array($object1, $object2),
-            'keyTowardsTraversable' => new \ArrayIterator(array($object1, $object2))
-        );
+        $exampleArray = [
+            'keyTowardsObject' => ((object) []),
+            'keyTowardsArray' => [$object1, $object2],
+            'keyTowardsTraversable' => new \ArrayIterator([$object1, $object2])
+        ];
 
-        return array(
-            'traversal of objects' => array(array($exampleArray), array('keyTowardsObject'), array($exampleArray['keyTowardsObject'])),
-            'traversal of arrays unrolls them' => array(array($exampleArray), array('keyTowardsArray'), array($object1, $object2)),
-            'traversal of traversables unrolls them' => array(array($exampleArray), array('keyTowardsTraversable'), array($object1, $object2)),
-        );
+        return [
+            'traversal of objects' => [[$exampleArray], ['keyTowardsObject'], [$exampleArray['keyTowardsObject']]],
+            'traversal of arrays unrolls them' => [[$exampleArray], ['keyTowardsArray'], [$object1, $object2]],
+            'traversal of traversables unrolls them' => [[$exampleArray], ['keyTowardsTraversable'], [$object1, $object2]],
+        ];
     }
 
     /**

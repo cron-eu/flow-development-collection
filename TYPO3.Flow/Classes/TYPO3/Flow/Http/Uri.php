@@ -1,14 +1,19 @@
 <?php
 namespace TYPO3\Flow\Http;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Error as FlowError;
+use TYPO3\Flow\Utility\Unicode;
 
 /**
  * Represents a Unique Resource Identifier according to STD 66 / RFC 3986
@@ -72,7 +77,7 @@ class Uri
      * Array representation of the URI query
      * @var array
      */
-    protected $arguments = array();
+    protected $arguments = [];
 
     /**
      * Fragment / anchor, if one was specified.
@@ -95,8 +100,8 @@ class Uri
 
         $parseUrlException = null;
         try {
-            $uriParts = \TYPO3\Flow\Utility\Unicode\Functions::parse_url($uriString);
-        } catch (\TYPO3\Flow\Error\Exception $exception) {
+            $uriParts = Unicode\Functions::parse_url($uriString);
+        } catch (FlowError\Exception $exception) {
             $parseUrlException = $exception;
         }
         if (is_array($uriParts)) {

@@ -1,14 +1,18 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Property\Fixtures;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Doctrine\ORM\Mapping as ORM;
+use TYPO3\Flow\Tests\Functional\Property\TypeConverter;
 
 /**
  * A simple class for PropertyMapper test
@@ -37,32 +41,32 @@ class TestClass
     public $somePublicPropertyWithoutVarAnnotation;
 
     /**
-     * @see \TYPO3\Flow\Tests\Functional\Property\TypeConverter\ObjectConverterTest::getTypeOfChildPropertyReturnsCorrectTypeIfThatPropertyIsPubliclyPresent
+     * @see TypeConverter\ObjectConverterTest::getTypeOfChildPropertyReturnsCorrectTypeIfThatPropertyIsPubliclyPresent
      * @var float
      */
     public $somePublicProperty;
 
     /**
-     * @see \TYPO3\Flow\Tests\Functional\Property\TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
+     * @see TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
      * @var string
      */
     public $propertyMeantForConstructorUsage = 'default';
 
     /**
-     * @see \TYPO3\Flow\Tests\Functional\Property\TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
+     * @see TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
      * @var string
      */
     public $propertyMeantForSetterUsage = 'default';
 
     /**
-     * @see \TYPO3\Flow\Tests\Functional\Property\TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
+     * @see TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
      * @var string
      */
     public $propertyMeantForPublicUsage = 'default';
 
     /**
-     * @see \TYPO3\Flow\Tests\Functional\Property\TypeConverter\ObjectConverterTest::getTypeOfChildPropertyReturnsCorrectTypeIfAConstructorArgumentForThatPropertyIsPresent
-     * @see \TYPO3\Flow\Tests\Functional\Property\TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
+     * @see TypeConverter\ObjectConverterTest::getTypeOfChildPropertyReturnsCorrectTypeIfAConstructorArgumentForThatPropertyIsPresent
+     * @see TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
      * @param float $dummy
      * @param string $propertyMeantForConstructorUsage
      */
@@ -125,7 +129,7 @@ class TestClass
     }
 
     /**
-     * @see \TYPO3\Flow\Tests\Functional\Property\TypeConverter\ObjectConverterTest::getTypeOfChildPropertyReturnsCorrectTypeIfASetterForThatPropertyIsPresent
+     * @see TypeConverter\ObjectConverterTest::getTypeOfChildPropertyReturnsCorrectTypeIfASetterForThatPropertyIsPresent
      * @param string $value
      */
     public function setAttributeWithStringTypeAnnotation($value)
@@ -133,7 +137,7 @@ class TestClass
     }
 
     /**
-     * @see \TYPO3\Flow\Tests\Functional\Property\TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
+     * @see TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
      * @param string $value
      */
     public function setPropertyMeantForConstructorUsage($value)
@@ -142,7 +146,7 @@ class TestClass
     }
 
     /**
-     * @see \TYPO3\Flow\Tests\Functional\Property\TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
+     * @see TypeConverter\ObjectConverterTest::convertFromUsesAppropriatePropertyPopulationMethodsInOrderConstructorSetterPublic
      * @param string $value
      */
     public function setPropertyMeantForSetterUsage($value)

@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Utility\Lock;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Configuration\ConfigurationManager;
@@ -26,7 +29,7 @@ class Lock
     protected static $lockStrategyClassName;
 
     /**
-     * @var \TYPO3\Flow\Utility\Lock\LockStrategyInterface
+     * @var LockStrategyInterface
      */
     protected $lockStrategy;
 
@@ -47,10 +50,10 @@ class Lock
     public function __construct($subject, $exclusiveLock = true)
     {
         if (self::$lockStrategyClassName === null) {
-            if (Bootstrap::$staticObjectManager === null || !Bootstrap::$staticObjectManager->isRegistered('TYPO3\Flow\Configuration\ConfigurationManager')) {
+            if (Bootstrap::$staticObjectManager === null || !Bootstrap::$staticObjectManager->isRegistered(ConfigurationManager::class)) {
                 return;
             }
-            $configurationManager = Bootstrap::$staticObjectManager->get('TYPO3\Flow\Configuration\ConfigurationManager');
+            $configurationManager = Bootstrap::$staticObjectManager->get(ConfigurationManager::class);
             $settings = $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.Flow');
             self::$lockStrategyClassName = $settings['utility']['lockStrategyClassName'];
         }
@@ -59,7 +62,7 @@ class Lock
     }
 
     /**
-     * @return \TYPO3\Flow\Utility\Lock\LockStrategyInterface
+     * @return LockStrategyInterface
      */
     public function getLockStrategy()
     {

@@ -1,18 +1,24 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Aop;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Tests\FunctionalTestCase;
+use TYPO3\Flow\Tests\Functional\Aop\Fixtures;
 
 /**
  * Testcase for the AOP Framework class
  *
  */
-class FrameworkTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class FrameworkTest extends FunctionalTestCase
 {
     /**
      * @test
@@ -52,8 +58,8 @@ class FrameworkTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     public function containWithSplObjectStorageInRuntimeEvaluation()
     {
         $targetClass = new Fixtures\TargetClass01();
-        $name = new \TYPO3\Flow\Tests\Functional\Aop\Fixtures\Name('Flow');
-        $otherName = new \TYPO3\Flow\Tests\Functional\Aop\Fixtures\Name('TYPO3');
+        $name = new Fixtures\Name('Flow');
+        $otherName = new Fixtures\Name('TYPO3');
         $splObjectStorage = new \SplObjectStorage();
         $splObjectStorage->attach($name);
         $targetClass->setCurrentName($name);
@@ -89,7 +95,7 @@ class FrameworkTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function adviceInformationIsAlsoBuiltWhenTheTargetClassIsUnserialized()
     {
-        $className = 'TYPO3\Flow\Tests\Functional\Aop\Fixtures\TargetClass01';
+        $className = Fixtures\TargetClass01::class;
         $targetClass = unserialize('O:' . strlen($className) . ':"' . $className . '":0:{};');
         $this->assertSame('Hello, me', $targetClass->greet('Flow'));
     }
@@ -140,10 +146,10 @@ class FrameworkTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function resultOfGreetObjectMethodIsModifiedByAdvice()
     {
-        $targetClass = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Aop\Fixtures\TargetClass01');
-        $name = new \TYPO3\Flow\Tests\Functional\Aop\Fixtures\Name('TYPO3');
+        $targetClass = $this->objectManager->get(Fixtures\TargetClass01::class);
+        $name = new Fixtures\Name('TYPO3');
         $this->assertSame('Hello, old friend', $targetClass->greetObject($name), 'Aspect should greet with "old friend" if the name property equals "TYPO3"');
-        $name = new \TYPO3\Flow\Tests\Functional\Aop\Fixtures\Name('Christopher');
+        $name = new Fixtures\Name('Christopher');
         $this->assertSame('Hello, Christopher', $targetClass->greetObject($name));
     }
 
@@ -152,12 +158,12 @@ class FrameworkTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function thisIsSupportedInMethodRuntimeCondition()
     {
-        $targetClass = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Aop\Fixtures\TargetClass01');
-        $name = new \TYPO3\Flow\Tests\Functional\Aop\Fixtures\Name('Neos');
+        $targetClass = $this->objectManager->get(Fixtures\TargetClass01::class);
+        $name = new Fixtures\Name('Neos');
         $targetClass->setCurrentName($name);
         $this->assertSame('Hello, you', $targetClass->greetObject($name), 'Aspect should greet with "you" if the current name equals the name argument');
 
-        $name = new \TYPO3\Flow\Tests\Functional\Aop\Fixtures\Name('Christopher');
+        $name = new Fixtures\Name('Christopher');
         $targetClass->setCurrentName(null);
         $this->assertSame('Hello, Christopher', $targetClass->greetObject($name), 'Aspect should greet with given name if the current name is not equal to the name argument');
     }
@@ -167,7 +173,7 @@ class FrameworkTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function globalObjectsAreSupportedInMethodRuntimeCondition()
     {
-        $targetClass = $this->objectManager->get('TYPO3\Flow\Tests\Functional\Aop\Fixtures\TargetClass01');
+        $targetClass = $this->objectManager->get(Fixtures\TargetClass01::class);
         $this->assertSame('Hello, superstar', $targetClass->greet('Robbie'), 'Aspect should greet with "superstar" if the global context getNameOfTheWeek equals the given name');
         $this->assertSame('Hello, Christopher', $targetClass->greet('Christopher'), 'Aspect should greet with given name if the global context getNameOfTheWeek does not equal the given name');
     }
@@ -182,7 +188,7 @@ class FrameworkTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     {
         $targetClass = new Fixtures\TargetClass03();
 
-        $this->assertInstanceOf('TYPO3\Flow\Tests\Functional\Aop\Fixtures\Introduced01Interface', $targetClass);
+        $this->assertInstanceOf(Fixtures\Introduced01Interface::class, $targetClass);
         $this->assertTrue(method_exists($targetClass, 'introducedMethod01'));
         $this->assertTrue(method_exists($targetClass, 'introducedMethodWithArguments'));
     }

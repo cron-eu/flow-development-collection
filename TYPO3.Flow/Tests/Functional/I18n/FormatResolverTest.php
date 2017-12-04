@@ -1,21 +1,28 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\I18n;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\I18n\FormatResolver;
+use TYPO3\Flow\Tests\FunctionalTestCase;
+use \TYPO3\Flow\I18n;
 
 /**
  * Testcase for the I18N placeholder replacing
  *
  */
-class FormatResolverTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class FormatResolverTest extends FunctionalTestCase
 {
     /**
-     * @var \TYPO3\Flow\I18n\FormatResolver
+     * @var FormatResolver
      */
     protected $formatResolver;
 
@@ -25,7 +32,7 @@ class FormatResolverTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->formatResolver = $this->objectManager->get('TYPO3\Flow\I18n\FormatResolver');
+        $this->formatResolver = $this->objectManager->get(FormatResolver::class);
     }
 
     /**
@@ -34,12 +41,12 @@ class FormatResolverTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     public function placeholderAndDateValues()
     {
         $date = new \DateTime('@1322228231');
-        return array(
-            array('{0,datetime,date,short}', array($date), new \TYPO3\Flow\I18n\Locale('de'), '25.11.11'),
-            array('{0,datetime,date,short}', array($date), new \TYPO3\Flow\I18n\Locale('en'), '11/25/11'),
-            array('{0,datetime,time,full}', array($date), new \TYPO3\Flow\I18n\Locale('de'), '13:37:11 +00:00'),
-            array('{0,datetime,dateTime,short}', array($date), new \TYPO3\Flow\I18n\Locale('en'), '11/25/11 1:37 p.m.')
-        );
+        return [
+            ['{0,datetime,date,short}', [$date], new I18n\Locale('de'), '25.11.11'],
+            ['{0,datetime,date,short}', [$date], new I18n\Locale('en'), '11/25/11'],
+            ['{0,datetime,time,full}', [$date], new I18n\Locale('de'), '13:37:11 +00:00'],
+            ['{0,datetime,dateTime,short}', [$date], new I18n\Locale('en'), '11/25/11 1:37 p.m.']
+        ];
     }
 
     /**
@@ -57,9 +64,9 @@ class FormatResolverTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function formatResolverWorksCorrectlyForFullyQualifiedFormatterClassNames()
     {
-        $actualFormatter = new \TYPO3\Flow\Tests\Functional\I18n\Fixtures\SampleFormatter;
-        $locale = new \TYPO3\Flow\I18n\Locale('de');
-        $testResult = $this->formatResolver->resolvePlaceholders('{0,TYPO3\Flow\Tests\Functional\I18n\Fixtures\SampleFormatter}', array('foo'), $locale);
+        $actualFormatter = new Fixtures\SampleFormatter;
+        $locale = new I18n\Locale('de');
+        $testResult = $this->formatResolver->resolvePlaceholders(sprintf('{0,%s}', Fixtures\SampleFormatter::class), ['foo'], $locale);
         $this->assertEquals($actualFormatter->format('foo', $locale), $testResult);
     }
 }

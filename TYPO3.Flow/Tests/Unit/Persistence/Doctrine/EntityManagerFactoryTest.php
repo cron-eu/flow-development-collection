@@ -1,16 +1,20 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Persistence\Doctrine;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
-
-/**
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
  */
-class EntityManagerFactoryTest extends \TYPO3\Flow\Tests\UnitTestCase
+
+use TYPO3\Flow\Persistence\Doctrine\EntityManagerFactory;
+use TYPO3\Flow\Tests\UnitTestCase;
+
+class EntityManagerFactoryTest extends UnitTestCase
 {
     /**
      * @test
@@ -50,23 +54,23 @@ class EntityManagerFactoryTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     protected function buildAndPrepareDqlCustomStringConfiguration()
     {
-        $entityManagerFactory = $this->getAccessibleMock('TYPO3\Flow\Persistence\Doctrine\EntityManagerFactory', array('dummy'));
+        $entityManagerFactory = $this->getAccessibleMock(EntityManagerFactory::class, ['dummy']);
         $configuration = new \Doctrine\ORM\Configuration;
 
-        $settingsArray = array(
-            'customStringFunctions' => array(
+        $settingsArray = [
+            'customStringFunctions' => [
                 'FOOSTRING' => 'Some\Foo\StringClass',
                 'BARSTRING' => 'Some\Bar\StringClass'
-            ),
-            'customNumericFunctions' => array(
+            ],
+            'customNumericFunctions' => [
                 'FOONUMERIC' => 'Some\Foo\NumericClass',
                 'BARNUMERIC' => 'Some\Bar\NumericClass'
-            ),
-            'customDatetimeFunctions' => array(
+            ],
+            'customDatetimeFunctions' => [
                 'FOODATETIME' => 'Some\Foo\DateTimeClass',
                 'BARDATETIME' => 'Some\Bar\DateTimeClass'
-            ),
-        );
+            ],
+        ];
         $entityManagerFactory->_call('applyDqlSettingsToConfiguration', $settingsArray, $configuration);
         return $configuration;
     }

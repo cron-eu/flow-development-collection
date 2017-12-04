@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Security\Authentication\Token;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Http\Request;
 use TYPO3\Flow\Http\Uri;
+use TYPO3\Flow\Mvc\ActionRequest;
 use TYPO3\Flow\Security\Authentication\Token\UsernamePasswordHttpBasic;
 use TYPO3\Flow\Security\Authentication\TokenInterface;
 use TYPO3\Flow\Tests\UnitTestCase;
@@ -38,18 +42,18 @@ class UsernamePasswordHttpBasicTest extends UnitTestCase
      */
     public function credentialsAreSetCorrectlyFromRequestHeadersArguments()
     {
-        $serverEnvironment = array(
+        $serverEnvironment = [
             'PHP_AUTH_USER' => 'robert',
             'PHP_AUTH_PW' => 'mysecretpassword, containing a : colon ;-)'
-        );
+        ];
 
-        $httpRequest = Request::create(new Uri('http://foo.com'), 'GET', array(), array(), $serverEnvironment);
-        $mockActionRequest = $this->getMockBuilder('TYPO3\Flow\Mvc\ActionRequest')->disableOriginalConstructor()->getMock();
+        $httpRequest = Request::create(new Uri('http://foo.com'), 'GET', [], [], $serverEnvironment);
+        $mockActionRequest = $this->getMockBuilder(ActionRequest::class)->disableOriginalConstructor()->getMock();
         $mockActionRequest->expects($this->atLeastOnce())->method('getHttpRequest')->will($this->returnValue($httpRequest));
 
         $this->token->updateCredentials($mockActionRequest);
 
-        $expectedCredentials = array('username' => 'robert', 'password' => 'mysecretpassword, containing a : colon ;-)');
+        $expectedCredentials = ['username' => 'robert', 'password' => 'mysecretpassword, containing a : colon ;-)'];
         $this->assertEquals($expectedCredentials, $this->token->getCredentials());
         $this->assertSame(TokenInterface::AUTHENTICATION_NEEDED, $this->token->getAuthenticationStatus());
     }
@@ -59,14 +63,14 @@ class UsernamePasswordHttpBasicTest extends UnitTestCase
      */
     public function credentialsAreSetCorrectlyForCGI()
     {
-        $expectedCredentials = array('username' => 'robert', 'password' => 'mysecretpassword, containing a : colon ;-)');
+        $expectedCredentials = ['username' => 'robert', 'password' => 'mysecretpassword, containing a : colon ;-)'];
 
-        $serverEnvironment = array(
+        $serverEnvironment = [
             'REDIRECT_REMOTE_AUTHORIZATION' => 'Basic ' . base64_encode($expectedCredentials['username'] . ':' . $expectedCredentials['password'])
-        );
+        ];
 
-        $httpRequest = Request::create(new Uri('http://foo.com'), 'GET', array(), array(), $serverEnvironment);
-        $mockActionRequest = $this->getMockBuilder('TYPO3\Flow\Mvc\ActionRequest')->disableOriginalConstructor()->getMock();
+        $httpRequest = Request::create(new Uri('http://foo.com'), 'GET', [], [], $serverEnvironment);
+        $mockActionRequest = $this->getMockBuilder(ActionRequest::class)->disableOriginalConstructor()->getMock();
         $mockActionRequest->expects($this->atLeastOnce())->method('getHttpRequest')->will($this->returnValue($httpRequest));
         $this->token->updateCredentials($mockActionRequest);
 
@@ -80,7 +84,7 @@ class UsernamePasswordHttpBasicTest extends UnitTestCase
     public function updateCredentialsSetsTheCorrectAuthenticationStatusIfNoCredentialsArrived()
     {
         $httpRequest = Request::create(new Uri('http://foo.com'));
-        $mockActionRequest = $this->getMockBuilder('TYPO3\Flow\Mvc\ActionRequest')->disableOriginalConstructor()->getMock();
+        $mockActionRequest = $this->getMockBuilder(ActionRequest::class)->disableOriginalConstructor()->getMock();
         $mockActionRequest->expects($this->atLeastOnce())->method('getHttpRequest')->will($this->returnValue($httpRequest));
         $this->token->updateCredentials($mockActionRequest);
 

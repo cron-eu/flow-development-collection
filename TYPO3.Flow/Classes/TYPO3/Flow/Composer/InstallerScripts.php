@@ -1,17 +1,20 @@
 <?php
 namespace TYPO3\Flow\Composer;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
-use Composer\Script\CommandEvent;
-use Composer\Script\PackageEvent;
+use Composer\Script\Event;
+use Composer\Installer\PackageEvent;
 use TYPO3\Flow\Utility\Files;
 
 /**
@@ -23,10 +26,10 @@ class InstallerScripts
      * Make sure required paths and files are available outside of Package
      * Run on every Composer install or update - must be configured in root manifest
      *
-     * @param CommandEvent $event
+     * @param Event $event
      * @return void
      */
-    public static function postUpdateAndInstall(CommandEvent $event)
+    public static function postUpdateAndInstall(Event $event)
     {
         Files::createDirectoryRecursively('Configuration');
         Files::createDirectoryRecursively('Data');
@@ -40,7 +43,7 @@ class InstallerScripts
     /**
      * Calls actions and install scripts provided by installed packages.
      *
-     * @param \Composer\Script\PackageEvent $event
+     * @param PackageEvent $event
      * @return void
      * @throws Exception\UnexpectedOperationException
      */
@@ -86,12 +89,12 @@ class InstallerScripts
     {
         $essentialsPath = $installerResourcesDirectory . 'Distribution/Essentials';
         if (is_dir($essentialsPath)) {
-            Files::copyDirectoryRecursively($essentialsPath, getcwd() . '/', false, true);
+            Files::copyDirectoryRecursively($essentialsPath, Files::getUnixStylePath(getcwd()) . '/', false, true);
         }
 
         $defaultsPath = $installerResourcesDirectory . 'Distribution/Defaults';
         if (is_dir($defaultsPath)) {
-            Files::copyDirectoryRecursively($defaultsPath, getcwd() . '/', true, true);
+            Files::copyDirectoryRecursively($defaultsPath, Files::getUnixStylePath(getcwd()) . '/', true, true);
         }
     }
 

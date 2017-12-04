@@ -1,17 +1,22 @@
 <?php
 namespace TYPO3\Flow\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Error\Error;
+use TYPO3\Flow\I18n\Locale;
 use TYPO3\Flow\Property\Exception\InvalidPropertyMappingConfigurationException;
 use TYPO3\Flow\I18n\Cldr\Reader\NumbersReader;
+use TYPO3\Flow\Property\PropertyMappingConfigurationInterface;
 
 /**
  * Converter which transforms a float, integer or string to a float.
@@ -102,7 +107,7 @@ class FloatConverter extends AbstractTypeConverter
     /**
      * @var array<string>
      */
-    protected $sourceTypes = array('float', 'integer', 'string');
+    protected $sourceTypes = ['float', 'integer', 'string'];
 
     /**
      * @var string
@@ -120,15 +125,15 @@ class FloatConverter extends AbstractTypeConverter
      * @param mixed $source
      * @param string $targetType
      * @param array $convertedChildProperties
-     * @param \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration
+     * @param PropertyMappingConfigurationInterface $configuration
      * @return float|\TYPO3\Flow\Error\Error
      * @api
      */
-    public function convertFrom($source, $targetType, array $convertedChildProperties = array(), \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration = null)
+    public function convertFrom($source, $targetType, array $convertedChildProperties = [], PropertyMappingConfigurationInterface $configuration = null)
     {
         if ($source === null || strlen($source) === 0) {
             return null;
-        } elseif (is_string($source) && $configuration instanceof \TYPO3\Flow\Property\PropertyMappingConfigurationInterface) {
+        } elseif (is_string($source) && $configuration instanceof PropertyMappingConfigurationInterface) {
             $source = $this->parseUsingLocaleIfConfigured($source, $configuration);
             if ($source instanceof Error) {
                 return $source;
@@ -136,7 +141,7 @@ class FloatConverter extends AbstractTypeConverter
         }
 
         if (!is_numeric($source)) {
-            return new Error('"%s" cannot be converted to a float value.', 1332934124, array($source));
+            return new Error('"%s" cannot be converted to a float value.', 1332934124, [$source]);
         }
         return (float)$source;
     }
@@ -145,25 +150,25 @@ class FloatConverter extends AbstractTypeConverter
      * Tries to parse the input using the NumberParser.
      *
      * @param string $source
-     * @param \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration
+     * @param PropertyMappingConfigurationInterface $configuration
      * @return float|\TYPO3\Flow\Validation\Error Parsed float number or error
      * @throws \TYPO3\Flow\Property\Exception\InvalidPropertyMappingConfigurationException
      */
-    protected function parseUsingLocaleIfConfigured($source, \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration)
+    protected function parseUsingLocaleIfConfigured($source, PropertyMappingConfigurationInterface $configuration)
     {
-        $configuration = $this->getConfigurationKeysAndValues($configuration, array('locale', 'strictMode', 'formatLength', 'formatType'));
+        $configuration = $this->getConfigurationKeysAndValues($configuration, ['locale', 'strictMode', 'formatLength', 'formatType']);
 
         if ($configuration['locale'] === null) {
             return $source;
         } elseif ($configuration['locale'] === true) {
             $locale = $this->localizationService->getConfiguration()->getCurrentLocale();
         } elseif (is_string($configuration['locale'])) {
-            $locale = new \TYPO3\Flow\I18n\Locale($configuration['locale']);
-        } elseif ($configuration['locale'] instanceof \TYPO3\Flow\I18n\Locale) {
+            $locale = new Locale($configuration['locale']);
+        } elseif ($configuration['locale'] instanceof Locale) {
             $locale = $configuration['locale'];
         }
 
-        if (!($locale instanceof \TYPO3\Flow\I18n\Locale)) {
+        if (!($locale instanceof Locale)) {
             $exceptionMessage = 'Determined locale is not of type "\TYPO3\Flow\I18n\Locale", but of type "' . (is_object($locale) ? get_class($locale) : gettype($locale)) . '".';
             throw new InvalidPropertyMappingConfigurationException($exceptionMessage, 1334837413);
         }
@@ -183,7 +188,7 @@ class FloatConverter extends AbstractTypeConverter
 
         if ($configuration['formatType'] !== null) {
             $formatType = $configuration['formatType'];
-            \TYPO3\Flow\I18n\Cldr\Reader\NumbersReader::validateFormatType($formatType);
+            NumbersReader::validateFormatType($formatType);
         } else {
             $formatType = NumbersReader::FORMAT_TYPE_DECIMAL;
         }
@@ -206,15 +211,15 @@ class FloatConverter extends AbstractTypeConverter
     /**
      * Helper method to collect configuration for this class.
      *
-     * @param \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration
+     * @param PropertyMappingConfigurationInterface $configuration
      * @param array $configurationKeys
      * @return array
      */
-    protected function getConfigurationKeysAndValues(\TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration, array $configurationKeys)
+    protected function getConfigurationKeysAndValues(PropertyMappingConfigurationInterface $configuration, array $configurationKeys)
     {
-        $keysAndValues = array();
+        $keysAndValues = [];
         foreach ($configurationKeys as $configurationKey) {
-            $keysAndValues[$configurationKey] = $configuration->getConfigurationValue('TYPO3\Flow\Property\TypeConverter\FloatConverter', $configurationKey);
+            $keysAndValues[$configurationKey] = $configuration->getConfigurationValue(FloatConverter::class, $configurationKey);
         }
         return $keysAndValues;
     }

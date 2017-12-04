@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -23,7 +26,7 @@ class ProtectedContext extends Context
     /**
      * @var array
      */
-    protected $whitelist = array();
+    protected $whitelist = [];
 
     /**
      * Call a method if in whitelist
@@ -33,7 +36,7 @@ class ProtectedContext extends Context
      * @return mixed|void
      * @throws NotAllowedException
      */
-    public function call($method, array $arguments = array())
+    public function call($method, array $arguments = [])
     {
         if ($this->value === null || isset($this->whitelist[$method]) || isset($this->whitelist['*']) || ($this->value instanceof ProtectedContextAwareInterface && $this->value->allowsCallOfMethod($method))) {
             return parent::call($method, $arguments);
@@ -47,7 +50,7 @@ class ProtectedContext extends Context
      * The whitelist for the given path is applied to the new context.
      *
      * @param string $path
-     * @return \TYPO3\Eel\Context The wrapped value
+     * @return Context The wrapped value
      */
     public function getAndWrap($path = null)
     {
@@ -85,7 +88,7 @@ class ProtectedContext extends Context
     public function whitelist($pathOrMethods)
     {
         if (!is_array($pathOrMethods)) {
-            $pathOrMethods = array($pathOrMethods);
+            $pathOrMethods = [$pathOrMethods];
         }
         foreach ($pathOrMethods as $pathOrMethod) {
             $parts = explode('.', $pathOrMethod);
@@ -95,7 +98,7 @@ class ProtectedContext extends Context
                 if ($i === $count - 1) {
                     $current[$parts[$i]] = true;
                 } else {
-                    $current[$parts[$i]] = array();
+                    $current[$parts[$i]] = [];
                     $current = &$current[$parts[$i]];
                 }
             }

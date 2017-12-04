@@ -1,18 +1,23 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\I18n;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\I18n;
 
 /**
  * Testcase for the Locale class
- *
  */
-class LocaleTest extends \TYPO3\Flow\Tests\UnitTestCase
+class LocaleTest extends UnitTestCase
 {
     /**
      * Data provider for theConstructorThrowsAnExceptionOnPassingAInvalidLocaleIdentifiers
@@ -21,11 +26,11 @@ class LocaleTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function invalidLocaleIdentifiers()
     {
-        return array(
-            array(''),
-            array('E'),
-            array('deDE')
-        );
+        return [
+            [''],
+            ['E'],
+            ['deDE']
+        ];
     }
 
     /**
@@ -35,7 +40,7 @@ class LocaleTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function theConstructorThrowsAnExceptionOnPassingAInvalidLocaleIdentifiers($invalidIdentifier)
     {
-        new \TYPO3\Flow\I18n\Locale($invalidIdentifier);
+        new I18n\Locale($invalidIdentifier);
     }
 
     /**
@@ -43,25 +48,25 @@ class LocaleTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function theConstructorRecognizesTheMostImportantValidLocaleIdentifiers()
     {
-        $locale = new \TYPO3\Flow\I18n\Locale('de');
+        $locale = new I18n\Locale('de');
         $this->assertEquals('de', $locale->getLanguage());
         $this->assertNull($locale->getScript());
         $this->assertNull($locale->getRegion());
         $this->assertNull($locale->getVariant());
 
-        $locale = new \TYPO3\Flow\I18n\Locale('de_DE');
+        $locale = new I18n\Locale('de_DE');
         $this->assertEquals('de', $locale->getLanguage());
         $this->assertEquals('DE', $locale->getRegion());
         $this->assertNull($locale->getScript());
         $this->assertNull($locale->getVariant());
 
-        $locale = new \TYPO3\Flow\I18n\Locale('en_Latn_US');
+        $locale = new I18n\Locale('en_Latn_US');
         $this->assertEquals('en', $locale->getLanguage());
         $this->assertEquals('Latn', $locale->getScript());
         $this->assertEquals('US', $locale->getRegion());
         $this->assertNull($locale->getVariant());
 
-        $locale = new \TYPO3\Flow\I18n\Locale('AR-arab_ae');
+        $locale = new I18n\Locale('AR-arab_ae');
         $this->assertEquals('ar', $locale->getLanguage());
         $this->assertEquals('Arab', $locale->getScript());
         $this->assertEquals('AE', $locale->getRegion());
@@ -73,13 +78,13 @@ class LocaleTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function producesCorrectLocaleIdentifierWhenStringCasted()
     {
-        $locale = new \TYPO3\Flow\I18n\Locale('de_DE');
+        $locale = new I18n\Locale('de_DE');
         $this->assertEquals('de_DE', (string)$locale);
 
-        $locale = new \TYPO3\Flow\I18n\Locale('en_Latn_US');
+        $locale = new I18n\Locale('en_Latn_US');
         $this->assertEquals('en_Latn_US', (string)$locale);
 
-        $locale = new \TYPO3\Flow\I18n\Locale('AR-arab_ae');
+        $locale = new I18n\Locale('AR-arab_ae');
         $this->assertEquals('ar_Arab_AE', (string)$locale);
     }
 }

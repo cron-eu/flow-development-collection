@@ -1,17 +1,22 @@
 <?php
 namespace TYPO3\Flow\Security\Authentication;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Security\Context as SecurityContext;
 
 /**
  * Contract for an authentication manager.
  *
- * Has to add a \TYPO3\Flow\Security\Authentication\TokenInterface to the security context
+ * Has to add a TokenInterface to the security context
  * Might set a UserDetailsService, RequestPattern and AuthenticationEntryPoint (from configuration).
  */
 interface AuthenticationManagerInterface
@@ -20,28 +25,28 @@ interface AuthenticationManagerInterface
      * Returns the tokens this manager is responsible for.
      * Note: The order of the tokens in the array is important, as the tokens will be authenticated in the given order.
      *
-     * @return array Array of \TYPO3\Flow\Security\Authentication\TokenInterface An array of tokens this manager is responsible for
+     * @return array<TokenInterface> An array of tokens this manager is responsible for
      */
     public function getTokens();
 
     /**
      * Sets the security context
      *
-     * @param \TYPO3\Flow\Security\Context $securityContext The security context of the current request
+     * @param SecurityContext $securityContext The security context of the current request
      * @return void
      */
-    public function setSecurityContext(\TYPO3\Flow\Security\Context $securityContext);
+    public function setSecurityContext(SecurityContext $securityContext);
 
     /**
      * Returns the security context
      *
-     * @return \TYPO3\Flow\Security\Context $securityContext The security context of the current request
+     * @return SecurityContext $securityContext The security context of the current request
      */
     public function getSecurityContext();
 
     /**
      * Tries to authenticate the tokens in the security context, if needed.
-     * (Have a look at the \TYPO3\Flow\Security\Authentication\TokenManager for an implementation example)
+     * (Have a look at the Authentication\TokenManager for an implementation example)
      *
      * @return void
      */

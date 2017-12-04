@@ -1,21 +1,24 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Error;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Core\ApplicationContext;
 use TYPO3\Flow\Error\Debugger;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for the Debugger
- *
  */
-class DebuggerTest extends \TYPO3\Flow\Tests\UnitTestCase
+class DebuggerTest extends UnitTestCase
 {
     public function setUp()
     {
@@ -27,7 +30,8 @@ class DebuggerTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function renderingClosuresWorksWithoutThrowingException()
     {
-        Debugger::renderDump(function () {}, 0);
+        Debugger::renderDump(function () {
+        }, 0);
         // dummy assertion to avoid PHPUnit warning
         $this->assertTrue(true);
     }

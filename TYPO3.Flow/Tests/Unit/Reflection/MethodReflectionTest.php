@@ -1,19 +1,23 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Reflection;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Reflection;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for MethodReflection
- *
  */
-class MethodReflectionTest extends \TYPO3\Flow\Tests\UnitTestCase
+class MethodReflectionTest extends UnitTestCase
 {
     /**
      * @var mixed
@@ -25,8 +29,8 @@ class MethodReflectionTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function getDeclaringClassReturnsFlowsClassReflection()
     {
-        $method = new \TYPO3\Flow\Reflection\MethodReflection(__CLASS__, __FUNCTION__);
-        $this->assertInstanceOf('TYPO3\Flow\Reflection\ClassReflection', $method->getDeclaringClass());
+        $method = new Reflection\MethodReflection(__CLASS__, __FUNCTION__);
+        $this->assertInstanceOf(Reflection\ClassReflection::class, $method->getDeclaringClass());
     }
 
     /**
@@ -34,9 +38,9 @@ class MethodReflectionTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function getParametersReturnsFlowsParameterReflection($dummyArg1 = null, $dummyArg2 = null)
     {
-        $method = new \TYPO3\Flow\Reflection\MethodReflection(__CLASS__, __FUNCTION__);
+        $method = new Reflection\MethodReflection(__CLASS__, __FUNCTION__);
         foreach ($method->getParameters() as $parameter) {
-            $this->assertInstanceOf('TYPO3\Flow\Reflection\ParameterReflection', $parameter);
+            $this->assertInstanceOf(Reflection\ParameterReflection::class, $parameter);
             $this->assertEquals(__CLASS__, $parameter->getDeclaringClass()->getName());
         }
     }

@@ -1,19 +1,23 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Mvc;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Mvc\Routing\Route;
+use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
  * Functional tests for the ActionController
  */
-class AbstractControllerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class AbstractControllerTest extends FunctionalTestCase
 {
     /**
      * @var boolean
@@ -30,12 +34,12 @@ class AbstractControllerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
         $route = new Route();
         $route->setName('AbstractControllerTest Route 1');
         $route->setUriPattern('test/mvc/abstractcontrollertesta/{@action}');
-        $route->setDefaults(array(
+        $route->setDefaults([
             '@package' => 'TYPO3.Flow',
             '@subpackage' => 'Tests\Functional\Mvc\Fixtures',
             '@controller' => 'AbstractControllerTestA',
             '@format' =>'html'
-        ));
+        ]);
         $route->setAppendExceedingArguments(true);
         $this->router->addRoute($route);
     }

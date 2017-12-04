@@ -1,14 +1,18 @@
 <?php
 namespace TYPO3\Flow\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Property\PropertyMappingConfigurationInterface;
 
 /**
  * Converter which transforms simple types to a boolean.
@@ -25,7 +29,7 @@ class BooleanConverter extends AbstractTypeConverter
     /**
      * @var array<string>
      */
-    protected $sourceTypes = array('boolean', 'string', 'integer', 'float');
+    protected $sourceTypes = ['boolean', 'string', 'integer', 'float'];
 
     /**
      * @var string
@@ -43,11 +47,11 @@ class BooleanConverter extends AbstractTypeConverter
      * @param mixed $source
      * @param string $targetType
      * @param array $convertedChildProperties
-     * @param \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration
+     * @param PropertyMappingConfigurationInterface $configuration
      * @return boolean
      * @api
      */
-    public function convertFrom($source, $targetType, array $convertedChildProperties = array(), \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration = null)
+    public function convertFrom($source, $targetType, array $convertedChildProperties = [], PropertyMappingConfigurationInterface $configuration = null)
     {
         if (is_bool($source)) {
             return $source;
@@ -57,6 +61,6 @@ class BooleanConverter extends AbstractTypeConverter
             return (boolean)$source;
         }
 
-        return (!empty($source) && !in_array(strtolower($source), array('off', 'n', 'no', 'false')));
+        return (!empty($source) && !in_array(strtolower($source), ['off', 'n', 'no', 'false']));
     }
 }

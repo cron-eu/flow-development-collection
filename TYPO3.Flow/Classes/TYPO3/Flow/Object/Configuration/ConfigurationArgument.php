@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Object\Configuration;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Doctrine\ORM\Mapping as ORM;
 use TYPO3\Flow\Annotations as Flow;
@@ -42,7 +45,7 @@ class ConfigurationArgument
     /**
      * @var integer
      */
-    protected $autowiring = \TYPO3\Flow\Object\Configuration\Configuration::AUTOWIRING_MODE_ON;
+    protected $autowiring = Configuration::AUTOWIRING_MODE_ON;
 
     /**
      * Constructor - sets the index, value and type of the argument
@@ -104,7 +107,7 @@ class ConfigurationArgument
     /**
      * Sets autowiring for this argument
      *
-     * @param integer $autowiring One of the \TYPO3\Flow\Object\Configuration\Configuration::AUTOWIRING_MODE_* constants
+     * @param integer $autowiring One of the Configuration::AUTOWIRING_MODE_* constants
      * @return void
      */
     public function setAutowiring($autowiring)
@@ -115,7 +118,7 @@ class ConfigurationArgument
     /**
      * Returns the autowiring mode for this argument
      *
-     * @return integer Value of one of the \TYPO3\Flow\Object\Configuration\Configuration::AUTOWIRING_MODE_* constants
+     * @return integer Value of one of the Configuration::AUTOWIRING_MODE_* constants
      */
     public function getAutowiring()
     {

@@ -1,13 +1,19 @@
 <?php
 namespace TYPO3\Flow\Session\Aspect;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Aop\Builder\ClassNameIndex;
+use TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface;
+use TYPO3\Flow\Object\CompileTimeObjectManager;
 use TYPO3\Flow\Object\Configuration\Configuration as ObjectConfiguration;
 use TYPO3\Flow\Annotations as Flow;
 
@@ -16,7 +22,7 @@ use TYPO3\Flow\Annotations as Flow;
  *
  * @Flow\Scope("singleton")
  */
-class SessionObjectMethodsPointcutFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
+class SessionObjectMethodsPointcutFilter implements PointcutFilterInterface
 {
     /**
      * @var \TYPO3\Flow\Object\ObjectManagerInterface
@@ -24,10 +30,10 @@ class SessionObjectMethodsPointcutFilter implements \TYPO3\Flow\Aop\Pointcut\Poi
     protected $objectManager;
 
     /**
-     * @param \TYPO3\Flow\Object\CompileTimeObjectManager $objectManager
+     * @param CompileTimeObjectManager $objectManager
      * @return void
      */
-    public function injectObjectManager(\TYPO3\Flow\Object\CompileTimeObjectManager $objectManager)
+    public function injectObjectManager(CompileTimeObjectManager $objectManager)
     {
         $this->objectManager = $objectManager;
     }
@@ -80,18 +86,18 @@ class SessionObjectMethodsPointcutFilter implements \TYPO3\Flow\Aop\Pointcut\Poi
      */
     public function getRuntimeEvaluationsDefinition()
     {
-        return array();
+        return [];
     }
 
     /**
      * This method is used to optimize the matching process.
      *
-     * @param \TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex
-     * @return \TYPO3\Flow\Aop\Builder\ClassNameIndex
+     * @param ClassNameIndex $classNameIndex
+     * @return ClassNameIndex
      */
-    public function reduceTargetClassNames(\TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex)
+    public function reduceTargetClassNames(ClassNameIndex $classNameIndex)
     {
-        $sessionClasses = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
+        $sessionClasses = new ClassNameIndex();
         $sessionClasses->setClassNames($this->objectManager->getClassNamesByScope(ObjectConfiguration::SCOPE_SESSION));
         return $classNameIndex->intersect($sessionClasses);
     }

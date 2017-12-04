@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Fluid\Tests\Unit\ViewHelpers\Link;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 require_once(__DIR__ . '/../ViewHelperBaseTestcase.php');
 
@@ -32,7 +35,7 @@ class ActionViewHelperTest extends \TYPO3\Fluid\ViewHelpers\ViewHelperBaseTestca
      */
     public function renderCorrectlySetsTagNameAndAttributesAndContent()
     {
-        $mockTagBuilder = $this->getMock('TYPO3\Fluid\Core\ViewHelper\TagBuilder', array('setTagName', 'addAttribute', 'setContent'));
+        $mockTagBuilder = $this->createMock('TYPO3\Fluid\Core\ViewHelper\TagBuilder', array('setTagName', 'addAttribute', 'setContent'));
         $mockTagBuilder->expects($this->once())->method('setTagName')->with('a');
         $mockTagBuilder->expects($this->once())->method('addAttribute')->with('href', 'someUri');
         $mockTagBuilder->expects($this->once())->method('setContent')->with('some content');
@@ -115,7 +118,7 @@ class ActionViewHelperTest extends \TYPO3\Fluid\ViewHelpers\ViewHelperBaseTestca
         $this->request->expects($this->atLeastOnce())->method('isMainRequest')->will($this->returnValue(false));
         $this->request->expects($this->atLeastOnce())->method('getParentRequest')->will($this->returnValue($parentRequest));
 
-        $this->controllerContext = $this->getMock('TYPO3\Flow\Mvc\Controller\ControllerContext', array(), array(), '', false);
+        $this->controllerContext = $this->getMockBuilder('TYPO3\Flow\Mvc\Controller\ControllerContext')->disableOriginalConstructor()->getMock();
         $this->controllerContext->expects($this->any())->method('getUriBuilder')->will($this->returnValue($this->uriBuilder));
         $this->controllerContext->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
 
@@ -138,7 +141,7 @@ class ActionViewHelperTest extends \TYPO3\Fluid\ViewHelpers\ViewHelperBaseTestca
 
         $this->request = $this->getMockBuilder('TYPO3\Flow\Mvc\ActionRequest')->disableOriginalConstructor()->getMock();
 
-        $this->controllerContext = $this->getMock('TYPO3\Flow\Mvc\Controller\ControllerContext', array(), array(), '', false);
+        $this->controllerContext = $this->getMockBuilder('TYPO3\Flow\Mvc\Controller\ControllerContext')->disableOriginalConstructor()->getMock();
         $this->controllerContext->expects($this->any())->method('getUriBuilder')->will($this->returnValue($this->uriBuilder));
         $this->controllerContext->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
 
@@ -163,7 +166,7 @@ class ActionViewHelperTest extends \TYPO3\Fluid\ViewHelpers\ViewHelperBaseTestca
 
         $this->request = $this->getMockBuilder('TYPO3\Flow\Mvc\ActionRequest')->disableOriginalConstructor()->getMock();
 
-        $this->controllerContext = $this->getMock('TYPO3\Flow\Mvc\Controller\ControllerContext', array(), array(), '', false);
+        $this->controllerContext = $this->getMockBuilder('TYPO3\Flow\Mvc\Controller\ControllerContext')->disableOriginalConstructor()->getMock();
         $this->controllerContext->expects($this->any())->method('getUriBuilder')->will($this->returnValue($this->uriBuilder));
         $this->controllerContext->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
 

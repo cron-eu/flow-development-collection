@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Security\Authorization\Privilege\Method;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Aop\Pointcut\PointcutFilter;
@@ -81,7 +84,7 @@ class MethodPrivilege extends AbstractPrivilege implements MethodPrivilegeInterf
     public function matchesSubject(PrivilegeSubjectInterface $subject)
     {
         if ($subject instanceof MethodPrivilegeSubject === false) {
-            throw new InvalidPrivilegeTypeException(sprintf('Privileges of type "TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilegeInterface" only support subjects of type "TYPO3\Flow\Security\Method\MethodPrivilegeSubject", but we got a subject of type: "%s".', get_class($subject)), 1416241148);
+            throw new InvalidPrivilegeTypeException(sprintf('Privileges of type "%s" only support subjects of type "%s", but we got a subject of type: "%s".', MethodPrivilegeInterface::class, MethodPrivilegeSubject::class, get_class($subject)), 1416241148);
         }
 
         $this->initialize();
@@ -129,7 +132,7 @@ class MethodPrivilege extends AbstractPrivilege implements MethodPrivilegeInterf
     {
         if ($this->pointcutFilter === null) {
             /** @var MethodTargetExpressionParser $methodTargetExpressionParser */
-            $methodTargetExpressionParser = $this->objectManager->get('TYPO3\Flow\Security\Authorization\Privilege\Method\MethodTargetExpressionParser');
+            $methodTargetExpressionParser = $this->objectManager->get(MethodTargetExpressionParser::class);
             $this->pointcutFilter = $methodTargetExpressionParser->parse($this->getParsedMatcher(), 'Policy privilege "' . $this->getPrivilegeTargetIdentifier() . '"');
         }
 

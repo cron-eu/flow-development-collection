@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Core\Migrations;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Utility\Files;
 
@@ -266,7 +269,12 @@ class Manager
         Tools::writeComposerManifest($this->currentPackageData['composerManifest'], $composerFilePathAndName);
 
         if ($commitChanges) {
-            $commitMessage = '[TASK] Import core migration log to composer.json' . chr(10) . chr(10);
+            $commitMessageSubject = 'TASK: Import core migration log to composer.json';
+            if (!Git::isWorkingCopyRoot($this->currentPackageData['path'])) {
+                $commitMessageSubject .= sprintf(' of "%s"', $this->currentPackageData['packageKey']);
+            }
+
+            $commitMessage = $commitMessageSubject . chr(10) . chr(10);
             $commitMessage .= wordwrap('This commit imports the core migration log to the "extra" section of the composer manifest.', 72);
 
             list($returnCode, $output) = Git::commitAll($this->currentPackageData['path'], $commitMessage);
@@ -306,7 +314,7 @@ class Manager
     protected function commitMigration(AbstractMigration $migration, $commitMessageNotice = null)
     {
         $migrationIdentifier = $migration->getIdentifier();
-        $commitMessageSubject = sprintf('[TASK] Apply migration %s', $migrationIdentifier);
+        $commitMessageSubject = sprintf('TASK: Apply migration %s', $migrationIdentifier);
         if (!Git::isWorkingCopyRoot($this->currentPackageData['path'])) {
             $commitMessageSubject .= sprintf(' to package "%s"', $this->currentPackageData['packageKey']);
         }

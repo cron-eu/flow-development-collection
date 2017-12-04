@@ -319,6 +319,22 @@ TYPO3:
 
     resource:
 
+      # A list of filename extensions that must not be uploaded through the resource
+      # management.
+      uploadExtensionBlacklist: &uploadExtensionBlacklist
+        'aspx': TRUE
+        'cgi': TRUE
+        'php3': TRUE
+        'php4': TRUE
+        'php5': TRUE
+        'phtml': TRUE
+        'php': TRUE
+        'pl': TRUE
+        'py': TRUE
+        'pyc': TRUE
+        'pyo': TRUE
+        'rb': TRUE
+
       # Definition of resource storages provided by the Flow core.
       # Storages are used for storing and retrieving resources.
       storages:
@@ -352,12 +368,14 @@ TYPO3:
 
       # Definition of the basic resource publication targets.
       targets:
+
         # Target for publishing static resources to the local web directory
         localWebDirectoryStaticResourcesTarget:
           target: 'TYPO3\Flow\Resource\Target\FileSystemSymlinkTarget'
           targetOptions:
             path: '%FLOW_PATH_WEB%_Resources/Static/Packages/'
             baseUri: '_Resources/Static/Packages/'
+            extensionBlacklist: *uploadExtensionBlacklist
 
         # Target for publishing persistent resources to the local web directory
         localWebDirectoryPersistentResourcesTarget:
@@ -365,6 +383,7 @@ TYPO3:
           targetOptions:
             path: '%FLOW_PATH_WEB%_Resources/Persistent/'
             baseUri: '_Resources/Persistent/'
+            extensionBlacklist: *uploadExtensionBlacklist
 
             # If the generated URI path segment containing the sha1 should be divided into multiple segments (recommended if you expect many resources):
             subdivideHashPathSegment: false
@@ -512,8 +531,6 @@ TYPO3:
       # A specific name for the session, used in the session cookie.
       # The session name must be alphanumerical and must contain at least one
       # character – not only numbers.
-      #
-      # If left empty, the session name will be determined from the base URL.
       name: 'TYPO3_Flow_Session'
 
       # Configuration for handling of expired sessions
@@ -556,14 +573,6 @@ TYPO3:
         domain: NULL
 
     utility:
-      environment:
-
-        # Defines the base directory which Flow may use for storing different kinds
-        # of temporary files.
-        # The directory must be writable and Flow will automatically create a sub
-        # directory (named after the context) which will contain the actual temporary files.
-        temporaryDirectoryBase: '%FLOW_PATH_DATA%Temporary/'
-
       lockStrategyClassName: 'TYPO3\Flow\Utility\Lock\FlockLockStrategy'
 
   # DocTools is a tool used by Flow Developers to help with a variety of documentation tasks.

@@ -1,29 +1,35 @@
 <?php
 namespace TYPO3\Flow\Aop\Pointcut;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Aop\Builder\ClassNameIndex;
+use TYPO3\Flow\Log\SystemLoggerInterface;
+use TYPO3\Flow\Reflection\ReflectionService;
 
 /**
  * A class filter which fires on classes annotated with a certain annotation
  *
  * @Flow\Proxy(false)
  */
-class PointcutClassAnnotatedWithFilter implements \TYPO3\Flow\Aop\Pointcut\PointcutFilterInterface
+class PointcutClassAnnotatedWithFilter implements PointcutFilterInterface
 {
     /**
-     * @var \TYPO3\Flow\Reflection\ReflectionService
+     * @var ReflectionService
      */
     protected $reflectionService;
 
     /**
-     * @var \TYPO3\Flow\Log\SystemLoggerInterface
+     * @var SystemLoggerInterface
      */
     protected $systemLogger;
 
@@ -43,7 +49,7 @@ class PointcutClassAnnotatedWithFilter implements \TYPO3\Flow\Aop\Pointcut\Point
      * @param string $annotation An annotation class (for example "@TYPO3\Flow\Annotations\Aspect") which defines which class annotations should match
      * @param array $annotationValueConstraints
      */
-    public function __construct($annotation, array $annotationValueConstraints = array())
+    public function __construct($annotation, array $annotationValueConstraints = [])
     {
         $this->annotation = $annotation;
         $this->annotationValueConstraints = $annotationValueConstraints;
@@ -52,19 +58,19 @@ class PointcutClassAnnotatedWithFilter implements \TYPO3\Flow\Aop\Pointcut\Point
     /**
      * Injects the reflection service
      *
-     * @param \TYPO3\Flow\Reflection\ReflectionService $reflectionService The reflection service
+     * @param ReflectionService $reflectionService The reflection service
      * @return void
      */
-    public function injectReflectionService(\TYPO3\Flow\Reflection\ReflectionService $reflectionService)
+    public function injectReflectionService(ReflectionService $reflectionService)
     {
         $this->reflectionService = $reflectionService;
     }
 
     /**
-     * @param \TYPO3\Flow\Log\SystemLoggerInterface $systemLogger
+     * @param SystemLoggerInterface $systemLogger
      * @return void
      */
-    public function injectSystemLogger(\TYPO3\Flow\Log\SystemLoggerInterface $systemLogger)
+    public function injectSystemLogger(SystemLoggerInterface $systemLogger)
     {
         $this->systemLogger = $systemLogger;
     }
@@ -81,8 +87,8 @@ class PointcutClassAnnotatedWithFilter implements \TYPO3\Flow\Aop\Pointcut\Point
     public function matches($className, $methodName, $methodDeclaringClassName, $pointcutQueryIdentifier)
     {
         $designatedAnnotations = $this->reflectionService->getClassAnnotations($className, $this->annotation);
-        if ($designatedAnnotations !== array() || $this->annotationValueConstraints === array()) {
-            $matches = ($designatedAnnotations !== array());
+        if ($designatedAnnotations !== [] || $this->annotationValueConstraints === []) {
+            $matches = ($designatedAnnotations !== []);
         } else {
             // It makes no sense to check property values for an annotation that is used multiple times, we shortcut and check the value against the first annotation found.
             $firstFoundAnnotation = $designatedAnnotations;
@@ -121,19 +127,19 @@ class PointcutClassAnnotatedWithFilter implements \TYPO3\Flow\Aop\Pointcut\Point
      */
     public function getRuntimeEvaluationsDefinition()
     {
-        return array();
+        return [];
     }
 
     /**
      * This method is used to optimize the matching process.
      *
-     * @param \TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex
-     * @return \TYPO3\Flow\Aop\Builder\ClassNameIndex
+     * @param ClassNameIndex $classNameIndex
+     * @return ClassNameIndex
      */
-    public function reduceTargetClassNames(\TYPO3\Flow\Aop\Builder\ClassNameIndex $classNameIndex)
+    public function reduceTargetClassNames(ClassNameIndex $classNameIndex)
     {
         $classNames = $this->reflectionService->getClassNamesByAnnotation($this->annotation);
-        $annotatedIndex = new \TYPO3\Flow\Aop\Builder\ClassNameIndex();
+        $annotatedIndex = new ClassNameIndex();
         $annotatedIndex->setClassNames($classNames);
         return $classNameIndex->intersect($annotatedIndex);
     }

@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Security\Fixtures;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Doctrine\ORM\Mapping as ORM;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Security\Account;
 
 /**
  * An entity for tests
@@ -24,13 +28,13 @@ class TestEntityB
     protected $stringValue;
 
     /**
-     * @var \TYPO3\Flow\Tests\Functional\Security\Fixtures\TestEntityA
+     * @var TestEntityA
      * @ORM\OneToOne(mappedBy="relatedEntityB")
      */
     protected $relatedEntityA;
 
     /**
-     * @var \TYPO3\Flow\Security\Account
+     * @var Account
      * @ORM\ManyToOne
      */
     protected $ownerAccount;
@@ -62,7 +66,7 @@ class TestEntityB
     }
 
     /**
-     * @param \TYPO3\Flow\Tests\Functional\Security\Fixtures\TestEntityA $relatedEntityA
+     * @param TestEntityA $relatedEntityA
      */
     public function setRelatedEntityA($relatedEntityA)
     {
@@ -70,7 +74,7 @@ class TestEntityB
     }
 
     /**
-     * @return \TYPO3\Flow\Tests\Functional\Security\Fixtures\TestEntityA
+     * @return TestEntityA
      */
     public function getRelatedEntityA()
     {
@@ -78,7 +82,7 @@ class TestEntityB
     }
 
     /**
-     * @param \TYPO3\Flow\Security\Account $ownerAccount
+     * @param Account $ownerAccount
      */
     public function setOwnerAccount($ownerAccount)
     {
@@ -86,7 +90,7 @@ class TestEntityB
     }
 
     /**
-     * @return \TYPO3\Flow\Security\Account
+     * @return Account
      */
     public function getOwnerAccount()
     {

@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Eel;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Eel package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 require_once __DIR__ . '/../../../Resources/Private/PHP/php-peg/Parser.php';
 
@@ -43,11 +46,7 @@ Identifier: / [a-zA-Z_] [a-zA-Z0-9_\-]* /
         $result['val'] = (string)str_replace("'", "'", substr($sub['text'], 1, -1));
     }
 
-	public function StringLiteral_SingleQuotedStringLiteral(&$result, $sub) {
-		$result['val'] = (string)str_replace("'", "'", substr($sub['text'], 1, -1));
-	}
-	public function StringLiteral_DoubleQuotedStringLiteral(&$result, $sub) {
+    public function StringLiteral_DoubleQuotedStringLiteral(&$result, $sub) {
         $result['val'] = (string)str_replace('\"', '"', substr($sub['text'], 1, -1));
     }
 }
-?>

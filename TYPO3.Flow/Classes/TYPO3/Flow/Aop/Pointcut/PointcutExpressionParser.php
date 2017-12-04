@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Aop\Pointcut;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Aop\Builder\ProxyClassBuilder;
@@ -29,7 +32,7 @@ use TYPO3\Flow\Reflection\ReflectionService;
 class PointcutExpressionParser
 {
     const PATTERN_SPLITBYOPERATOR = '/\s*(\&\&|\|\|)\s*/';
-    const PATTERN_MATCHPOINTCUTDESIGNATOR = '/^\s*(classAnnotatedWith|class|methodAnnotatedWith|methodTaggedWith|method|within|filter|setting|evaluate)/';
+    const PATTERN_MATCHPOINTCUTDESIGNATOR = '/^\s*(classAnnotatedWith|class|methodAnnotatedWith|method|within|filter|setting|evaluate)/';
     const PATTERN_MATCHVISIBILITYMODIFIER = '/^(public|protected) +/';
     const PATTERN_MATCHRUNTIMEEVALUATIONSDEFINITION = '/(?:
 														(?:
@@ -138,7 +141,7 @@ class PointcutExpressionParser
             if (strpos($expression, '(') === false) {
                 $this->parseDesignatorPointcut($operator, $expression, $pointcutFilterComposite);
             } else {
-                $matches = array();
+                $matches = [];
                 $numberOfMatches = preg_match(self::PATTERN_MATCHPOINTCUTDESIGNATOR, $expression, $matches);
                 if ($numberOfMatches !== 1) {
                     throw new InvalidPointcutExpressionException('Syntax error: Pointcut designator expected near "' . $expression . '", defined in ' . $this->sourceHint, 1168874739);
@@ -147,20 +150,19 @@ class PointcutExpressionParser
                 $signaturePattern = $this->getSubstringBetweenParentheses($expression);
                 switch ($pointcutDesignator) {
                     case 'classAnnotatedWith':
-                    case 'class' :
+                    case 'class':
                     case 'methodAnnotatedWith':
-                    case 'methodTaggedWith' :
-                    case 'method' :
-                    case 'within' :
-                    case 'filter' :
-                    case 'setting' :
+                    case 'method':
+                    case 'within':
+                    case 'filter':
+                    case 'setting':
                         $parseMethodName = 'parseDesignator' . ucfirst($pointcutDesignator);
                         $this->$parseMethodName($operator, $signaturePattern, $pointcutFilterComposite);
                     break;
-                    case 'evaluate' :
+                    case 'evaluate':
                         $this->parseRuntimeEvaluations($operator, $signaturePattern, $pointcutFilterComposite);
                     break;
-                    default :
+                    default:
                         throw new AopException('Support for pointcut designator "' . $pointcutDesignator . '" has not been implemented (yet), defined in ' . $this->sourceHint, 1168874740);
                 }
             }
@@ -179,12 +181,12 @@ class PointcutExpressionParser
      */
     protected function parseDesignatorClassAnnotatedWith($operator, $annotationPattern, PointcutFilterComposite $pointcutFilterComposite)
     {
-        $annotationPropertyConstraints = array();
+        $annotationPropertyConstraints = [];
         $this->parseAnnotationPattern($annotationPattern, $annotationPropertyConstraints);
 
         $filter = new PointcutClassAnnotatedWithFilter($annotationPattern, $annotationPropertyConstraints);
         $filter->injectReflectionService($this->reflectionService);
-        $filter->injectSystemLogger($this->objectManager->get('TYPO3\Flow\Log\SystemLoggerInterface'));
+        $filter->injectSystemLogger($this->objectManager->get(SystemLoggerInterface::class));
         $pointcutFilterComposite->addFilter($operator, $filter);
     }
 
@@ -215,12 +217,12 @@ class PointcutExpressionParser
      */
     protected function parseDesignatorMethodAnnotatedWith($operator, $annotationPattern, PointcutFilterComposite $pointcutFilterComposite)
     {
-        $annotationPropertyConstraints = array();
+        $annotationPropertyConstraints = [];
         $this->parseAnnotationPattern($annotationPattern, $annotationPropertyConstraints);
 
         $filter = new PointcutMethodAnnotatedWithFilter($annotationPattern, $annotationPropertyConstraints);
         $filter->injectReflectionService($this->reflectionService);
-        $filter->injectSystemLogger($this->objectManager->get('TYPO3\Flow\Log\SystemLoggerInterface'));
+        $filter->injectSystemLogger($this->objectManager->get(SystemLoggerInterface::class));
         $pointcutFilterComposite->addFilter($operator, $filter);
     }
 
@@ -235,7 +237,7 @@ class PointcutExpressionParser
     protected function parseAnnotationPattern(&$annotationPattern, array &$annotationPropertyConstraints)
     {
         if (strpos($annotationPattern, '(') !== false) {
-            $matches = array();
+            $matches = [];
             preg_match(self::PATTERN_MATCHMETHODNAMEANDARGUMENTS, $annotationPattern, $matches);
 
             $annotationPattern = $matches['MethodName'];
@@ -266,7 +268,7 @@ class PointcutExpressionParser
             throw new InvalidPointcutExpressionException('Syntax error: "(" expected in "' . $methodPattern . '", defined in ' . $this->sourceHint, 1169144299);
         }
 
-        $matches = array();
+        $matches = [];
         preg_match(self::PATTERN_MATCHMETHODNAMEANDARGUMENTS, $methodPattern, $matches);
 
         $methodNamePattern = $matches['MethodName'];
@@ -277,7 +279,7 @@ class PointcutExpressionParser
         $classNameFilter->injectReflectionService($this->reflectionService);
         $methodNameFilter = new PointcutMethodNameFilter($methodNamePattern, $methodVisibility, $methodArgumentConstraints);
         /** @var SystemLoggerInterface $systemLogger */
-        $systemLogger = $this->objectManager->get('TYPO3\Flow\Log\SystemLoggerInterface');
+        $systemLogger = $this->objectManager->get(SystemLoggerInterface::class);
         $methodNameFilter->injectSystemLogger($systemLogger);
         $methodNameFilter->injectReflectionService($this->reflectionService);
 
@@ -360,7 +362,7 @@ class PointcutExpressionParser
     {
         $filter = new PointcutSettingFilter($configurationPath);
         /** @var ConfigurationManager $configurationManager */
-        $configurationManager = $this->objectManager->get('TYPO3\Flow\Configuration\ConfigurationManager');
+        $configurationManager = $this->objectManager->get(ConfigurationManager::class);
         $filter->injectConfigurationManager($configurationManager);
 
         $pointcutFilterComposite->addFilter($operator, $filter);
@@ -376,11 +378,11 @@ class PointcutExpressionParser
      */
     protected function parseRuntimeEvaluations($operator, $runtimeEvaluations, PointcutFilterComposite $pointcutFilterComposite)
     {
-        $runtimeEvaluationsDefinition = array(
-            $operator => array(
+        $runtimeEvaluationsDefinition = [
+            $operator => [
                 'evaluateConditions' => $this->getRuntimeEvaluationConditionsFromEvaluateString($runtimeEvaluations)
-            )
-        );
+            ]
+        ];
 
         $pointcutFilterComposite->setGlobalRuntimeEvaluationsDefinition($runtimeEvaluationsDefinition);
     }
@@ -430,7 +432,7 @@ class PointcutExpressionParser
     protected function getVisibilityFromSignaturePattern(&$signaturePattern)
     {
         $visibility = null;
-        $matches = array();
+        $matches = [];
         $numberOfMatches = preg_match_all(self::PATTERN_MATCHVISIBILITYMODIFIER, $signaturePattern, $matches, PREG_SET_ORDER);
         if ($numberOfMatches > 1) {
             throw new InvalidPointcutExpressionException('Syntax error: method name expected after visibility modifier in "' . $signaturePattern . '", defined in ' . $this->sourceHint, 1172492754);
@@ -453,15 +455,15 @@ class PointcutExpressionParser
     */
     protected function getArgumentConstraintsFromMethodArgumentsPattern($methodArgumentsPattern)
     {
-        $matches = array();
-        $argumentConstraints = array();
+        $matches = [];
+        $argumentConstraints = [];
 
         preg_match_all(self::PATTERN_MATCHRUNTIMEEVALUATIONSDEFINITION, $methodArgumentsPattern, $matches);
 
         for ($i = 0; $i < count($matches[0]); $i++) {
             if ($matches[2][$i] === 'in' || $matches[2][$i] === 'matches') {
-                $list = array();
-                $listEntries = array();
+                $list = [];
+                $listEntries = [];
 
                 if (preg_match('/^\s*\(.*\)\s*$/', $matches[3][$i], $list) > 0) {
                     preg_match_all(self::PATTERN_MATCHRUNTIMEEVALUATIONSVALUELIST, $list[0], $listEntries);
@@ -483,15 +485,15 @@ class PointcutExpressionParser
      */
     protected function getRuntimeEvaluationConditionsFromEvaluateString($evaluateString)
     {
-        $matches = array();
-        $runtimeEvaluationConditions = array();
+        $matches = [];
+        $runtimeEvaluationConditions = [];
 
         preg_match_all(self::PATTERN_MATCHRUNTIMEEVALUATIONSDEFINITION, $evaluateString, $matches);
 
         for ($i = 0; $i < count($matches[0]); $i++) {
             if ($matches[2][$i] === 'in' || $matches[2][$i] === 'matches') {
-                $list = array();
-                $listEntries = array();
+                $list = [];
+                $listEntries = [];
 
                 if (preg_match('/^\s*\(.*\)\s*$/', $matches[3][$i], $list) > 0) {
                     preg_match_all(self::PATTERN_MATCHRUNTIMEEVALUATIONSVALUELIST, $list[0], $listEntries);
@@ -499,11 +501,11 @@ class PointcutExpressionParser
                 }
             }
 
-            $runtimeEvaluationConditions[] = array(
+            $runtimeEvaluationConditions[] = [
                 'operator' => $matches[2][$i],
                 'leftValue' => $matches[1][$i],
                 'rightValue' => $matches[3][$i],
-            );
+            ];
         }
         return $runtimeEvaluationConditions;
     }

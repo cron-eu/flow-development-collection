@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Fluid\View;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Mvc\ActionRequest;
 use TYPO3\Flow\Mvc\Controller\ControllerContext;
@@ -336,6 +339,7 @@ abstract class AbstractTemplateView extends AbstractView
         if ($this->templateCompiler->has($partialIdentifier)) {
             $parsedPartial = $this->templateCompiler->get($partialIdentifier);
         } else {
+            $this->templateParser->setConfiguration($this->buildParserConfiguration());
             $parsedPartial = $this->templateParser->parse($this->getPartialSource($partialName));
             if ($parsedPartial->isCompilable()) {
                 $this->templateCompiler->store($partialIdentifier, $parsedPartial);

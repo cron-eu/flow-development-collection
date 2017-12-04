@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Cache\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Core\ApplicationContext;
 
@@ -39,7 +42,7 @@ class PdoBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
     public function setThrowsExceptionIfNoFrontEndHasBeenSet()
     {
         $backend = new \TYPO3\Flow\Cache\Backend\PdoBackend(new ApplicationContext('Testing'));
-        $backend->injectEnvironment($this->getMock('TYPO3\Flow\Utility\Environment', array(), array(), '', false));
+        $backend->injectEnvironment($this->getMockBuilder(\TYPO3\Flow\Utility\Environment::class)->disableOriginalConstructor()->getMock());
         $data = 'Some data';
         $identifier = 'MyIdentifier';
         $backend->set($identifier, $data);
@@ -107,7 +110,7 @@ class PdoBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
 
         $data = 'Some data';
         $entryIdentifier = 'MyIdentifier';
-        $backend->set($entryIdentifier, $data, array('UnitTestTag%tag1', 'UnitTestTag%tag2'));
+        $backend->set($entryIdentifier, $data, ['UnitTestTag%tag1', 'UnitTestTag%tag2']);
 
         $retrieved = $backend->findIdentifiersByTag('UnitTestTag%tag1');
         $this->assertEquals($entryIdentifier, $retrieved[0]);
@@ -125,11 +128,11 @@ class PdoBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
 
         $data = 'Some data';
         $entryIdentifier = 'MyIdentifier';
-        $backend->set($entryIdentifier, $data, array('UnitTestTag%tag1', 'UnitTestTag%tag2'));
-        $backend->set($entryIdentifier, $data, array('UnitTestTag%tag3'));
+        $backend->set($entryIdentifier, $data, ['UnitTestTag%tag1', 'UnitTestTag%tag2']);
+        $backend->set($entryIdentifier, $data, ['UnitTestTag%tag3']);
 
         $retrieved = $backend->findIdentifiersByTag('UnitTestTag%tag2');
-        $this->assertEquals(array(), $retrieved);
+        $this->assertEquals([], $retrieved);
     }
 
     /**
@@ -160,9 +163,9 @@ class PdoBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
         $backend = $this->setUpBackend();
 
         $data = 'some data' . microtime();
-        $backend->set('PdoBackendTest1', $data, array('UnitTestTag%test', 'UnitTestTag%boring'));
-        $backend->set('PdoBackendTest2', $data, array('UnitTestTag%test', 'UnitTestTag%special'));
-        $backend->set('PdoBackendTest3', $data, array('UnitTestTag%test'));
+        $backend->set('PdoBackendTest1', $data, ['UnitTestTag%test', 'UnitTestTag%boring']);
+        $backend->set('PdoBackendTest2', $data, ['UnitTestTag%test', 'UnitTestTag%special']);
+        $backend->set('PdoBackendTest3', $data, ['UnitTestTag%test']);
 
         $backend->flushByTag('UnitTestTag%special');
 
@@ -195,12 +198,12 @@ class PdoBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function flushRemovesOnlyOwnEntries()
     {
-        $thisCache = $this->getMock('TYPO3\Flow\Cache\Frontend\FrontendInterface', array(), array(), '', false);
+        $thisCache = $this->getMockBuilder(\TYPO3\Flow\Cache\Frontend\FrontendInterface::class)->disableOriginalConstructor()->getMock();
         $thisCache->expects($this->any())->method('getIdentifier')->will($this->returnValue('thisCache'));
         $thisBackend = $this->setUpBackend();
         $thisBackend->setCache($thisCache);
 
-        $thatCache = $this->getMock('TYPO3\Flow\Cache\Frontend\FrontendInterface', array(), array(), '', false);
+        $thatCache = $this->getMockBuilder(\TYPO3\Flow\Cache\Frontend\FrontendInterface::class)->disableOriginalConstructor()->getMock();
         $thatCache->expects($this->any())->method('getIdentifier')->will($this->returnValue('thatCache'));
         $thatBackend = $this->setUpBackend();
         $thatBackend->setCache($thatCache);
@@ -220,9 +223,9 @@ class PdoBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     protected function setUpBackend()
     {
-        $mockEnvironment = $this->getMock('TYPO3\Flow\Utility\Environment', array(), array(), '', false);
+        $mockEnvironment = $this->getMockBuilder(\TYPO3\Flow\Utility\Environment::class)->disableOriginalConstructor()->getMock();
 
-        $mockCache = $this->getMock('TYPO3\Flow\Cache\Frontend\FrontendInterface', array(), array(), '', false);
+        $mockCache = $this->getMockBuilder(\TYPO3\Flow\Cache\Frontend\FrontendInterface::class)->disableOriginalConstructor()->getMock();
         $mockCache->expects($this->any())->method('getIdentifier')->will($this->returnValue('TestCache'));
 
         $backend = new \TYPO3\Flow\Cache\Backend\PdoBackend(new ApplicationContext('Testing'));

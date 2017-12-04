@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Package;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * Documentation for a package
@@ -17,7 +20,7 @@ class Documentation
 {
     /**
      * Reference to the package of this documentation
-     * @var \TYPO3\Flow\Package\PackageInterface
+     * @var PackageInterface
      */
     protected $package;
 
@@ -35,7 +38,7 @@ class Documentation
     /**
      * Constructor
      *
-     * @param \TYPO3\Flow\Package\PackageInterface $package Reference to the package of this documentation
+     * @param PackageInterface $package Reference to the package of this documentation
      * @param string $documentationName Name of the documentation
      * @param string $documentationPath Absolute path to the documentation directory
      */
@@ -49,7 +52,7 @@ class Documentation
     /**
      * Get the package of this documentation
      *
-     * @return \TYPO3\Flow\Package\PackageInterface The package of this documentation
+     * @return PackageInterface The package of this documentation
      * @api
      */
     public function getPackage()
@@ -82,7 +85,7 @@ class Documentation
     /**
      * Returns the available documentation formats for this documentation
      *
-     * @return array Array of \TYPO3\Flow\Package\DocumentationFormat
+     * @return array<DocumentationFormat>
      * @api
      */
     public function getDocumentationFormats()
@@ -94,7 +97,7 @@ class Documentation
         while ($documentationFormatsDirectoryIterator->valid()) {
             $filename = $documentationFormatsDirectoryIterator->getFilename();
             if ($filename[0] != '.' && $documentationFormatsDirectoryIterator->isDir()) {
-                $documentationFormat = new \TYPO3\Flow\Package\Documentation\Format($filename, $this->documentationPath . $filename . '/');
+                $documentationFormat = new Documentation\Format($filename, $this->documentationPath . $filename . '/');
                 $documentationFormats[$filename] = $documentationFormat;
             }
             $documentationFormatsDirectoryIterator->next();

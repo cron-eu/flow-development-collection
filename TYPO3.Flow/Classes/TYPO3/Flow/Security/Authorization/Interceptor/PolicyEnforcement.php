@@ -1,17 +1,21 @@
 <?php
 namespace TYPO3\Flow\Security\Authorization\Interceptor;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Doctrine\ORM\EntityNotFoundException;
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Aop\JoinPointInterface;
 use TYPO3\Flow\Security\Authentication\AuthenticationManagerInterface;
+use TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilegeInterface;
 use TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilegeSubject;
 use TYPO3\Flow\Security\Authorization\PrivilegeManagerInterface;
 use TYPO3\Flow\Security\Authorization\InterceptorInterface;
@@ -96,12 +100,12 @@ class PolicyEnforcement implements InterceptorInterface
             throw new AuthenticationRequiredException('Could not authenticate. Looks like a broken session.', 1358971444, $exception);
         } catch (NoTokensAuthenticatedException $noTokensAuthenticatedException) {
             // We still need to check if the privilege is available to "TYPO3.Flow:Everybody".
-            if ($this->privilegeManager->isGranted('TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilegeInterface', $privilegeSubject, $reason) === false) {
+            if ($this->privilegeManager->isGranted(MethodPrivilegeInterface::class, $privilegeSubject, $reason) === false) {
                 throw new NoTokensAuthenticatedException($noTokensAuthenticatedException->getMessage() . chr(10) . $reason, $noTokensAuthenticatedException->getCode());
             }
         }
 
-        if ($this->privilegeManager->isGranted('TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilegeInterface', $privilegeSubject, $reason) === false) {
+        if ($this->privilegeManager->isGranted(MethodPrivilegeInterface::class, $privilegeSubject, $reason) === false) {
             throw new AccessDeniedException($this->renderDecisionReasonMessage($reason), 1222268609);
         }
     }

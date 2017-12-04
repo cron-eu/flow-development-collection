@@ -1,21 +1,26 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Core\Booting;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Core\Booting\Scripts;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for the initialization scripts
- *
  */
-class ScriptsTest extends \TYPO3\Flow\Tests\UnitTestCase
+class ScriptsTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\Core\Booting\Scripts|\PHPUnit_Framework_MockObject_MockObject
+     * @var Scripts|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $scriptsMock;
 
@@ -24,7 +29,7 @@ class ScriptsTest extends \TYPO3\Flow\Tests\UnitTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->scriptsMock = $this->getAccessibleMock('TYPO3\Flow\Core\Booting\Scripts', array('dummy'));
+        $this->scriptsMock = $this->getAccessibleMock(Scripts::class, ['dummy']);
     }
 
     /**
@@ -32,10 +37,10 @@ class ScriptsTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function subProcessCommandEvaluatesIniFileUsageSettingCorrectly()
     {
-        $settings = array('core' => array(
+        $settings = ['core' => [
             'context' => 'Testing',
             'phpBinaryPathAndFilename' => '/foo/var/php'
-        ));
+        ]];
 
         $message = 'The command must contain the current ini because it is not explicitly set in settings.';
         $actual = $this->scriptsMock->_call('buildSubprocessCommand', 'flow:foo:identifier', $settings);
@@ -62,11 +67,11 @@ class ScriptsTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function subProcessCommandEvaluatesSubRequestIniEntriesCorrectly()
     {
-        $settings = array('core' => array(
+        $settings = ['core' => [
             'context' => 'Testing',
             'phpBinaryPathAndFilename' => '/must/be/set/according/to/schema',
-            'subRequestIniEntries' => array('someSetting' => 'withValue', 'someFlagSettingWithoutValue' => '')
-        ));
+            'subRequestIniEntries' => ['someSetting' => 'withValue', 'someFlagSettingWithoutValue' => '']
+        ]];
         $actual = $this->scriptsMock->_call('buildSubprocessCommand', 'flow:foo:identifier', $settings);
 
         $this->assertContains(sprintf(' -d %s=%s ', escapeshellarg('someSetting'), escapeshellarg('withValue')), $actual);

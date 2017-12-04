@@ -1,17 +1,23 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Http;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Http\RequestHandler;
+use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
  * Functional tests for the HTTP Request Handler
  */
-class RequestHandlerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class RequestHandlerTest extends FunctionalTestCase
 {
     /**
      * @var boolean
@@ -35,17 +41,18 @@ class RequestHandlerTest extends \TYPO3\Flow\Tests\FunctionalTestCase
             return;
         }
 
-        $_SERVER = array(
+        $_SERVER = [
             'HTTP_HOST' => 'localhost',
             'REQUEST_METHOD' => 'GET',
             'QUERY_STRING' => '',
             'REQUEST_URI' => '/typo3/flow/test/http/foo',
             'SCRIPT_NAME' => '/index.php',
             'PHP_SELF' => '/index.php',
-        );
+        ];
 
-        $requestHandler = $this->getAccessibleMock('TYPO3\Flow\Http\RequestHandler', array('boot'), array(self::$bootstrap));
-        $requestHandler->exit = function () {};
+        $requestHandler = $this->getAccessibleMock(RequestHandler::class, ['boot'], [self::$bootstrap]);
+        $requestHandler->exit = function () {
+        };
         $requestHandler->handleRequest();
 
         $this->expectOutputString('FooController responded');

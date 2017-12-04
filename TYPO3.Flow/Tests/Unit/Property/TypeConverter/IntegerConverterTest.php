@@ -1,28 +1,36 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Property\TypeConverter\IntegerConverter;
+use TYPO3\Flow\Property\TypeConverterInterface;
+use TYPO3\Flow\Tests\UnitTestCase;
+use \TYPO3\Flow\Error as FlowError;
 
 /**
  * Testcase for the Integer converter
  *
  * @covers \TYPO3\Flow\Property\TypeConverter\IntegerConverter<extended>
  */
-class IntegerConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
+class IntegerConverterTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\Property\TypeConverterInterface
+     * @var TypeConverterInterface
      */
     protected $converter;
 
     public function setUp()
     {
-        $this->converter = new \TYPO3\Flow\Property\TypeConverter\IntegerConverter();
+        $this->converter = new IntegerConverter();
     }
 
     /**
@@ -30,7 +38,7 @@ class IntegerConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function checkMetadata()
     {
-        $this->assertEquals(array('integer', 'string', 'DateTime'), $this->converter->getSupportedSourceTypes(), 'Source types do not match');
+        $this->assertEquals(['integer', 'string', 'DateTime'], $this->converter->getSupportedSourceTypes(), 'Source types do not match');
         $this->assertEquals('integer', $this->converter->getSupportedTargetType(), 'Target type does not match');
         $this->assertEquals(1, $this->converter->getPriority(), 'Priority does not match');
     }
@@ -74,7 +82,7 @@ class IntegerConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function convertFromReturnsAnErrorIfSpecifiedStringIsNotNumeric()
     {
-        $this->assertInstanceOf('TYPO3\Flow\Error\Error', $this->converter->convertFrom('not numeric', 'integer'));
+        $this->assertInstanceOf(FlowError\Error::class, $this->converter->convertFrom('not numeric', 'integer'));
     }
 
     /**
@@ -122,6 +130,6 @@ class IntegerConverterTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function getSourceChildPropertiesToBeConvertedShouldReturnEmptyArray()
     {
-        $this->assertEquals(array(), $this->converter->getSourceChildPropertiesToBeConverted('myString'));
+        $this->assertEquals([], $this->converter->getSourceChildPropertiesToBeConverted('myString'));
     }
 }

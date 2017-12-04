@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Fluid\Tests\Unit\ViewHelpers\Security;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Error\Error;
 use TYPO3\Flow\Error\Result;
@@ -64,7 +67,7 @@ class IfHasErrorsViewHelperTest extends ViewHelperBaseTestcase
      */
     public function queriesResultForPropertyIfPropertyPathIsGiven()
     {
-        $resultMock = $this->getMock('TYPO3\Flow\Error\Result');
+        $resultMock = $this->createMock('TYPO3\Flow\Error\Result');
         $resultMock->expects($this->once())->method('forProperty')->with('foo.bar.baz')->will($this->returnValue(new Result()));
 
         /** @var $requestMock \PHPUnit_Framework_MockObject_MockObject */

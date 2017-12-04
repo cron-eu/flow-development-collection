@@ -1,12 +1,19 @@
 <?php
 namespace TYPO3\Flow\Mvc\Controller;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Mvc\Exception\UnsupportedRequestTypeException;
+use TYPO3\Flow\Mvc\RequestInterface;
+use TYPO3\Flow\Mvc\ResponseInterface;
 
 /**
  * Generic interface for controllers
@@ -24,11 +31,11 @@ interface ControllerInterface
     /**
      * Processes a general request. The result can be returned by altering the given response.
      *
-     * @param \TYPO3\Flow\Mvc\RequestInterface $request The request object
-     * @param \TYPO3\Flow\Mvc\ResponseInterface $response The response, modified by the controller
+     * @param RequestInterface $request The request object
+     * @param ResponseInterface $response The response, modified by the controller
      * @return void
-     * @throws \TYPO3\Flow\Mvc\Exception\UnsupportedRequestTypeException if the controller doesn't support the current request type
+     * @throws UnsupportedRequestTypeException if the controller doesn't support the current request type
      * @api
      */
-    public function processRequest(\TYPO3\Flow\Mvc\RequestInterface $request, \TYPO3\Flow\Mvc\ResponseInterface $response);
+    public function processRequest(RequestInterface $request, ResponseInterface $response);
 }

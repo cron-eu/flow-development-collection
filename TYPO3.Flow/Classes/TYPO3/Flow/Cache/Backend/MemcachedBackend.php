@@ -1,18 +1,25 @@
 <?php
 namespace TYPO3\Flow\Cache\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Cache\Exception;
+use TYPO3\Flow\Cache\Exception\InvalidDataException;
+use TYPO3\Flow\Cache\Frontend\FrontendInterface;
+use TYPO3\Flow\Core\ApplicationContext;
 
 /**
- * A caching backend which stores cache entries by using Memcached.
+ * A caching backend which stores cache entries by using Memcache/Memcached.
  *
- * This backend uses the following types of Memcache keys:
+ * This backend uses the following types of cache keys:
  * - tag_xxx
  *   xxx is tag name, value is array of associated identifiers identifier. This
  *   is "forward" tag index. It is mainly used for obtaining content by tag
@@ -31,8 +38,8 @@ namespace TYPO3\Flow\Cache\Backend;
  * This prefix makes sure that keys from the different installations do not
  * conflict.
  *
- * Note: When using the Memcached backend to store values of more than ~1 MB, the
- * data will be split into chunks to make them fit into the memcached limits.
+ * Note: When using the Memcache backend to store values of more than ~1 MB, the
+ * data will be split into chunks to make them fit into the caches limits.
  *
  * @api
  */
@@ -45,9 +52,9 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
     const MAX_BUCKET_SIZE = 1048534;
 
     /**
-     * Instance of the PHP Memcache class
+     * Instance of the PHP Memcache/Memcached class
      *
-     * @var \Memcache
+     * @var \Memcache|\Memcached
      */
     protected $memcache;
 
@@ -56,13 +63,13 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
      *
      * @var array
      */
-    protected $servers = array();
+    protected $servers = [];
 
     /**
      * Indicates whether the memcache uses compression or not (requires zlib),
      * either 0 or MEMCACHE_COMPRESSED
      *
-     * @var int
+     * @var integer
      */
     protected $flags;
 
@@ -76,14 +83,14 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
     /**
      * Constructs this backend
      *
-     * @param \TYPO3\Flow\Core\ApplicationContext $context Flow's application context
+     * @param ApplicationContext $context Flow's application context
      * @param array $options Configuration options - depends on the actual backend
-     * @throws \TYPO3\Flow\Cache\Exception
+     * @throws Exception
      */
-    public function __construct(\TYPO3\Flow\Core\ApplicationContext $context, array $options = array())
+    public function __construct(ApplicationContext $context, array $options = [])
     {
-        if (!extension_loaded('memcache')) {
-            throw new \TYPO3\Flow\Cache\Exception('The PHP extension "memcache" must be installed and loaded in order to use the Memcached backend.', 1213987706);
+        if (!extension_loaded('memcache') && !extension_loaded('memcached')) {
+            throw new Exception('The PHP extension "memcache" or "memcached" must be installed and loaded in order to use the Memcache backend.', 1213987706);
         }
         parent::__construct($context, $options);
     }
@@ -110,10 +117,14 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
      */
     protected function setCompression($useCompression)
     {
-        if ($useCompression === true) {
-            $this->flags ^= MEMCACHE_COMPRESSED;
+        if ($this->memcache instanceof \Memcached) {
+            $this->memcache->setOption(\Memcached::OPT_COMPRESSION, $useCompression);
         } else {
-            $this->flags &= ~MEMCACHE_COMPRESSED;
+            if ($useCompression === true) {
+                $this->flags ^= MEMCACHE_COMPRESSED;
+            } else {
+                $this->flags &= ~MEMCACHE_COMPRESSED;
+            }
         }
     }
 
@@ -121,16 +132,16 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
      * Initializes the identifier prefix
      *
      * @return void
-     * @throws \TYPO3\Flow\Cache\Exception
+     * @throws Exception
      */
     public function initializeObject()
     {
         if (!count($this->servers)) {
-            throw new \TYPO3\Flow\Cache\Exception('No servers were given to Memcache', 1213115903);
+            throw new Exception('No servers were given to Memcache', 1213115903);
         }
 
-        $this->memcache = new \Memcache();
-        $defaultPort = ini_get('memcache.default_port');
+        $this->memcache = extension_loaded('memcached') ? new \MemCached() : new \Memcache();
+        $defaultPort = ini_get('memcache.default_port') ?: 11211;
 
         foreach ($this->servers as $server) {
             if (substr($server, 0, 7) === 'unix://') {
@@ -154,10 +165,10 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
     /**
      * Initializes the identifier prefix when setting the cache.
      *
-     * @param \TYPO3\Flow\Cache\Frontend\FrontendInterface $cache
+     * @param FrontendInterface $cache
      * @return void
      */
-    public function setCache(\TYPO3\Flow\Cache\Frontend\FrontendInterface $cache)
+    public function setCache(FrontendInterface $cache)
     {
         parent::setCache($cache);
 
@@ -191,26 +202,26 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
      * @param array $tags Tags to associate with this cache entry
      * @param integer $lifetime Lifetime of this cache entry in seconds. If NULL is specified, the default lifetime is used. "0" means unlimited lifetime.
      * @return void
-     * @throws \TYPO3\Flow\Cache\Exception if no cache frontend has been set.
+     * @throws Exception if no cache frontend has been set.
      * @throws \InvalidArgumentException if the identifier is not valid or the final memcached key is longer than 250 characters
-     * @throws \TYPO3\Flow\Cache\Exception\InvalidDataException if $data is not a string
+     * @throws InvalidDataException if $data is not a string
      * @api
      */
-    public function set($entryIdentifier, $data, array $tags = array(), $lifetime = null)
+    public function set($entryIdentifier, $data, array $tags = [], $lifetime = null)
     {
         if (strlen($this->identifierPrefix . $entryIdentifier) > 250) {
             throw new \InvalidArgumentException('Could not set value. Key more than 250 characters (' . $this->identifierPrefix . $entryIdentifier . ').', 1232969508);
         }
-        if (!$this->cache instanceof \TYPO3\Flow\Cache\Frontend\FrontendInterface) {
-            throw new \TYPO3\Flow\Cache\Exception('No cache frontend has been set yet via setCache().', 1207149215);
+        if (!$this->cache instanceof FrontendInterface) {
+            throw new Exception('No cache frontend has been set yet via setCache().', 1207149215);
         }
         if (!is_string($data)) {
-            throw new \TYPO3\Flow\Cache\Exception\InvalidDataException('The specified data is of type "' . gettype($data) . '" but a string is expected.', 1207149231);
+            throw new InvalidDataException('The specified data is of type "' . gettype($data) . '" but a string is expected.', 1207149231);
         }
 
         $tags[] = '%MEMCACHEBE%' . $this->cacheIdentifier;
         $expiration = $lifetime !== null ? $lifetime : $this->defaultLifetime;
-        // Memcached considers values over 2592000 sec (30 days) as UNIX timestamp
+        // Memcache considers values over 2592000 sec (30 days) as UNIX timestamp
         // thus $expiration should be converted from lifetime to UNIX timestamp
         if ($expiration > 2592000) {
             $expiration += time();
@@ -222,22 +233,38 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
                 $success = true;
                 $chunkNumber = 1;
                 foreach ($data as $chunk) {
-                    $success = $success && $this->memcache->set($this->identifierPrefix . $entryIdentifier . '_chunk_' . $chunkNumber, $chunk, $this->flags, $expiration);
+                    $success = $success && $this->setItem($this->identifierPrefix . $entryIdentifier . '_chunk_' . $chunkNumber, $chunk, $expiration);
                     $chunkNumber++;
                 }
-                $success = $success && $this->memcache->set($this->identifierPrefix . $entryIdentifier, 'Flow*chunked:' . $chunkNumber, $this->flags, $expiration);
+                $success = $success && $this->setItem($this->identifierPrefix . $entryIdentifier, 'Flow*chunked:' . $chunkNumber, $expiration);
             } else {
-                $success = $this->memcache->set($this->identifierPrefix . $entryIdentifier, $data, $this->flags, $expiration);
+                $success = $this->setItem($this->identifierPrefix . $entryIdentifier, $data, $expiration);
             }
             if ($success === true) {
                 $this->removeIdentifierFromAllTags($entryIdentifier);
                 $this->addIdentifierToTags($entryIdentifier, $tags);
             } else {
-                throw new \TYPO3\Flow\Cache\Exception('Could not set value on memcache server.', 1275830266);
+                throw new Exception('Could not set value on memcache server.', 1275830266);
             }
         } catch (\Exception $exception) {
-            throw new \TYPO3\Flow\Cache\Exception('Could not set value. ' . $exception->getMessage(), 1207208100);
+            throw new Exception('Could not set value. ' . $exception->getMessage(), 1207208100);
         }
+    }
+
+    /**
+     * Stores an item on the server
+     *
+     * @param string $key
+     * @param string $value
+     * @param integer $expiration
+     * @return boolean
+     */
+    protected function setItem($key, $value, $expiration)
+    {
+        if ($this->memcache instanceof \Memcached) {
+            return $this->memcache->set($key, $value, $expiration);
+        }
+        return $this->memcache->set($key, $value, $this->flags, $expiration);
     }
 
     /**
@@ -284,7 +311,7 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
     public function remove($entryIdentifier)
     {
         $this->removeIdentifierFromAllTags($entryIdentifier);
-        return $this->memcache->delete($this->identifierPrefix . $entryIdentifier, 0);
+        return $this->memcache->delete($this->identifierPrefix . $entryIdentifier);
     }
 
     /**
@@ -301,7 +328,7 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
         if ($identifiers !== false) {
             return (array) $identifiers;
         } else {
-            return array();
+            return [];
         }
     }
 
@@ -315,20 +342,20 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
     protected function findTagsByIdentifier($identifier)
     {
         $tags = $this->memcache->get($this->identifierPrefix . 'ident_' . $identifier);
-        return ($tags === false ? array() : (array)$tags);
+        return ($tags === false ? [] : (array)$tags);
     }
 
     /**
      * Removes all cache entries of this cache.
      *
      * @return void
-     * @throws \TYPO3\Flow\Cache\Exception
+     * @throws Exception
      * @api
      */
     public function flush()
     {
-        if (!$this->cache instanceof \TYPO3\Flow\Cache\Frontend\FrontendInterface) {
-            throw new \TYPO3\Flow\Cache\Exception('Yet no cache frontend has been set via setCache().', 1204111376);
+        if (!$this->cache instanceof FrontendInterface) {
+            throw new Exception('Yet no cache frontend has been set via setCache().', 1204111376);
         }
 
         $this->flushByTag('%MEMCACHEBE%' . $this->cacheIdentifier);
@@ -398,16 +425,16 @@ class MemcachedBackend extends AbstractBackend implements TaggableBackendInterfa
                 if (count($identifiers)) {
                     $this->memcache->set($this->identifierPrefix . 'tag_' . $tag, $identifiers);
                 } else {
-                    $this->memcache->delete($this->identifierPrefix . 'tag_' . $tag, 0);
+                    $this->memcache->delete($this->identifierPrefix . 'tag_' . $tag);
                 }
             }
         }
         // Clear reverse tag index for this identifier
-        $this->memcache->delete($this->identifierPrefix . 'ident_' . $entryIdentifier, 0);
+        $this->memcache->delete($this->identifierPrefix . 'ident_' . $entryIdentifier);
     }
 
     /**
-     * Does nothing, as memcached does GC itself
+     * Does nothing, as memcache/memcached does GC itself
      *
      * @return void
      * @api

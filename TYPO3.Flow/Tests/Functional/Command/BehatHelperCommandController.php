@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Command;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 
 
@@ -58,7 +61,7 @@ class BehatHelperCommandController extends CommandController
         $testHelper = $this->objectManager->get($testHelperObjectName);
 
         $rawMethodArguments = $this->request->getExceedingArguments();
-        $mappedArguments = array();
+        $mappedArguments = [];
         for ($i = 0; $i < count($rawMethodArguments); $i+=2) {
             $mappedArguments[] = $this->propertyMapper->convert($rawMethodArguments[$i+1], $rawMethodArguments[$i]);
         }
@@ -67,15 +70,15 @@ class BehatHelperCommandController extends CommandController
         try {
             if ($withoutSecurityChecks === true) {
                 $this->securityContext->withoutAuthorizationChecks(function () use ($testHelper, $methodName, $mappedArguments, &$result) {
-                    $result = call_user_func_array(array($testHelper, $methodName), $mappedArguments);
+                    $result = call_user_func_array([$testHelper, $methodName], $mappedArguments);
                 });
             } else {
-                $result = call_user_func_array(array($testHelper, $methodName), $mappedArguments);
+                $result = call_user_func_array([$testHelper, $methodName], $mappedArguments);
             }
         } catch (\Exception $exception) {
-            $this->outputLine('EXCEPTION: %s %d %s in %s:%s %s', array(get_class($exception), $exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception->getTraceAsString()));
+            $this->outputLine('EXCEPTION: %s %d %s in %s:%s %s', [get_class($exception), $exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception->getTraceAsString()]);
             return;
         }
-        $this->output('SUCCESS: %s', array($result));
+        $this->output('SUCCESS: %s', [$result]);
     }
 }

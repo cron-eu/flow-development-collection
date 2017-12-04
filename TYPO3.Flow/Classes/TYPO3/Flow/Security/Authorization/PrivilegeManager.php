@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Security\Authorization;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Object\ObjectManagerInterface;
@@ -74,7 +77,7 @@ class PrivilegeManager implements PrivilegeManagerInterface
      */
     public function isGrantedForRoles(array $roles, $privilegeType, $subject, &$reason = '')
     {
-        $effectivePrivilegeIdentifiersWithPermission = array();
+        $effectivePrivilegeIdentifiersWithPermission = [];
         $accessGrants = 0;
         $accessDenies = 0;
         $accessAbstains = 0;
@@ -83,7 +86,7 @@ class PrivilegeManager implements PrivilegeManagerInterface
             /** @var PrivilegeInterface[] $availablePrivileges */
             $availablePrivileges = $role->getPrivilegesByType($privilegeType);
             /** @var PrivilegeInterface[] $effectivePrivileges */
-            $effectivePrivileges = array();
+            $effectivePrivileges = [];
             foreach ($availablePrivileges as $privilege) {
                 if ($privilege->matchesSubject($subject)) {
                     $effectivePrivileges[] = $privilege;
@@ -92,11 +95,11 @@ class PrivilegeManager implements PrivilegeManagerInterface
 
             foreach ($effectivePrivileges as $effectivePrivilege) {
                 $privilegeName = $effectivePrivilege->getPrivilegeTargetIdentifier();
-                $parameterStrings = array();
+                $parameterStrings = [];
                 foreach ($effectivePrivilege->getParameters() as $parameter) {
                     $parameterStrings[] = sprintf('%s: "%s"', $parameter->getName(), $parameter->getValue());
                 }
-                if ($parameterStrings !== array()) {
+                if ($parameterStrings !== []) {
                     $privilegeName .= ' (with parameters: ' . implode(', ', $parameterStrings) . ')';
                 }
 
@@ -134,7 +137,7 @@ class PrivilegeManager implements PrivilegeManagerInterface
      * @param array $privilegeParameters Optional array of privilege parameters (simple key => value array)
      * @return boolean TRUE if access is granted, FALSE otherwise
      */
-    public function isPrivilegeTargetGranted($privilegeTargetIdentifier, array $privilegeParameters = array())
+    public function isPrivilegeTargetGranted($privilegeTargetIdentifier, array $privilegeParameters = [])
     {
         return $this->isPrivilegeTargetGrantedForRoles($this->securityContext->getRoles(), $privilegeTargetIdentifier, $privilegeParameters);
     }
@@ -147,7 +150,7 @@ class PrivilegeManager implements PrivilegeManagerInterface
      * @param array $privilegeParameters Optional array of privilege parameters (simple key => value array)
      * @return boolean TRUE if access is granted, FALSE otherwise
      */
-    public function isPrivilegeTargetGrantedForRoles(array $roles, $privilegeTargetIdentifier, array $privilegeParameters = array())
+    public function isPrivilegeTargetGrantedForRoles(array $roles, $privilegeTargetIdentifier, array $privilegeParameters = [])
     {
         $privilegeFound = false;
         $accessGrants = 0;

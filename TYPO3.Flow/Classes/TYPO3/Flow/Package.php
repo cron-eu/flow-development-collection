@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Package\Package as BasePackage;
 use TYPO3\Flow\Package\PackageInterface;
@@ -92,6 +95,7 @@ class Package extends BasePackage
         $dispatcher->connect('TYPO3\Flow\Core\Bootstrap', 'bootstrapShuttingDown', 'TYPO3\Flow\Reflection\ReflectionService', 'saveToCache');
 
         $dispatcher->connect('TYPO3\Flow\Command\CoreCommandController', 'finishedCompilationRun', 'TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilegePointcutFilter', 'savePolicyCache');
+        $dispatcher->connect('TYPO3\Flow\Command\CoreCommandController', 'finishedCompilationRun', 'TYPO3\Flow\Aop\Pointcut\RuntimeExpressionEvaluator', 'saveRuntimeExpressions');
 
         $dispatcher->connect('TYPO3\Flow\Security\Authentication\AuthenticationProviderManager', 'authenticatedToken', function () use ($bootstrap) {
             $session = $bootstrap->getObjectManager()->get('TYPO3\Flow\Session\SessionInterface');

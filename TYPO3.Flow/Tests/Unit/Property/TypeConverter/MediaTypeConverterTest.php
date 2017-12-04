@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Property\PropertyMappingConfigurationInterface;
 use TYPO3\Flow\Property\TypeConverter\MediaTypeConverter;
@@ -35,7 +38,7 @@ class MediaTypeConverterTest extends UnitTestCase
     {
         $this->mediaTypeConverter = new MediaTypeConverter();
 
-        $this->mockPropertyMappingConfiguration = $this->getMockBuilder('TYPO3\Flow\Property\PropertyMappingConfigurationInterface')->getMock();
+        $this->mockPropertyMappingConfiguration = $this->getMockBuilder(PropertyMappingConfigurationInterface::class)->getMock();
     }
 
     /**
@@ -44,7 +47,7 @@ class MediaTypeConverterTest extends UnitTestCase
     public function convertExpectsJsonAsDefault()
     {
         $actualResult = $this->mediaTypeConverter->convertFrom('{"jsonArgument":"jsonValue"}', 'array');
-        $expectedResult = array('jsonArgument' => 'jsonValue');
+        $expectedResult = ['jsonArgument' => 'jsonValue'];
         $this->assertSame($expectedResult, $actualResult);
     }
 
@@ -54,7 +57,7 @@ class MediaTypeConverterTest extends UnitTestCase
     public function convertReturnsEmptyArrayIfBodyCantBeParsed()
     {
         $actualResult = $this->mediaTypeConverter->convertFrom('<root><xmlArgument>xmlValue</xmlArgument></root>', 'array');
-        $expectedResult = array();
+        $expectedResult = [];
         $this->assertSame($expectedResult, $actualResult);
     }
 
@@ -63,10 +66,10 @@ class MediaTypeConverterTest extends UnitTestCase
      */
     public function convertReturnsEmptyArrayIfGivenMediaTypeIsInvalid()
     {
-        $this->mockPropertyMappingConfiguration->expects($this->atLeastOnce())->method('getConfigurationValue')->with('TYPO3\Flow\Property\TypeConverter\MediaTypeConverterInterface', MediaTypeConverterInterface::CONFIGURATION_MEDIA_TYPE)->will($this->returnValue('someInvalidMediaType'));
+        $this->mockPropertyMappingConfiguration->expects($this->atLeastOnce())->method('getConfigurationValue')->with(MediaTypeConverterInterface::class, MediaTypeConverterInterface::CONFIGURATION_MEDIA_TYPE)->will($this->returnValue('someInvalidMediaType'));
 
-        $actualResult = $this->mediaTypeConverter->convertFrom('{"jsonArgument":"jsonValue"}', 'array', array(), $this->mockPropertyMappingConfiguration);
-        $expectedResult = array();
+        $actualResult = $this->mediaTypeConverter->convertFrom('{"jsonArgument":"jsonValue"}', 'array', [], $this->mockPropertyMappingConfiguration);
+        $expectedResult = [];
         $this->assertSame($expectedResult, $actualResult);
     }
 
@@ -75,22 +78,22 @@ class MediaTypeConverterTest extends UnitTestCase
      */
     public function contentTypesBodiesAndExpectedUnifiedArguments()
     {
-        return array(
-            array('application/json', '{"jsonArgument":"jsonValue"}', array('jsonArgument' => 'jsonValue')),
-            array('application/json', 'invalid json source code', array()),
-            array('application/json; charset=UTF-8', '{"jsonArgument":"jsonValue"}', array('jsonArgument' => 'jsonValue')),
-            array('application/xml', '<root><xmlArgument>xmlValue</xmlArgument></root>', array('xmlArgument' => 'xmlValue')),
-            array('text/xml', '<root><xmlArgument>xmlValue</xmlArgument><![CDATA[<!-- text/xml is, by the way, meant to be readable by "the casual user" -->]]></root>', array('xmlArgument' => 'xmlValue')),
-            array('text/xml', '<invalid xml source code>', array()),
-            array('application/xml;charset=UTF8', '<root><xmlArgument>xmlValue</xmlArgument></root>', array('xmlArgument' => 'xmlValue')),
+        return [
+            ['application/json', '{"jsonArgument":"jsonValue"}', ['jsonArgument' => 'jsonValue']],
+            ['application/json', 'invalid json source code', []],
+            ['application/json; charset=UTF-8', '{"jsonArgument":"jsonValue"}', ['jsonArgument' => 'jsonValue']],
+            ['application/xml', '<root><xmlArgument>xmlValue</xmlArgument></root>', ['xmlArgument' => 'xmlValue']],
+            ['text/xml', '<root><xmlArgument>xmlValue</xmlArgument><![CDATA[<!-- text/xml is, by the way, meant to be readable by "the casual user" -->]]></root>', ['xmlArgument' => 'xmlValue']],
+            ['text/xml', '<invalid xml source code>', []],
+            ['application/xml;charset=UTF8', '<root><xmlArgument>xmlValue</xmlArgument></root>', ['xmlArgument' => 'xmlValue']],
 
             // the following media types are wrong (not registered at IANA), but still used by some out there:
 
-            array('application/x-javascript', '{"jsonArgument":"jsonValue"}', array('jsonArgument' => 'jsonValue')),
-            array('text/javascript', '{"jsonArgument":"jsonValue"}', array('jsonArgument' => 'jsonValue')),
-            array('text/x-javascript', '{"jsonArgument":"jsonValue"}', array('jsonArgument' => 'jsonValue')),
-            array('text/x-json', '{"jsonArgument":"jsonValue"}', array('jsonArgument' => 'jsonValue')),
-        );
+            ['application/x-javascript', '{"jsonArgument":"jsonValue"}', ['jsonArgument' => 'jsonValue']],
+            ['text/javascript', '{"jsonArgument":"jsonValue"}', ['jsonArgument' => 'jsonValue']],
+            ['text/x-javascript', '{"jsonArgument":"jsonValue"}', ['jsonArgument' => 'jsonValue']],
+            ['text/x-json', '{"jsonArgument":"jsonValue"}', ['jsonArgument' => 'jsonValue']],
+        ];
     }
 
     /**
@@ -99,9 +102,9 @@ class MediaTypeConverterTest extends UnitTestCase
      */
     public function convertTests($mediaType, $requestBody, array $expectedResult)
     {
-        $this->mockPropertyMappingConfiguration->expects($this->atLeastOnce())->method('getConfigurationValue')->with('TYPO3\Flow\Property\TypeConverter\MediaTypeConverterInterface', MediaTypeConverterInterface::CONFIGURATION_MEDIA_TYPE)->will($this->returnValue($mediaType));
+        $this->mockPropertyMappingConfiguration->expects($this->atLeastOnce())->method('getConfigurationValue')->with(MediaTypeConverterInterface::class, MediaTypeConverterInterface::CONFIGURATION_MEDIA_TYPE)->will($this->returnValue($mediaType));
 
-        $actualResult = $this->mediaTypeConverter->convertFrom($requestBody, 'array', array(), $this->mockPropertyMappingConfiguration);
+        $actualResult = $this->mediaTypeConverter->convertFrom($requestBody, 'array', [], $this->mockPropertyMappingConfiguration);
         $this->assertSame($expectedResult, $actualResult);
     }
 }

@@ -1,27 +1,32 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Persistence;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Persistence\AbstractPersistenceManager;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for the Abstract Persistence Manager
- *
  */
-class AbstractPersistenceManagerTest extends \TYPO3\Flow\Tests\UnitTestCase
+class AbstractPersistenceManagerTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\Tests\Unit\Persistence\AbstractPersistenceManager
+     * @var AbstractPersistenceManager
      */
     protected $abstractPersistenceManager;
 
     public function setUp()
     {
-        $this->abstractPersistenceManager = $this->getMock('TYPO3\Flow\Persistence\AbstractPersistenceManager', array('initialize', 'persistAll', 'isNewObject', 'getObjectByIdentifier', 'createQueryForType', 'add', 'remove', 'update', 'getIdentifierByObject', 'clearState', 'isConnected'));
+        $this->abstractPersistenceManager = $this->getMockBuilder(AbstractPersistenceManager::class)->setMethods(['initialize', 'persistAll', 'isNewObject', 'getObjectByIdentifier', 'createQueryForType', 'add', 'remove', 'update', 'getIdentifierByObject', 'clearState', 'isConnected'])->getMock();
     }
 
     /**
@@ -32,7 +37,7 @@ class AbstractPersistenceManagerTest extends \TYPO3\Flow\Tests\UnitTestCase
         $someObject = new \stdClass();
         $this->abstractPersistenceManager->expects($this->once())->method('getIdentifierByObject')->with($someObject)->will($this->returnValue(123));
 
-        $expectedResult = array('__identity' => 123);
+        $expectedResult = ['__identity' => 123];
         $actualResult = $this->abstractPersistenceManager->convertObjectToIdentityArray($someObject);
         $this->assertEquals($expectedResult, $actualResult);
     }
@@ -59,8 +64,8 @@ class AbstractPersistenceManagerTest extends \TYPO3\Flow\Tests\UnitTestCase
         $this->abstractPersistenceManager->expects($this->at(0))->method('getIdentifierByObject')->with($object1)->will($this->returnValue('identifier1'));
         $this->abstractPersistenceManager->expects($this->at(1))->method('getIdentifierByObject')->with($object2)->will($this->returnValue('identifier2'));
 
-        $originalArray = array('foo' => 'bar', 'object1' => $object1, 'baz' => array('object2' => $object2));
-        $expectedResult = array('foo' => 'bar', 'object1' => array('__identity' => 'identifier1'), 'baz' => array('object2' => array('__identity' => 'identifier2')));
+        $originalArray = ['foo' => 'bar', 'object1' => $object1, 'baz' => ['object2' => $object2]];
+        $expectedResult = ['foo' => 'bar', 'object1' => ['__identity' => 'identifier1'], 'baz' => ['object2' => ['__identity' => 'identifier2']]];
 
         $actualResult = $this->abstractPersistenceManager->convertObjectsToIdentityArrays($originalArray);
         $this->assertEquals($expectedResult, $actualResult);
@@ -76,8 +81,8 @@ class AbstractPersistenceManagerTest extends \TYPO3\Flow\Tests\UnitTestCase
         $this->abstractPersistenceManager->expects($this->at(0))->method('getIdentifierByObject')->with($object1)->will($this->returnValue('identifier1'));
         $this->abstractPersistenceManager->expects($this->at(1))->method('getIdentifierByObject')->with($object2)->will($this->returnValue('identifier2'));
 
-        $originalArray = array('foo' => 'bar', 'object1' => $object1, 'baz' => new \ArrayObject(array('object2' => $object2)));
-        $expectedResult = array('foo' => 'bar', 'object1' => array('__identity' => 'identifier1'), 'baz' => array('object2' => array('__identity' => 'identifier2')));
+        $originalArray = ['foo' => 'bar', 'object1' => $object1, 'baz' => new \ArrayObject(['object2' => $object2])];
+        $expectedResult = ['foo' => 'bar', 'object1' => ['__identity' => 'identifier1'], 'baz' => ['object2' => ['__identity' => 'identifier2']]];
 
         $actualResult = $this->abstractPersistenceManager->convertObjectsToIdentityArrays($originalArray);
         $this->assertEquals($expectedResult, $actualResult);

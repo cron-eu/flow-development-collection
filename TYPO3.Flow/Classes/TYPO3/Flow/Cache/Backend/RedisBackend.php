@@ -1,14 +1,18 @@
 <?php
 namespace TYPO3\Flow\Cache\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Cache\Exception as CacheException;
+use TYPO3\Flow\Core\ApplicationContext;
 
 /**
  * A caching backend which stores cache entries in Redis using the phpredis PHP extension.
@@ -75,12 +79,17 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
     protected $database = 0;
 
     /**
-     * @param \TYPO3\Flow\Core\ApplicationContext $context
+     * @var integer
+     */
+    protected $compressionLevel = 0;
+
+    /**
+     * @param ApplicationContext $context
      * @param array $options
      * @param \Redis $redis
      * @throws CacheException
      */
-    public function __construct(\TYPO3\Flow\Core\ApplicationContext $context, array $options = array(), \Redis $redis = null)
+    public function __construct(ApplicationContext $context, array $options = [], \Redis $redis = null)
     {
         parent::__construct($context, $options);
         if (null === $redis) {
@@ -100,7 +109,7 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
      * @return void
      * @api
      */
-    public function set($entryIdentifier, $data, array $tags = array(), $lifetime = null)
+    public function set($entryIdentifier, $data, array $tags = [], $lifetime = null)
     {
         if ($this->isFrozen()) {
             throw new \RuntimeException(sprintf('Cannot add or modify cache entry because the backend of cache "%s" is frozen.', $this->cacheIdentifier), 1323344192);
@@ -110,16 +119,17 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
             $lifetime = $this->defaultLifetime;
         }
 
-        $setOptions = array();
+        $setOptions = [];
         if ($lifetime > 0) {
             $setOptions['ex'] = $lifetime;
         }
 
         $this->redis->multi();
-        $result = $this->redis->set($this->buildKey('entry:' . $entryIdentifier), $data, $setOptions);
+        $result = $this->redis->set($this->buildKey('entry:' . $entryIdentifier), $this->compress($data), $setOptions);
         if (!$result instanceof \Redis) {
             $this->verifyRedisVersionIsSupported();
         }
+        $this->redis->lRem($this->buildKey('entries'), $entryIdentifier, 0);
         $this->redis->rPush($this->buildKey('entries'), $entryIdentifier);
         foreach ($tags as $tag) {
             $this->redis->sAdd($this->buildKey('tag:' . $tag), $entryIdentifier);
@@ -137,7 +147,7 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
      */
     public function get($entryIdentifier)
     {
-        return $this->redis->get($this->buildKey('entry:' . $entryIdentifier));
+        return $this->uncompress($this->redis->get($this->buildKey('entry:' . $entryIdentifier)));
     }
 
     /**
@@ -208,7 +218,7 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
 		redis.call('DEL', KEYS[1])
 		redis.call('DEL', KEYS[2])
 		";
-        $this->redis->eval($script, array($this->buildKey('entries'), $this->buildKey('frozen'), $this->buildKey('')), 2);
+        $this->redis->eval($script, [$this->buildKey('entries'), $this->buildKey('frozen'), $this->buildKey('')], 2);
 
         $this->frozen = null;
     }
@@ -247,7 +257,7 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
         }
 
         $script = "
-		local entries = redis.call('SMEMBERS',KEYS[1])
+		local entries = redis.call('SMEMBERS', KEYS[1])
 		for k1,entryIdentifier in ipairs(entries) do
 			redis.call('DEL', ARGV[1]..'entry:'..entryIdentifier)
 			local tags = redis.call('SMEMBERS', ARGV[1]..'tags:'..entryIdentifier)
@@ -255,11 +265,11 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
 				redis.call('SREM', ARGV[1]..'tag:'..tagName, entryIdentifier)
 			end
 			redis.call('DEL', ARGV[1]..'tags:'..entryIdentifier)
+			redis.call('LREM', KEYS[2], 0, entryIdentifier)
 		end
 		return #entries
 		";
-        $count = $this->redis->eval($script, array($this->buildKey('tag:' . $tag), $this->buildKey('')), 1);
-
+        $count = $this->redis->eval($script, [$this->buildKey('tag:' . $tag), $this->buildKey('entries'), $this->buildKey('')], 2);
         return $count;
     }
 
@@ -297,7 +307,13 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
      */
     public function key()
     {
-        return $this->redis->lIndex($this->buildKey('entries'), $this->entryCursor);
+        $entryIdentifier = $this->redis->lIndex($this->buildKey('entries'), $this->entryCursor);
+        if ($entryIdentifier !== false) {
+            if (!$this->has($entryIdentifier)) {
+                return false;
+            }
+        }
+        return $entryIdentifier;
     }
 
     /**
@@ -363,8 +379,7 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
     /**
      * Sets the default lifetime for this cache backend
      *
-     * @param integer $lifetime
-     * @param integer $defaultLifetime Default lifetime of this cache backend in seconds. If NULL is specified, the default lifetime is used. 0 means unlimited lifetime.
+     * @param integer $lifetime Default lifetime of this cache backend in seconds. If NULL is specified, the default lifetime is used. 0 means unlimited lifetime.
      * @return void
      * @api
      */
@@ -376,7 +391,6 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
     /**
      * Sets the hostname or the socket of the Redis server
      *
-     * @param string $hostname
      * @param string $hostname Hostname of the Redis server
      * @api
      */
@@ -390,7 +404,6 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
      *
      * Leave this empty if you want to connect to a socket
      *
-     * @param string $port
      * @param string $port Port of the Redis server
      * @api
      */
@@ -402,13 +415,49 @@ class RedisBackend extends AbstractBackend implements TaggableBackendInterface, 
     /**
      * Sets the database that will be used for this backend
      *
-     * @param integer $database
      * @param integer $database Database that will be used
      * @api
      */
     public function setDatabase($database)
     {
         $this->database = $database;
+    }
+
+    /**
+     * @param integer $compressionLevel
+     */
+    public function setCompressionLevel($compressionLevel)
+    {
+        $this->compressionLevel = $compressionLevel;
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    private function uncompress($value)
+    {
+        if (empty($value)) {
+            return $value;
+        }
+        return $this->useCompression() ? gzdecode($value) : $value;
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    private function compress($value)
+    {
+        return $this->useCompression() ? gzencode($value, $this->compressionLevel) : $value;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function useCompression()
+    {
+        return $this->compressionLevel > 0;
     }
 
     /**

@@ -1,14 +1,20 @@
 <?php
 namespace TYPO3\Flow\Property\TypeConverter;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Persistence\Aspect\PersistenceMagicInterface;
+use TYPO3\Flow\Persistence\PersistenceManagerInterface;
+use TYPO3\Flow\Property\PropertyMappingConfigurationInterface;
 
 /**
  * This converter transforms persistent objects to strings by returning their (technical) identifier.
@@ -23,7 +29,7 @@ class PersistentObjectSerializer extends AbstractTypeConverter
     /**
      * @var array
      */
-    protected $sourceTypes = array('TYPO3\Flow\Persistence\Aspect\PersistenceMagicInterface');
+    protected $sourceTypes = [PersistenceMagicInterface::class];
 
     /**
      * @var string
@@ -37,7 +43,7 @@ class PersistentObjectSerializer extends AbstractTypeConverter
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Persistence\PersistenceManagerInterface
+     * @var PersistenceManagerInterface
      */
     protected $persistenceManager;
 
@@ -47,12 +53,10 @@ class PersistentObjectSerializer extends AbstractTypeConverter
      * @param object $source
      * @param string $targetType
      * @param array $convertedChildProperties
-     * @param \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration
+     * @param PropertyMappingConfigurationInterface $configuration
      * @return object the target type
-     * @throws \TYPO3\Flow\Property\Exception\InvalidTargetException
-     * @throws \InvalidArgumentException
      */
-    public function convertFrom($source, $targetType, array $convertedChildProperties = array(), \TYPO3\Flow\Property\PropertyMappingConfigurationInterface $configuration = null)
+    public function convertFrom($source, $targetType, array $convertedChildProperties = [], PropertyMappingConfigurationInterface $configuration = null)
     {
         $identifier = $this->persistenceManager->getIdentifierByObject($source);
         return $identifier;

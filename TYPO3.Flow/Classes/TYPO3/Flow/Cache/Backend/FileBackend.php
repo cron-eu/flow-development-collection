@@ -1,14 +1,20 @@
 <?php
 namespace TYPO3\Flow\Cache\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Cache\Exception;
+use TYPO3\Flow\Cache\Exception\InvalidDataException;
+use TYPO3\Flow\Cache\Frontend\FrontendInterface;
 use TYPO3\Flow\Utility\Files;
 use TYPO3\Flow\Utility\Lock\Lock;
 use TYPO3\Flow\Utility\OpcodeCacheHelper;
@@ -38,7 +44,7 @@ class FileBackend extends SimpleFileBackend implements PhpCapableBackendInterfac
     /**
      * @var array
      */
-    protected $cacheEntryIdentifiers = array();
+    protected $cacheEntryIdentifiers = [];
 
     /**
      * @var boolean
@@ -112,11 +118,11 @@ class FileBackend extends SimpleFileBackend implements PhpCapableBackendInterfac
      * This method also detects if this backend is frozen and sets the internal
      * flag accordingly.
      *
-     * @param \TYPO3\Flow\Cache\Frontend\FrontendInterface $cache The cache frontend
+     * @param FrontendInterface $cache The cache frontend
      * @return void
-     * @throws \TYPO3\Flow\Cache\Exception
+     * @throws Exception
      */
-    public function setCache(\TYPO3\Flow\Cache\Frontend\FrontendInterface $cache)
+    public function setCache(FrontendInterface $cache)
     {
         parent::setCache($cache);
 
@@ -143,15 +149,15 @@ class FileBackend extends SimpleFileBackend implements PhpCapableBackendInterfac
      * @param integer $lifetime Lifetime of this cache entry in seconds. If NULL is specified, the default lifetime is used. "0" means unlimited lifetime.
      * @return void
      * @throws \RuntimeException
-     * @throws \TYPO3\Flow\Cache\Exception\InvalidDataException
-     * @throws \TYPO3\Flow\Cache\Exception if the directory does not exist or is not writable or exceeds the maximum allowed path length, or if no cache frontend has been set.
+     * @throws InvalidDataException
+     * @throws Exception if the directory does not exist or is not writable or exceeds the maximum allowed path length, or if no cache frontend has been set.
      * @throws \InvalidArgumentException
      * @api
      */
-    public function set($entryIdentifier, $data, array $tags = array(), $lifetime = null)
+    public function set($entryIdentifier, $data, array $tags = [], $lifetime = null)
     {
         if (!is_string($data)) {
-            throw new \TYPO3\Flow\Cache\Exception\InvalidDataException('The specified data is of type "' . gettype($data) . '" but a string is expected.', 1204481674);
+            throw new InvalidDataException('The specified data is of type "' . gettype($data) . '" but a string is expected.', 1204481674);
         }
         if ($entryIdentifier !== basename($entryIdentifier)) {
             throw new \InvalidArgumentException('The specified entry identifier must not contain a path segment.', 1282073032);
@@ -168,17 +174,17 @@ class FileBackend extends SimpleFileBackend implements PhpCapableBackendInterfac
         $expiryTime = ($lifetime === 0) ? 0 : (time() + $lifetime);
         $metaData = str_pad($expiryTime, self::EXPIRYTIME_LENGTH) . implode(' ', $tags) . str_pad(strlen($data), self::DATASIZE_DIGITS);
 
-        $lock = new Lock($cacheEntryPathAndFilename);
-        $result = file_put_contents($cacheEntryPathAndFilename, $data . $metaData);
-        $lock->release();
+        $result = $this->writeCacheFile($cacheEntryPathAndFilename, $data . $metaData);
 
-        if ($result === false) {
-            throw new \TYPO3\Flow\Cache\Exception('The cache file "' . $cacheEntryPathAndFilename . '" could not be written.', 1222361632);
+        if ($result !== false) {
+            if ($this->cacheEntryFileExtension === '.php') {
+                OpcodeCacheHelper::clearAllActive($cacheEntryPathAndFilename);
+            }
+            return;
         }
 
-        if ($this->cacheEntryFileExtension === '.php') {
-            OpcodeCacheHelper::clearAllActive($cacheEntryPathAndFilename);
-        }
+        $this->throwExceptionIfPathExceedsMaximumLength($cacheEntryPathAndFilename);
+        throw new Exception('The cache file "' . $cacheEntryPathAndFilename . '" could not be written.', 1222361632);
     }
 
     /**
@@ -255,7 +261,7 @@ class FileBackend extends SimpleFileBackend implements PhpCapableBackendInterfac
      */
     public function findIdentifiersByTag($searchedTag)
     {
-        $entryIdentifiers = array();
+        $entryIdentifiers = [];
         $now = $_SERVER['REQUEST_TIME'];
         $cacheEntryFileExtensionLength = strlen($this->cacheEntryFileExtension);
         for ($directoryIterator = new \DirectoryIterator($this->cacheDirectory); $directoryIterator->valid(); $directoryIterator->next()) {
@@ -377,7 +383,7 @@ class FileBackend extends SimpleFileBackend implements PhpCapableBackendInterfac
      *
      * @param string $entryIdentifier The cache entry identifier
      * @return mixed The filenames (including path) as an array if one or more entries could be found, otherwise FALSE
-     * @throws \TYPO3\Flow\Cache\Exception if no frontend has been set
+     * @throws Exception if no frontend has been set
      */
     protected function findCacheFilesByIdentifier($entryIdentifier)
     {

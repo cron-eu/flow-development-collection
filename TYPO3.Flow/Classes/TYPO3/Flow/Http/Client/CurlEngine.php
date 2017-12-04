@@ -1,16 +1,18 @@
 <?php
 namespace TYPO3\Flow\Http\Client;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Http\Request;
-use TYPO3\Flow\Http\Response;
+use TYPO3\Flow\Http;
 
 /**
  * A Request Engine which uses cURL in order to send requests to external
@@ -21,14 +23,14 @@ class CurlEngine implements RequestEngineInterface
     /**
      * @var array
      */
-    protected $options = array(
+    protected $options = [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HEADER => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_FRESH_CONNECT => true,
         CURLOPT_FORBID_REUSE => true,
         CURLOPT_TIMEOUT => 30,
-    );
+    ];
 
     /**
      * Sets an option to be used by cURL.
@@ -44,16 +46,16 @@ class CurlEngine implements RequestEngineInterface
     /**
      * Sends the given HTTP request
      *
-     * @param \TYPO3\Flow\Http\Request $request
-     * @return \TYPO3\Flow\Http\Response The response or FALSE
+     * @param Http\Request $request
+     * @return Http\Response The response or FALSE
      * @api
-     * @throws \TYPO3\Flow\Http\Exception
+     * @throws Http\Exception
      * @throws CurlEngineException
      */
-    public function sendRequest(Request $request)
+    public function sendRequest(Http\Request $request)
     {
         if (!extension_loaded('curl')) {
-            throw new \TYPO3\Flow\Http\Exception('CurlEngine requires the PHP CURL extension to be installed and loaded.', 1346319808);
+            throw new Http\Exception('CurlEngine requires the PHP CURL extension to be installed and loaded.', 1346319808);
         }
 
         $requestUri = $request->getUri();
@@ -63,21 +65,21 @@ class CurlEngine implements RequestEngineInterface
 
         // Send an empty Expect header in order to avoid chunked data transfer (which we can't handle yet).
         // If we don't set this, cURL will set "Expect: 100-continue" for requests larger than 1024 bytes.
-        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Expect:'));
+        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, ['Expect:']);
 
         // If the content is a stream resource, use cURL's INFILE feature to stream it
         $content = $request->getContent();
         if (is_resource($content)) {
             curl_setopt_array($curlHandle,
-                array(
+                [
                     CURLOPT_INFILE => $content,
                     CURLOPT_INFILESIZE => $request->getHeader('Content-Length'),
-                )
+                ]
             );
         }
 
         switch ($request->getMethod()) {
-            case 'GET' :
+            case 'GET':
                 if ($request->getContent()) {
                     // workaround because else the request would implicitly fall into POST:
                     curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, 'GET');
@@ -86,23 +88,23 @@ class CurlEngine implements RequestEngineInterface
                     }
                 }
             break;
-            case 'POST' :
+            case 'POST':
                 curl_setopt($curlHandle, CURLOPT_POST, true);
                 if (!is_resource($content)) {
                     $body = $content !== '' ? $content : http_build_query($request->getArguments());
                     curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $body);
                 }
             break;
-            case 'PUT' :
+            case 'PUT':
                 curl_setopt($curlHandle, CURLOPT_PUT, true);
                 if (!is_resource($content) && $content !== '') {
                     $inFileHandler = fopen('php://temp', 'r+');
                     fwrite($inFileHandler, $request->getContent());
                     rewind($inFileHandler);
-                    curl_setopt_array($curlHandle, array(
+                    curl_setopt_array($curlHandle, [
                         CURLOPT_INFILE => $inFileHandler,
                         CURLOPT_INFILESIZE => strlen($request->getContent()),
-                    ));
+                    ]);
                 }
             break;
             default:
@@ -113,7 +115,7 @@ class CurlEngine implements RequestEngineInterface
                 curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $request->getMethod());
         }
 
-        $preparedHeaders = array();
+        $preparedHeaders = [];
         foreach ($request->getHeaders()->getAll() as $fieldName => $values) {
             foreach ($values as $value) {
                 $preparedHeaders[] = $fieldName . ': ' . $value;
@@ -138,9 +140,9 @@ class CurlEngine implements RequestEngineInterface
         }
         curl_close($curlHandle);
 
-        $response = Response::createFromRaw($curlResult);
+        $response = Http\Response::createFromRaw($curlResult);
         if ($response->getStatusCode() === 100) {
-            $response = Response::createFromRaw($response->getContent(), $response);
+            $response = Http\Response::createFromRaw($response->getContent(), $response);
         }
         return $response;
     }

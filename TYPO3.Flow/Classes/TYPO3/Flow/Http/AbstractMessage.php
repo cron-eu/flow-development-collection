@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Http;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -26,7 +29,7 @@ abstract class AbstractMessage
     protected $version = 'HTTP/1.1';
 
     /**
-     * @var \TYPO3\Flow\Http\Headers
+     * @var Headers
      */
     protected $headers;
 
@@ -53,7 +56,7 @@ abstract class AbstractMessage
     /**
      * Returns the HTTP headers of this request
      *
-     * @return \TYPO3\Flow\Http\Headers
+     * @return Headers
      * @api
      */
     public function getHeaders()
@@ -105,12 +108,19 @@ abstract class AbstractMessage
      * @param array|string|\DateTime $values An array of values or a single value for the specified header field
      * @param boolean $replaceExistingHeader If a header with the same name should be replaced. Default is TRUE.
      * @return self This message, for method chaining
+     * @throws \InvalidArgumentException
      * @api
      */
     public function setHeader($name, $values, $replaceExistingHeader = true)
     {
         switch ($name) {
-            case 'Content-Type' :
+            case 'Content-Type':
+                if (is_array($values)) {
+                    if (count($values) !== 1) {
+                        throw new \InvalidArgumentException('The "Content-Type" header must be unique and thus only one field value may be specified.', 1454949291);
+                    }
+                    $values = (string) $values[0];
+                }
                 if (stripos($values, 'charset') === false && stripos($values, 'text/') === 0) {
                     $values .= '; charset=' . $this->charset;
                 }
@@ -163,7 +173,7 @@ abstract class AbstractMessage
         if ($this->headers->has('Content-Type')) {
             $contentType = $this->headers->get('Content-Type');
             if (stripos($contentType, 'text/') === 0) {
-                $matches = array();
+                $matches = [];
                 if (preg_match('/(?P<contenttype>.*); ?charset[^;]+(?P<extra>;.*)?/iu', $contentType, $matches)) {
                     $contentType = $matches['contenttype'];
                 }
@@ -215,7 +225,7 @@ abstract class AbstractMessage
      *
      * This is a shortcut for $message->getHeaders()->setCookie($cookie);
      *
-     * @param \TYPO3\Flow\Http\Cookie $cookie The cookie to set
+     * @param Cookie $cookie The cookie to set
      * @return void
      * @api
      */
@@ -230,7 +240,7 @@ abstract class AbstractMessage
      * This is a shortcut for $message->getHeaders()->getCookie($name);
      *
      * @param string $name Name of the cookie
-     * @return \TYPO3\Flow\Http\Cookie The cookie or NULL if no such cookie exists
+     * @return Cookie The cookie or NULL if no such cookie exists
      * @api
      */
     public function getCookie($name)

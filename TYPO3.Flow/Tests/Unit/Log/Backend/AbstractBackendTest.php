@@ -1,21 +1,26 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Log\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Log\Backend\AbstractBackend;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for the abstract log backend
- *
  */
-class AbstractBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
+class AbstractBackendTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\Log\Backend\AbstractBackend
+     * @var AbstractBackend
      */
     protected $backendClassName;
 
@@ -46,7 +51,7 @@ class AbstractBackendTest extends \TYPO3\Flow\Tests\UnitTestCase
     public function theConstructorCallsSetterMethodsForAllSpecifiedOptions()
     {
         $className = $this->backendClassName;
-        $backend = new $className(array('someOption' => 'someValue'));
+        $backend = new $className(['someOption' => 'someValue']);
         $this->assertSame('someValue', $backend->getSomeOption());
     }
 }

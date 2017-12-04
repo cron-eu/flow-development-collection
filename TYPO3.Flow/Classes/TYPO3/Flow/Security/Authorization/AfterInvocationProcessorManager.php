@@ -1,14 +1,20 @@
 <?php
 namespace TYPO3\Flow\Security\Authorization;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Aop\JoinPointInterface;
+use TYPO3\Flow\Security\Context;
+use TYPO3\Flow\Security\Exception\AccessDeniedException;
 
 /**
  * The default after invocation manager that uses AfterInvocationProcessorInterface to process the return objects.
@@ -16,7 +22,7 @@ use TYPO3\Flow\Annotations as Flow;
  *
  * @Flow\Scope("singleton")
  */
-class AfterInvocationProcessorManager implements \TYPO3\Flow\Security\Authorization\AfterInvocationManagerInterface
+class AfterInvocationProcessorManager implements AfterInvocationManagerInterface
 {
     /**
      * Processes the given return object. May throw an security exception or filter the result depending on the current user rights.
@@ -24,14 +30,14 @@ class AfterInvocationProcessorManager implements \TYPO3\Flow\Security\Authorizat
      * The naming convention is: [InterceptedClassName]_[InterceptedMethodName]_AfterInvocationProcessor
      *
      *
-     * @param \TYPO3\Flow\Security\Context $securityContext The current security context
+     * @param Context $securityContext The current security context
      * @param object $object The return object to be processed
-     * @param \TYPO3\Flow\Aop\JoinPointInterface $joinPoint The joinpoint of the returning method
+     * @param JoinPointInterface $joinPoint The joinpoint of the returning method
      * @return boolean TRUE if access is granted, FALSE if the manager abstains from decision
-     * @throws \TYPO3\Flow\Security\Exception\AccessDeniedException If access is not granted
+     * @throws AccessDeniedException If access is not granted
      * @todo processors must also be configurable
      */
-    public function process(\TYPO3\Flow\Security\Context $securityContext, $object, \TYPO3\Flow\Aop\JoinPointInterface $joinPoint)
+    public function process(Context $securityContext, $object, JoinPointInterface $joinPoint)
     {
     }
 

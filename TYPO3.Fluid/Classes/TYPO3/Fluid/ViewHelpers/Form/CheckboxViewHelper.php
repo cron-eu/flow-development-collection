@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Fluid\ViewHelpers\Form;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * View Helper which creates a simple checkbox (<input type="checkbox">).
@@ -72,7 +75,6 @@ class CheckboxViewHelper extends AbstractFormFieldViewHelper
     {
         $this->tag->addAttribute('type', 'checkbox');
 
-        $nameAttribute = $this->getName();
         $valueAttribute = $this->getValueAttribute(true);
         $propertyValue = null;
         if ($this->hasMappingErrorOccurred()) {
@@ -89,11 +91,14 @@ class CheckboxViewHelper extends AbstractFormFieldViewHelper
             if ($checked === null) {
                 $checked = in_array($valueAttribute, $propertyValue);
             }
-            $nameAttribute .= '[]';
-        } elseif ($multiple === true) {
-            $nameAttribute .= '[]';
-        } elseif ($propertyValue !== null) {
+            $this->arguments['multiple'] = true;
+        } elseif (!$multiple && $propertyValue !== null) {
             $checked = (boolean)$propertyValue === (boolean)$valueAttribute;
+        }
+
+        $nameAttribute = $this->getName();
+        if (isset($this->arguments['multiple']) && $this->arguments['multiple'] === true) {
+            $nameAttribute .= '[]';
         }
 
         $this->registerFieldNameForFormTokenGeneration($nameAttribute);

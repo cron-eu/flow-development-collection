@@ -1,15 +1,19 @@
 <?php
 namespace TYPO3\Flow\Cli;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Object\ObjectManagerInterface;
+use TYPO3\Flow\Reflection\MethodReflection;
 use TYPO3\Flow\Reflection\ReflectionService;
 
 /**
@@ -33,7 +37,7 @@ class Command
     protected $commandIdentifier;
 
     /**
-     * @var \TYPO3\Flow\Reflection\MethodReflection
+     * @var MethodReflection
      */
     protected $commandMethodReflection;
 
@@ -120,8 +124,8 @@ class Command
         $lines = explode(chr(10), $commandMethodReflection->getDescription());
         $shortDescription = ((count($lines) > 0) ? trim($lines[0]) : '<no description available>') . ($this->isDeprecated() ? ' <b>(DEPRECATED)</b>' : '');
 
-        if ($commandMethodReflection->getDeclaringClass()->implementsInterface('TYPO3\Flow\Cli\DescriptionAwareCommandControllerInterface')) {
-            $shortDescription = call_user_func(array($this->controllerClassName, 'processDescription'), $this->controllerCommandName, $shortDescription, $this->objectManager);
+        if ($commandMethodReflection->getDeclaringClass()->implementsInterface(DescriptionAwareCommandControllerInterface::class)) {
+            $shortDescription = call_user_func([$this->controllerClassName, 'processDescription'], $this->controllerCommandName, $shortDescription, $this->objectManager);
         }
         return $shortDescription;
     }
@@ -138,16 +142,16 @@ class Command
         $commandMethodReflection = $this->getCommandMethodReflection();
         $lines = explode(chr(10), $commandMethodReflection->getDescription());
         array_shift($lines);
-        $descriptionLines = array();
+        $descriptionLines = [];
         foreach ($lines as $line) {
             $trimmedLine = trim($line);
-            if ($descriptionLines !== array() || $trimmedLine !== '') {
+            if ($descriptionLines !== [] || $trimmedLine !== '') {
                 $descriptionLines[] = $trimmedLine;
             }
         }
         $description = implode(chr(10), $descriptionLines);
-        if ($commandMethodReflection->getDeclaringClass()->implementsInterface('TYPO3\Flow\Cli\DescriptionAwareCommandControllerInterface')) {
-            $description = call_user_func(array($this->controllerClassName, 'processDescription'), $this->controllerCommandName, $description, $this->objectManager);
+        if ($commandMethodReflection->getDeclaringClass()->implementsInterface(DescriptionAwareCommandControllerInterface::class)) {
+            $description = call_user_func([$this->controllerClassName, 'processDescription'], $this->controllerCommandName, $description, $this->objectManager);
         }
         return $description;
     }
@@ -163,18 +167,18 @@ class Command
     }
 
     /**
-     * Returns an array of \TYPO3\Flow\Cli\CommandArgumentDefinition that contains
+     * Returns an array of CommandArgumentDefinition that contains
      * information about required/optional arguments of this command.
      * If the command does not expect any arguments, an empty array is returned
      *
-     * @return array<\TYPO3\Flow\Cli\CommandArgumentDefinition>
+     * @return array<CommandArgumentDefinition>
      */
     public function getArgumentDefinitions()
     {
         if (!$this->hasArguments()) {
-            return array();
+            return [];
         }
-        $commandArgumentDefinitions = array();
+        $commandArgumentDefinitions = [];
         $commandMethodReflection = $this->getCommandMethodReflection();
         $annotations = $commandMethodReflection->getTagsValues();
         $commandParameters = $this->reflectionService->getMethodParameters($this->controllerClassName, $this->controllerCommandName . 'Command');
@@ -237,10 +241,10 @@ class Command
     {
         $commandMethodReflection = $this->getCommandMethodReflection();
         if (!$commandMethodReflection->isTaggedWith('see')) {
-            return array();
+            return [];
         }
 
-        $relatedCommandIdentifiers = array();
+        $relatedCommandIdentifiers = [];
         foreach ($commandMethodReflection->getTagValues('see') as $tagValue) {
             if (preg_match('/^[\w\d\.]+:[\w\d]+:[\w\d]+$/', $tagValue) === 1) {
                 $relatedCommandIdentifiers[] = $tagValue;
@@ -250,12 +254,12 @@ class Command
     }
 
     /**
-     * @return \TYPO3\Flow\Reflection\MethodReflection
+     * @return MethodReflection
      */
     protected function getCommandMethodReflection()
     {
         if ($this->commandMethodReflection === null) {
-            $this->commandMethodReflection = new \TYPO3\Flow\Reflection\MethodReflection($this->controllerClassName, $this->controllerCommandName . 'Command');
+            $this->commandMethodReflection = new MethodReflection($this->controllerClassName, $this->controllerCommandName . 'Command');
         }
         return $this->commandMethodReflection;
     }

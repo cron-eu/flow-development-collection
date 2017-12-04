@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Validation\Validator;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 
 /**
@@ -19,10 +22,10 @@ class NumberRangeValidator extends AbstractValidator
     /**
      * @var array
      */
-    protected $supportedOptions = array(
-        'minimum' => array(0, 'The minimum value to accept', 'integer'),
-        'maximum' => array(PHP_INT_MAX, 'The maximum value to accept', 'integer')
-    );
+    protected $supportedOptions = [
+        'minimum' => [0, 'The minimum value to accept', 'integer'],
+        'maximum' => [PHP_INT_MAX, 'The maximum value to accept', 'integer']
+    ];
 
     /**
      * The given value is valid if it is a number in the specified range.
@@ -46,7 +49,7 @@ class NumberRangeValidator extends AbstractValidator
             $maximum = $x;
         }
         if ($value < $minimum || $value > $maximum) {
-            $this->addError('Please enter a valid number between %1$d and %2$d.', 1221561046, array($minimum, $maximum));
+            $this->addError('Please enter a valid number between %1$d and %2$d.', 1221561046, [$minimum, $maximum]);
         }
     }
 }

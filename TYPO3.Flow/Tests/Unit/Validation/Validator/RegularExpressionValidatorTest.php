@@ -1,12 +1,18 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Validation\Validator;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Validation\Validator\RegularExpressionValidator;
+use TYPO3\Flow\Validation;
 
 require_once('AbstractValidatorTestcase.php');
 
@@ -14,9 +20,9 @@ require_once('AbstractValidatorTestcase.php');
  * Testcase for the regular expression validator
  *
  */
-class RegularExpressionValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\AbstractValidatorTestcase
+class RegularExpressionValidatorTest extends AbstractValidatorTestcase
 {
-    protected $validatorClassName = 'TYPO3\Flow\Validation\Validator\RegularExpressionValidator';
+    protected $validatorClassName = RegularExpressionValidator::class;
 
     /**
      * Looks empty - and that's the purpose: do not run the parent's setUp().
@@ -31,7 +37,7 @@ class RegularExpressionValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\V
      */
     public function validateThrowsExceptionIfExpressionIsEmpty()
     {
-        $this->validatorOptions(array());
+        $this->validatorOptions([]);
         $this->validator->validate('foo');
     }
 
@@ -40,7 +46,7 @@ class RegularExpressionValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\V
      */
     public function validateReturnsNoErrorIfTheGivenValueIsNull()
     {
-        $this->validatorOptions(array('regularExpression' => '/^.*$/'));
+        $this->validatorOptions(['regularExpression' => '/^.*$/']);
         $this->assertFalse($this->validator->validate(null)->hasErrors());
     }
 
@@ -49,7 +55,7 @@ class RegularExpressionValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\V
      */
     public function validateReturnsNoErrorIfTheGivenValueIsAnEmptyString()
     {
-        $this->validatorOptions(array('regularExpression' => '/^.*$/'));
+        $this->validatorOptions(['regularExpression' => '/^.*$/']);
         $this->assertFalse($this->validator->validate('')->hasErrors());
     }
 
@@ -58,7 +64,7 @@ class RegularExpressionValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\V
      */
     public function regularExpressionValidatorMatchesABasicExpressionCorrectly()
     {
-        $this->validatorOptions(array('regularExpression' => '/^simple[0-9]expression$/'));
+        $this->validatorOptions(['regularExpression' => '/^simple[0-9]expression$/']);
 
         $this->assertFalse($this->validator->validate('simple1expression')->hasErrors());
         $this->assertTrue($this->validator->validate('simple1expressions')->hasErrors());
@@ -69,9 +75,9 @@ class RegularExpressionValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\V
      */
     public function regularExpressionValidatorCreatesTheCorrectErrorIfTheExpressionDidNotMatch()
     {
-        $this->validatorOptions(array('regularExpression' => '/^simple[0-9]expression$/'));
+        $this->validatorOptions(['regularExpression' => '/^simple[0-9]expression$/']);
         $subject = 'some subject that will not match';
         $errors = $this->validator->validate($subject)->getErrors();
-        $this->assertEquals(array(new \TYPO3\Flow\Validation\Error('The given subject did not match the pattern. Got: %1$s', 1221565130, array($subject))), $errors);
+        $this->assertEquals([new Validation\Error('The given subject did not match the pattern. Got: %1$s', 1221565130, [$subject])], $errors);
     }
 }

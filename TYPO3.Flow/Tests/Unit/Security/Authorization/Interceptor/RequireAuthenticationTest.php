@@ -1,29 +1,35 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Security\Authorization\Interceptor;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Security\Authentication\AuthenticationManagerInterface;
+use TYPO3\Flow\Security\Authorization\Interceptor\RequireAuthentication;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for the authentication required security interceptor
- *
  */
-class RequireAuthenticationTest extends \TYPO3\Flow\Tests\UnitTestCase
+class RequireAuthenticationTest extends UnitTestCase
 {
     /**
      * @test
      */
     public function invokeCallsTheAuthenticationManagerToPerformAuthentication()
     {
-        $authenticationManager = $this->getMock('TYPO3\Flow\Security\Authentication\AuthenticationManagerInterface');
+        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
 
         $authenticationManager->expects($this->once())->method('authenticate');
 
-        $interceptor = new \TYPO3\Flow\Security\Authorization\Interceptor\RequireAuthentication($authenticationManager);
+        $interceptor = new RequireAuthentication($authenticationManager);
         $interceptor->invoke();
     }
 }

@@ -1,52 +1,58 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Security\Aspect;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Aop\Advice\AdviceChain;
+use TYPO3\Flow\Aop\JoinPointInterface;
+use TYPO3\Flow\Security;
 use TYPO3\Flow\Security\Aspect\PolicyEnforcementAspect;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for the security policy enforcement aspect
- *
  */
-class PolicyEnforcementAspectTest extends \TYPO3\Flow\Tests\UnitTestCase
+class PolicyEnforcementAspectTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\Aop\JoinPointInterface
+     * @var JoinPointInterface
      */
     protected $mockJoinPoint;
 
     /**
-     * @var \TYPO3\Flow\Aop\Advice\AdviceChain
+     * @var AdviceChain
      */
     protected $mockAdviceChain;
 
     /**
-     * @var \TYPO3\Flow\Security\Authorization\Interceptor\PolicyEnforcement
+     * @var Security\Authorization\Interceptor\PolicyEnforcement
      */
     protected $mockPolicyEnforcementInterceptor;
 
     /**
-     * @var \TYPO3\Flow\Security\Context
+     * @var Security\Context
      */
     protected $mockSecurityContext;
 
     /**
-     * @var \TYPO3\Flow\Security\Aspect\PolicyEnforcementAspect
+     * @var PolicyEnforcementAspect
      */
     protected $policyEnforcementAspect;
 
     public function setUp()
     {
-        $this->mockJoinPoint = $this->getMock('TYPO3\Flow\Aop\JoinPointInterface', array(), array(), '', false);
-        $this->mockAdviceChain = $this->getMock('TYPO3\Flow\Aop\Advice\AdviceChain', array(), array(), '', false);
-        $this->mockPolicyEnforcementInterceptor = $this->getMock('TYPO3\Flow\Security\Authorization\Interceptor\PolicyEnforcement', array(), array(), '', false);
-        $this->mockSecurityContext = $this->getMock('TYPO3\Flow\Security\Context');
+        $this->mockJoinPoint = $this->getMockBuilder(JoinPointInterface::class)->disableOriginalConstructor()->getMock();
+        $this->mockAdviceChain = $this->getMockBuilder(AdviceChain::class)->disableOriginalConstructor()->getMock();
+        $this->mockPolicyEnforcementInterceptor = $this->getMockBuilder(Security\Authorization\Interceptor\PolicyEnforcement::class)->disableOriginalConstructor()->getMock();
+        $this->mockSecurityContext = $this->createMock(Security\Context::class);
         $this->policyEnforcementAspect = new PolicyEnforcementAspect($this->mockPolicyEnforcementInterceptor, $this->mockSecurityContext);
     }
 

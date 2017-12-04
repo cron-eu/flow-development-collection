@@ -1,19 +1,22 @@
 <?php
 namespace TYPO3\Flow\Log\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * An abstract Log backend
  *
  * @api
  */
-abstract class AbstractBackend implements \TYPO3\Flow\Log\Backend\BackendInterface
+abstract class AbstractBackend implements BackendInterface
 {
     /**
      * One of the LOG_* constants. Anything below that will be filtered out.
@@ -33,7 +36,7 @@ abstract class AbstractBackend implements \TYPO3\Flow\Log\Backend\BackendInterfa
      * @param mixed $options Configuration options - depends on the actual backend
      * @api
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         if (is_array($options) || $options instanceof \ArrayAccess) {
             foreach ($options as $optionKey => $optionValue) {

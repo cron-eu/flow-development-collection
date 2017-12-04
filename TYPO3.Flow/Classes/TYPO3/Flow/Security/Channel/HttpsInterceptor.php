@@ -1,21 +1,28 @@
 <?php
 namespace TYPO3\Flow\Security\Channel;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Log\SystemLoggerInterface;
+use TYPO3\Flow\Security\Authentication\AuthenticationManagerInterface;
+use TYPO3\Flow\Security\Authorization\InterceptorInterface;
+use TYPO3\Flow\Security\Context;
 
 /**
  * This security interceptor switches the current channel between HTTP and HTTPS protocol.
  *
  * @Flow\Scope("singleton")
  */
-class HttpsInterceptor implements \TYPO3\Flow\Security\Authorization\InterceptorInterface
+class HttpsInterceptor implements InterceptorInterface
 {
     /**
      * @var boolean
@@ -26,14 +33,14 @@ class HttpsInterceptor implements \TYPO3\Flow\Security\Authorization\Interceptor
     /**
      * Constructor.
      *
-     * @param \TYPO3\Flow\Security\Context $securityContext The current security context
-     * @param \TYPO3\Flow\Security\Authentication\AuthenticationManagerInterface $authenticationManager The authentication Manager
-     * @param \TYPO3\Flow\Log\SystemLoggerInterface $logger A logger to log security relevant actions
+     * @param Context $securityContext The current security context
+     * @param AuthenticationManagerInterface $authenticationManager The authentication Manager
+     * @param SystemLoggerInterface $logger A logger to log security relevant actions
      */
     public function __construct(
-        \TYPO3\Flow\Security\Context $securityContext,
-        \TYPO3\Flow\Security\Authentication\AuthenticationManagerInterface $authenticationManager,
-        \TYPO3\Flow\Log\SystemLoggerInterface $logger
+        Context $securityContext,
+        AuthenticationManagerInterface $authenticationManager,
+        SystemLoggerInterface $logger
     ) {
     }
 

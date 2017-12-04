@@ -1,19 +1,24 @@
 <?php
 namespace TYPO3\Flow\Security\RequestPattern;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
+use TYPO3\Flow\Mvc\RequestInterface;
+use TYPO3\Flow\Security\RequestPatternInterface;
 
 /**
  * This class holds an URI pattern an decides, if a \TYPO3\Flow\Mvc\ActionRequest object matches against this pattern
  *
  */
-class Uri implements \TYPO3\Flow\Security\RequestPatternInterface
+class Uri implements RequestPatternInterface
 {
     /**
      * The preg_match() styled URI pattern
@@ -49,10 +54,10 @@ class Uri implements \TYPO3\Flow\Security\RequestPatternInterface
     /**
      * Matches a \TYPO3\Flow\Mvc\RequestInterface against its set URL pattern rules
      *
-     * @param \TYPO3\Flow\Mvc\RequestInterface $request The request that should be matched
+     * @param RequestInterface $request The request that should be matched
      * @return boolean TRUE if the pattern matched, FALSE otherwise
      */
-    public function matchRequest(\TYPO3\Flow\Mvc\RequestInterface $request)
+    public function matchRequest(RequestInterface $request)
     {
         return (boolean)preg_match('/^' . $this->uriPattern . '$/', $request->getHttpRequest()->getUri()->getPath());
     }

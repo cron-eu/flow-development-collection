@@ -1,21 +1,28 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\I18n\Xliff;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Cache\Frontend\VariableFrontend;
+use TYPO3\Flow\Log\LoggerInterface;
+use TYPO3\Flow\Tests\UnitTestCase;
+use TYPO3\Flow\I18n;
 
 /**
  * Testcase for the XliffModel
- *
  */
-class XliffModelTest extends \TYPO3\Flow\Tests\UnitTestCase
+class XliffModelTest extends UnitTestCase
 {
     /**
-     * @var \TYPO3\Flow\I18n\Xliff\XliffModel
+     * @var I18n\Xliff\XliffModel
      */
     protected $model;
 
@@ -27,16 +34,16 @@ class XliffModelTest extends \TYPO3\Flow\Tests\UnitTestCase
         $mockFilename = 'foo';
         $mockParsedData = require(__DIR__ . '/../Fixtures/MockParsedXliffData.php');
 
-        $this->mockCache = $this->getMock('TYPO3\Flow\Cache\Frontend\VariableFrontend', array(), array(), '', false);
+        $this->mockCache = $this->getMockBuilder(VariableFrontend::class)->disableOriginalConstructor()->getMock();
         $this->mockCache->expects($this->any())->method('has')->with(md5($mockFilename))->will($this->returnValue(false));
 
-        $this->mockXliffParser = $this->getMock('TYPO3\Flow\I18n\Xliff\XliffParser');
+        $this->mockXliffParser = $this->createMock(I18n\Xliff\XliffParser::class);
         $this->mockXliffParser->expects($this->any())->method('getParsedData')->with($mockFilename)->will($this->returnValue($mockParsedData));
 
-        $this->model = new \TYPO3\Flow\I18n\Xliff\XliffModel($mockFilename, new \TYPO3\Flow\I18n\Locale('de'));
+        $this->model = new I18n\Xliff\XliffModel($mockFilename, new I18n\Locale('de'));
         $this->model->injectCache($this->mockCache);
         $this->model->injectParser($this->mockXliffParser);
-        $this->inject($this->model, 'i18nLogger', $this->getMock('TYPO3\Flow\Log\LoggerInterface', array(), array(), '', false));
+        $this->inject($this->model, 'i18nLogger', $this->getMockBuilder(LoggerInterface::class)->disableOriginalConstructor()->getMock());
         $this->model->initializeObject();
     }
 
@@ -78,7 +85,7 @@ class XliffModelTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function sourceIsReturnedWhenIdProvidedAndSourceEqualsTargetLanguage()
     {
-        $this->model = new \TYPO3\Flow\I18n\Xliff\XliffModel('foo', new \TYPO3\Flow\I18n\Locale('en_US'));
+        $this->model = new I18n\Xliff\XliffModel('foo', new I18n\Locale('en_US'));
         $this->model->injectCache($this->mockCache);
         $this->model->injectParser($this->mockXliffParser);
         $this->model->initializeObject();
@@ -92,10 +99,10 @@ class XliffModelTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function getTargetBySourceLogsSilentlyIfNoTransUnitsArePresent()
     {
-        $this->mockXliffParser = $this->getMock('TYPO3\Flow\I18n\Xliff\XliffParser');
-        $this->mockXliffParser->expects($this->once())->method('getParsedData')->will($this->returnValue(array()));
+        $this->mockXliffParser = $this->createMock(I18n\Xliff\XliffParser::class);
+        $this->mockXliffParser->expects($this->once())->method('getParsedData')->will($this->returnValue([]));
 
-        $mockLogger = $this->getMock('TYPO3\Flow\Log\LoggerInterface', array(), array(), '', false);
+        $mockLogger = $this->getMockBuilder(LoggerInterface::class)->disableOriginalConstructor()->getMock();
         $mockLogger->expects($this->once())->method('log')->with($this->stringStartsWith('No trans-unit elements were found'), LOG_DEBUG);
 
         $this->model->injectParser($this->mockXliffParser);

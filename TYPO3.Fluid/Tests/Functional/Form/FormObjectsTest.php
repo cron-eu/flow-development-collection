@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Fluid\Tests\Functional\Form;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * Testcase for Standalone View
@@ -58,6 +61,19 @@ class FormObjectsTest extends \TYPO3\Flow\Tests\FunctionalTestCase
 
         $response = $this->browser->submit($form);
         $this->assertSame('Egon Olsen|test@typo3.org', $response->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function multipleCheckboxRendersCorrectFieldNameForEntities()
+    {
+        $postIdentifier = $this->setupDummyPost(true);
+
+        $this->browser->request('http://localhost/test/fluid/formobjects/edit?fooPost=' . $postIdentifier);
+        $form = $this->browser->getForm();
+        $this->assertFalse(isset($form['post']['tags']['__identity']));
+        $this->assertFalse(isset($form['tags']['__identity']));
     }
 
     /**
@@ -330,9 +346,10 @@ class FormObjectsTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     }
 
     /**
+     * @param boolean $withTags
      * @return string UUID of the dummy post
      */
-    protected function setupDummyPost()
+    protected function setupDummyPost($withTags = false)
     {
         $author = new Fixtures\Domain\Model\User();
         $author->setEmailAddress('foo@bar.org');
@@ -340,6 +357,10 @@ class FormObjectsTest extends \TYPO3\Flow\Tests\FunctionalTestCase
         $post->setAuthor($author);
         $post->setName('myName');
         $post->setPrivate(true);
+        if ($withTags === true) {
+            $post->addTag(new Fixtures\Domain\Model\Tag('Tag1'));
+            $post->addTag(new Fixtures\Domain\Model\Tag('Tag2'));
+        }
         $this->persistenceManager->add($post);
         $postIdentifier = $this->persistenceManager->getIdentifierByObject($post);
         $this->persistenceManager->persistAll();

@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Reflection;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -18,7 +21,7 @@ use TYPO3\Flow\Annotations as Flow;
 class PropertyReflection extends \ReflectionProperty
 {
     /**
-     * @var \TYPO3\Flow\Reflection\DocCommentParser: An instance of the doc comment parser
+     * @var DocCommentParser: An instance of the doc comment parser
      */
     protected $docCommentParser;
 
@@ -45,7 +48,7 @@ class PropertyReflection extends \ReflectionProperty
     /**
      * Returns the declaring class
      *
-     * @return \TYPO3\Flow\Reflection\ClassReflection The declaring class
+     * @return ClassReflection The declaring class
      */
     public function getDeclaringClass()
     {
@@ -88,7 +91,7 @@ class PropertyReflection extends \ReflectionProperty
      *
      * @param object $object Instance of the declaring class to read the value from
      * @return mixed Value of the property
-     * @throws \TYPO3\Flow\Reflection\Exception
+     * @throws Exception
      */
     public function getValue($object = null)
     {
@@ -109,12 +112,12 @@ class PropertyReflection extends \ReflectionProperty
      * @param object $object Instance of the declaring class to set the value on
      * @param mixed $value The value to set on the property
      * @return void
-     * @throws \TYPO3\Flow\Reflection\Exception
+     * @throws Exception
      */
     public function setValue($object = null, $value = null)
     {
         if (!is_object($object)) {
-            throw new \TYPO3\Flow\Reflection\Exception('$object is of type ' . gettype($object) . ', instance of class ' . $this->class . ' expected.', 1210859212);
+            throw new Exception('$object is of type ' . gettype($object) . ', instance of class ' . $this->class . ' expected.', 1210859212);
         }
 
         if ($this->isPublic()) {
@@ -129,7 +132,7 @@ class PropertyReflection extends \ReflectionProperty
      * Returns an instance of the doc comment parser and
      * runs the parse() method.
      *
-     * @return \TYPO3\Flow\Reflection\DocCommentParser
+     * @return DocCommentParser
      */
     protected function getDocCommentParser()
     {

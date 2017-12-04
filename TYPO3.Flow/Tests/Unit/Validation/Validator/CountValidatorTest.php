@@ -1,12 +1,17 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Validation\Validator;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Validation\Validator\CountValidator;
 
 require_once('AbstractValidatorTestcase.php');
 
@@ -14,16 +19,16 @@ require_once('AbstractValidatorTestcase.php');
  * Testcase for the count validator
  *
  */
-class CountValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\AbstractValidatorTestcase
+class CountValidatorTest extends AbstractValidatorTestcase
 {
-    protected $validatorClassName = 'TYPO3\Flow\Validation\Validator\CountValidator';
+    protected $validatorClassName = CountValidator::class;
 
     /**
      * @test
      */
     public function countValidatorReturnsNoErrorsIfTheGivenValueIsNull()
     {
-        $this->validatorOptions(array('minimum' => 1, 'maximum' => 10));
+        $this->validatorOptions(['minimum' => 1, 'maximum' => 10]);
         $this->assertFalse($this->validator->validate(null)->hasErrors());
     }
 
@@ -32,7 +37,7 @@ class CountValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\Abs
      */
     public function countValidatorReturnsNoErrorsIfTheGivenStringIsEmpty()
     {
-        $this->validatorOptions(array('minimum' => 1, 'maximum' => 10));
+        $this->validatorOptions(['minimum' => 1, 'maximum' => 10]);
         $this->assertFalse($this->validator->validate('')->hasErrors());
     }
 
@@ -43,11 +48,11 @@ class CountValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\Abs
     {
         $splObjectStorage = new \SplObjectStorage();
         $splObjectStorage->attach(new \stdClass);
-        return array(
-            array(array('Foo', 'Bar')),
-            array(new \ArrayObject(array('Baz', 'Quux'))),
-            array($splObjectStorage)
-        );
+        return [
+            [['Foo', 'Bar']],
+            [new \ArrayObject(['Baz', 'Quux'])],
+            [$splObjectStorage]
+        ];
     }
 
     /**
@@ -56,7 +61,7 @@ class CountValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\Abs
      */
     public function countValidatorReturnsNoErrorsForValidCountables($countable)
     {
-        $this->validatorOptions(array('minimum' => 1, 'maximum' => 10));
+        $this->validatorOptions(['minimum' => 1, 'maximum' => 10]);
         $this->assertFalse($this->validator->validate($countable)->hasErrors());
     }
 
@@ -66,7 +71,7 @@ class CountValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\Abs
      */
     public function countValidatorReturnsErrorsForInvalidCountables($countable)
     {
-        $this->validatorOptions(array('minimum' => 5, 'maximum' => 10));
+        $this->validatorOptions(['minimum' => 5, 'maximum' => 10]);
         $this->assertTrue($this->validator->validate($countable)->hasErrors());
     }
 
@@ -76,11 +81,11 @@ class CountValidatorTest extends \TYPO3\Flow\Tests\Unit\Validation\Validator\Abs
     {
         $splObjectStorage = new \SplObjectStorage();
         $splObjectStorage->attach(new \stdClass);
-        return array(
-            array('Bar'),
-            array(1),
-            array(new \stdClass)
-        );
+        return [
+            ['Bar'],
+            [1],
+            [new \stdClass]
+        ];
     }
 
     /**

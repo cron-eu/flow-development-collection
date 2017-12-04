@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Property;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * Configuration object for the property mapper. This interface specifies all methods
@@ -50,7 +53,7 @@ interface PropertyMappingConfigurationInterface
      * Returns the sub-configuration for the passed $propertyName. Must ALWAYS return a valid configuration object!
      *
      * @param string $propertyName
-     * @return \TYPO3\Flow\Property\PropertyMappingConfigurationInterface the property mapping configuration for the given $propertyName.
+     * @return PropertyMappingConfigurationInterface the property mapping configuration for the given $propertyName.
      * @api
      */
     public function getConfigurationFor($propertyName);
@@ -76,7 +79,7 @@ interface PropertyMappingConfigurationInterface
     /**
      * This method can be used to explicitely force a TypeConverter to be used for this Configuration.
      *
-     * @return \TYPO3\Flow\Property\TypeConverterInterface The type converter to be used for this particular PropertyMappingConfiguration, or NULL if the system-wide configured type converter should be used.
+     * @return TypeConverterInterface The type converter to be used for this particular PropertyMappingConfiguration, or NULL if the system-wide configured type converter should be used.
      * @api
      */
     public function getTypeConverter();

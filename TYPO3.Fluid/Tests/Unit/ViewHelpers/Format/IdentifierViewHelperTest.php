@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Fluid\Tests\Unit\ViewHelpers\Format;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 require_once(__DIR__ . '/../ViewHelperBaseTestcase.php');
 
@@ -35,7 +38,7 @@ class IdentifierViewHelperTest extends ViewHelperBaseTestcase
         parent::setUp();
         $this->viewHelper = $this->getAccessibleMock('TYPO3\Fluid\ViewHelpers\Format\IdentifierViewHelper', array('renderChildren'));
         $this->injectDependenciesIntoViewHelper($this->viewHelper);
-        $this->mockPersistenceManager = $this->getMock('TYPO3\Flow\Persistence\PersistenceManagerInterface');
+        $this->mockPersistenceManager = $this->createMock('TYPO3\Flow\Persistence\PersistenceManagerInterface');
         $this->viewHelper->_set('persistenceManager', $this->mockPersistenceManager);
     }
 

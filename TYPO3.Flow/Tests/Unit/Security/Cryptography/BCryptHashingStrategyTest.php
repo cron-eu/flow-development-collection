@@ -1,18 +1,23 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Security\Cryptography;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Security\Cryptography\BCryptHashingStrategy;
+use TYPO3\Flow\Tests\UnitTestCase;
 
 /**
  * Testcase for the BCryptHashingStrategy
- *
  */
-class BCryptHashingStrategyTest extends \TYPO3\Flow\Tests\UnitTestCase
+class BCryptHashingStrategyTest extends UnitTestCase
 {
     /**
      * Test the implementation using the sample hashes shown on http://php.net/crypt
@@ -31,7 +36,7 @@ class BCryptHashingStrategyTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function hashPasswordWithMatchingPasswordAndParametersSucceeds()
     {
-        $strategy = new \TYPO3\Flow\Security\Cryptography\BCryptHashingStrategy(10);
+        $strategy = new BCryptHashingStrategy(10);
         $derivedKeyWithSalt = $strategy->hashPassword('password');
 
         $this->assertTrue($strategy->validatePassword('password', $derivedKeyWithSalt));
@@ -43,7 +48,7 @@ class BCryptHashingStrategyTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function hashAndValidatePasswordWithNotMatchingPasswordFails()
     {
-        $strategy = new \TYPO3\Flow\Security\Cryptography\BCryptHashingStrategy(10);
+        $strategy = new BCryptHashingStrategy(10);
         $derivedKeyWithSalt = $strategy->hashPassword('password');
 
         $this->assertFalse($strategy->validatePassword('pass', $derivedKeyWithSalt), 'Different password should not match');
@@ -54,9 +59,9 @@ class BCryptHashingStrategyTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function hashAndValidatePasswordWithDifferentCostsMatch()
     {
-        $strategy = new \TYPO3\Flow\Security\Cryptography\BCryptHashingStrategy(10);
+        $strategy = new BCryptHashingStrategy(10);
 
-        $otherStrategy = new \TYPO3\Flow\Security\Cryptography\BCryptHashingStrategy(6);
+        $otherStrategy = new BCryptHashingStrategy(6);
         $derivedKeyWithSalt = $otherStrategy->hashPassword('password');
 
         $this->assertTrue($strategy->validatePassword('password', $derivedKeyWithSalt), 'Hashing strategy should validate password with different cost');
@@ -67,7 +72,7 @@ class BCryptHashingStrategyTest extends \TYPO3\Flow\Tests\UnitTestCase
      */
     public function validatePasswordWithInvalidHashFails()
     {
-        $strategy = new \TYPO3\Flow\Security\Cryptography\BCryptHashingStrategy(10);
+        $strategy = new BCryptHashingStrategy(10);
 
         $this->assertFalse($strategy->validatePassword('password', ''));
         $this->assertFalse($strategy->validatePassword('password', '$1$abc'));

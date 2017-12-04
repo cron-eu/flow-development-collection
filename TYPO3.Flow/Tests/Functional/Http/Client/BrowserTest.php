@@ -1,17 +1,22 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Http\Client;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
+use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
  * Functional tests for the HTTP browser
  */
-class BrowserTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class BrowserTest extends FunctionalTestCase
 {
     /**
      * @var boolean
@@ -27,13 +32,13 @@ class BrowserTest extends \TYPO3\Flow\Tests\FunctionalTestCase
         $this->registerRoute(
             'Functional Test - Http::Client::BrowserTest',
             'test/http/redirecting(/{@action})',
-            array(
+            [
                 '@package' => 'TYPO3.Flow',
                 '@subpackage' => 'Tests\Functional\Http\Fixtures',
                 '@controller' => 'Redirecting',
                 '@action' => 'fromHere',
                 '@format' => 'html'
-            )
+            ]
         );
     }
 

@@ -1,22 +1,28 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Security;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Http\Request;
 use TYPO3\Flow\Http\Uri;
+use TYPO3\Flow\Security\AccountFactory;
+use TYPO3\Flow\Security\AccountRepository;
+use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
  * Functional testcase for certain aspects of CSRF protection.
  *
  * Note that some other parts of this mechanism are tested in a unit testcase.
  */
-class CsrfProtectionTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class CsrfProtectionTest extends FunctionalTestCase
 {
     /**
      * @var boolean
@@ -24,7 +30,7 @@ class CsrfProtectionTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     protected $testableSecurityEnabled = true;
 
     /**
-     * @var \TYPO3\Flow\Tests\Functional\Security\Fixtures\Controller\RestrictedController
+     * @var Fixtures\Controller\RestrictedController
      */
     protected $restrictedController;
 
@@ -35,28 +41,28 @@ class CsrfProtectionTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     {
         parent::setUp();
 
-        $accountRepository = $this->objectManager->get('\TYPO3\Flow\Security\AccountRepository');
-        $accountFactory = $this->objectManager->get('\TYPO3\Flow\Security\AccountFactory');
+        $accountRepository = $this->objectManager->get(AccountRepository::class);
+        $accountFactory = $this->objectManager->get(AccountFactory::class);
 
-        $account = $accountFactory->createAccountWithPassword('admin', 'password', array('TYPO3.Flow:Administrator'), 'UsernamePasswordTestingProvider');
+        $account = $accountFactory->createAccountWithPassword('admin', 'password', ['TYPO3.Flow:Administrator'], 'UsernamePasswordTestingProvider');
         $accountRepository->add($account);
         $this->persistenceManager->persistAll();
 
-        $this->registerRoute('authentication', 'test/security/authentication/usernamepassword(/{@action})', array(
+        $this->registerRoute('authentication', 'test/security/authentication/usernamepassword(/{@action})', [
             '@package' => 'TYPO3.Flow',
             '@subpackage' => 'Tests\Functional\Security\Fixtures',
             '@controller' => 'UsernamePasswordTest',
             '@action' => 'authenticate',
             '@format' => 'html'
-        ));
+        ]);
 
-        $this->registerRoute('controller', 'test/security/restricted(/{@action})', array(
+        $this->registerRoute('controller', 'test/security/restricted(/{@action})', [
             '@package' => 'TYPO3.Flow',
             '@subpackage' => 'Tests\Functional\Security\Fixtures',
             '@controller' => 'Restricted',
             '@action' => 'public',
             '@format' =>'html',
-        ), true
+        ], true
         );
     }
 
@@ -68,7 +74,7 @@ class CsrfProtectionTest extends \TYPO3\Flow\Tests\FunctionalTestCase
         $this->markTestIncomplete('Needs to be implemtend');
         return;
 
-        $arguments = array();
+        $arguments = [];
         $arguments['__authentication']['TYPO3']['Flow']['Security']['Authentication']['Token']['UsernamePassword']['username'] = 'admin';
         $arguments['__authentication']['TYPO3']['Flow']['Security']['Authentication']['Token']['UsernamePassword']['password'] = 'password';
 

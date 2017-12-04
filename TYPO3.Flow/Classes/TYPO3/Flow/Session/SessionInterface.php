@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Session;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * Contract for a session.
@@ -45,7 +48,7 @@ interface SessionInterface
      * Returns the current session ID.
      *
      * @return string The current session ID
-     * @throws \TYPO3\Flow\Session\Exception\SessionNotStartedException
+     * @throws Exception\SessionNotStartedException
      */
     public function getId();
 
@@ -64,7 +67,7 @@ interface SessionInterface
      *
      * @param string $key An identifier for the content stored in the session.
      * @return array The contents associated with the given key
-     * @throws \TYPO3\Flow\Session\Exception\SessionNotStartedException
+     * @throws Exception\SessionNotStartedException
      */
     public function getData($key);
 
@@ -82,7 +85,7 @@ interface SessionInterface
      * @param string $key The key under which the data should be stored
      * @param mixed $data The data to be stored
      * @return void
-     * @throws \TYPO3\Flow\Session\Exception\SessionNotStartedException
+     * @throws Exception\SessionNotStartedException
      */
     public function putData($key, $data);
 
@@ -94,7 +97,7 @@ interface SessionInterface
      *
      * @param string $tag The tag – must match be a valid cache frontend tag
      * @return void
-     * @throws \TYPO3\Flow\Session\Exception\SessionNotStartedException
+     * @throws Exception\SessionNotStartedException
      * @throws \InvalidArgumentException
      * @api
      */
@@ -105,7 +108,7 @@ interface SessionInterface
      *
      * @param string $tag The tag – must match be a valid cache frontend tag
      * @return void
-     * @throws \TYPO3\Flow\Session\Exception\SessionNotStartedException
+     * @throws Exception\SessionNotStartedException
      * @api
      */
     public function removeTag($tag);
@@ -114,7 +117,7 @@ interface SessionInterface
      * Returns the tags this session has been tagged with.
      *
      * @return array The tags or an empty array if there aren't any
-     * @throws \TYPO3\Flow\Session\Exception\SessionNotStartedException
+     * @throws Exception\SessionNotStartedException
      * @api
      */
     public function getTags();
@@ -143,7 +146,7 @@ interface SessionInterface
      * Explicitly writes (persists) and closes the session
      *
      * @return void
-     * @throws \TYPO3\Flow\Session\Exception\SessionNotStartedException
+     * @throws Exception\SessionNotStartedException
      */
     public function close();
 
@@ -152,8 +155,7 @@ interface SessionInterface
      *
      * @param string $reason A reason for destroying the session – used by the LoggingAspect
      * @return void
-     * @throws \TYPO3\Flow\Session\Exception
-     * @throws \TYPO3\Flow\Session\Exception\SessionNotStartedException
+     * @throws Exception\SessionNotStartedException
      */
     public function destroy($reason = null);
 

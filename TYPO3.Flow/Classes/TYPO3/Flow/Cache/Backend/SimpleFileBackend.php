@@ -1,17 +1,24 @@
 <?php
 namespace TYPO3\Flow\Cache\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Cache\CacheManager;
+use TYPO3\Flow\Cache\Exception;
+use TYPO3\Flow\Cache\Exception\InvalidDataException;
 use TYPO3\Flow\Cache\Frontend\PhpFrontend;
 use TYPO3\Flow\Cache\Frontend\FrontendInterface;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Utility\Exception as UtilityException;
+use TYPO3\Flow\Utility\Files;
 use TYPO3\Flow\Utility\Lock\Lock;
 use TYPO3\Flow\Utility\OpcodeCacheHelper;
 
@@ -96,9 +103,9 @@ class SimpleFileBackend extends AbstractBackend implements PhpCapableBackendInte
      * Sets a reference to the cache frontend which uses this backend and
      * initializes the default cache directory.
      *
-     * @param \TYPO3\Flow\Cache\Frontend\FrontendInterface $cache The cache frontend
+     * @param FrontendInterface $cache The cache frontend
      * @return void
-     * @throws \TYPO3\Flow\Cache\Exception
+     * @throws Exception
      */
     public function setCache(FrontendInterface $cache)
     {
@@ -112,24 +119,20 @@ class SimpleFileBackend extends AbstractBackend implements PhpCapableBackendInte
         }
         if (!is_writable($cacheDirectory)) {
             try {
-                \TYPO3\Flow\Utility\Files::createDirectoryRecursively($cacheDirectory);
-            } catch (\TYPO3\Flow\Utility\Exception $exception) {
-                throw new \TYPO3\Flow\Cache\Exception('The cache directory "' . $cacheDirectory . '" could not be created.', 1264426237);
+                Files::createDirectoryRecursively($cacheDirectory);
+            } catch (UtilityException $exception) {
+                throw new Exception('The cache directory "' . $cacheDirectory . '" could not be created.', 1264426237);
             }
         }
         if (!is_dir($cacheDirectory) && !is_link($cacheDirectory)) {
-            throw new \TYPO3\Flow\Cache\Exception('The cache directory "' . $cacheDirectory . '" does not exist.', 1203965199);
+            throw new Exception('The cache directory "' . $cacheDirectory . '" does not exist.', 1203965199);
         }
         if (!is_writable($cacheDirectory)) {
-            throw new \TYPO3\Flow\Cache\Exception('The cache directory "' . $cacheDirectory . '" is not writable.', 1203965200);
+            throw new Exception('The cache directory "' . $cacheDirectory . '" is not writable.', 1203965200);
         }
 
         $this->cacheDirectory = $cacheDirectory;
         $this->cacheEntryFileExtension = ($cache instanceof PhpFrontend) ? '.php' : '';
-
-        if ((strlen($this->cacheDirectory) + 23) > $this->environment->getMaximumPathLength()) {
-            throw new \TYPO3\Flow\Cache\Exception('The length of the temporary cache path "' . $this->cacheDirectory . '" exceeds the maximum path length of ' . ($this->environment->getMaximumPathLength() - 23) . '. Please consider setting the temporaryDirectoryBase option to a shorter path. ', 1248710426);
-        }
     }
 
     /**
@@ -163,15 +166,15 @@ class SimpleFileBackend extends AbstractBackend implements PhpCapableBackendInte
      * @param array $tags Ignored in this type of cache backend
      * @param integer $lifetime Ignored in this type of cache backend
      * @return void
-     * @throws \TYPO3\Flow\Cache\Exception if the directory does not exist or is not writable or exceeds the maximum allowed path length, or if no cache frontend has been set.
-     * @throws \TYPO3\Flow\Cache\Exception\InvalidDataException
+     * @throws Exception if the directory does not exist or is not writable or exceeds the maximum allowed path length, or if no cache frontend has been set.
+     * @throws InvalidDataException
      * @throws \InvalidArgumentException
      * @api
      */
     public function set($entryIdentifier, $data, array $tags = array(), $lifetime = null)
     {
         if (!is_string($data)) {
-            throw new \TYPO3\Flow\Cache\Exception\InvalidDataException('The specified data is of type "' . gettype($data) . '" but a string is expected.', 1334756734);
+            throw new InvalidDataException('The specified data is of type "' . gettype($data) . '" but a string is expected.', 1334756734);
         }
         if ($entryIdentifier !== basename($entryIdentifier)) {
             throw new \InvalidArgumentException('The specified entry identifier must not contain a path segment.', 1334756735);
@@ -181,16 +184,17 @@ class SimpleFileBackend extends AbstractBackend implements PhpCapableBackendInte
         }
 
         $cacheEntryPathAndFilename = $this->cacheDirectory . $entryIdentifier . $this->cacheEntryFileExtension;
-        $lock = new Lock($cacheEntryPathAndFilename);
-        $result = file_put_contents($cacheEntryPathAndFilename, $data);
-        $lock->release();
-        if ($result === false) {
-            throw new \TYPO3\Flow\Cache\Exception('The cache file "' . $cacheEntryPathAndFilename . '" could not be written.', 1334756737);
+        $result = $this->writeCacheFile($cacheEntryPathAndFilename, $data);
+
+        if ($result !== false) {
+            if ($this->cacheEntryFileExtension === '.php') {
+                OpcodeCacheHelper::clearAllActive($cacheEntryPathAndFilename);
+            }
+            return;
         }
 
-        if ($this->cacheEntryFileExtension === '.php') {
-            OpcodeCacheHelper::clearAllActive($cacheEntryPathAndFilename);
-        }
+        $this->throwExceptionIfPathExceedsMaximumLength($cacheEntryPathAndFilename);
+        throw new Exception('The cache file "' . $cacheEntryPathAndFilename . '" could not be written.', 1334756737);
     }
 
     /**
@@ -274,7 +278,7 @@ class SimpleFileBackend extends AbstractBackend implements PhpCapableBackendInte
      */
     public function flush()
     {
-        \TYPO3\Flow\Utility\Files::emptyDirectoryRecursively($this->cacheDirectory);
+        Files::emptyDirectoryRecursively($this->cacheDirectory);
     }
 
     /**
@@ -305,7 +309,7 @@ class SimpleFileBackend extends AbstractBackend implements PhpCapableBackendInte
      *
      * @param string $entryIdentifier The cache entry identifier
      * @return mixed The filenames (including path) as an array if one or more entries could be found, otherwise FALSE
-     * @throws \TYPO3\Flow\Cache\Exception if no frontend has been set
+     * @throws Exception if no frontend has been set
      */
     protected function findCacheFilesByIdentifier($entryIdentifier)
     {
@@ -420,13 +424,30 @@ class SimpleFileBackend extends AbstractBackend implements PhpCapableBackendInte
     }
 
     /**
-     * Generate a temporary file path based on entryIdentifier, microtime and pid if available.
-     *
-     * @param string $entryIdentifier
-     * @return string
+     * @param string $cacheEntryPathAndFilename
+     * @return void
+     * @throws Exception
      */
-    protected function generateTemporaryPathAndFilename($entryIdentifier)
+    protected function throwExceptionIfPathExceedsMaximumLength($cacheEntryPathAndFilename)
     {
-        return $this->cacheDirectory . '.' . $entryIdentifier . '.' . microtime(true) . '-' . (getmypid() ?: 0) . '.tmp';
+        if (strlen($cacheEntryPathAndFilename) > $this->environment->getMaximumPathLength()) {
+            throw new Exception('The length of the cache entry path "' . $cacheEntryPathAndFilename . '" exceeds the maximum path length of ' . $this->environment->getMaximumPathLength() . '. Please consider setting the FLOW_PATH_TEMPORARY_BASE environment variable to a shorter path. ', 1248710426);
+        }
+    }
+
+    /**
+     * Writes the cache data into the given cache file, using locking.
+     *
+     * @param string $cacheEntryPathAndFilename
+     * @param string $data
+     * @return boolean|integer Return value of file_put_contents
+     */
+    protected function writeCacheFile($cacheEntryPathAndFilename, $data)
+    {
+        $lock = new Lock($cacheEntryPathAndFilename);
+        $result = file_put_contents($cacheEntryPathAndFilename, $data);
+        $lock->release();
+
+        return $result;
     }
 }

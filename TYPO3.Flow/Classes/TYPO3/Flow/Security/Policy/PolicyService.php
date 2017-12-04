@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Security\Policy;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Configuration\ConfigurationManager;
@@ -46,12 +49,12 @@ class PolicyService
     /**
      * @var PrivilegeTarget[]
      */
-    protected $privilegeTargets = array();
+    protected $privilegeTargets = [];
 
     /**
      * @var Role[]
      */
-    protected $roles = array();
+    protected $roles = [];
 
     /**
      * @var ObjectManagerInterface
@@ -99,7 +102,7 @@ class PolicyService
 
         $privilegeTargetsForEverybody = $this->privilegeTargets;
 
-        $this->roles = array();
+        $this->roles = [];
         $everybodyRole = new Role('TYPO3.Flow:Everybody');
         $everybodyRole->setAbstract(true);
         if (isset($this->policyConfiguration['roles'])) {
@@ -123,7 +126,7 @@ class PolicyService
                         if (!isset($privilegeConfiguration['permission'])) {
                             throw new SecurityException(sprintf('No permission set for privilegeTarget "%s" in Role "%s"', $privilegeTargetIdentifier, $roleIdentifier), 1395869331);
                         }
-                        $privilegeParameters = isset($privilegeConfiguration['parameters']) ? $privilegeConfiguration['parameters'] : array();
+                        $privilegeParameters = isset($privilegeConfiguration['parameters']) ? $privilegeConfiguration['parameters'] : [];
                         try {
                             $privilege = $privilegeTarget->createPrivilege($privilegeConfiguration['permission'], $privilegeParameters);
                         } catch (\Exception $exception) {
@@ -182,8 +185,8 @@ class PolicyService
                 if (!isset($privilegeTargetConfiguration['matcher'])) {
                     throw new SecurityException(sprintf('No "matcher" configured for privilegeTarget "%s"', $privilegeTargetIdentifier), 1401795388);
                 }
-                $parameterDefinitions = array();
-                $privilegeParameterConfiguration = isset($privilegeTargetConfiguration['parameters']) ? $privilegeTargetConfiguration['parameters'] : array();
+                $parameterDefinitions = [];
+                $privilegeParameterConfiguration = isset($privilegeTargetConfiguration['parameters']) ? $privilegeTargetConfiguration['parameters'] : [];
                 foreach ($privilegeParameterConfiguration as $parameterName => $parameterValue) {
                     if (!isset($privilegeTargetConfiguration['parameters'][$parameterName])) {
                         throw new SecurityException(sprintf('No parameter definition found for parameter "%s" in privilegeTarget "%s"', $parameterName, $privilegeTargetIdentifier), 1395869330);
@@ -253,7 +256,7 @@ class PolicyService
     public function getAllPrivilegesByType($type)
     {
         $this->initialize();
-        $privileges = array();
+        $privileges = [];
         foreach ($this->roles as $role) {
             $privileges = array_merge($privileges, $role->getPrivilegesByType($type));
         }
@@ -292,7 +295,7 @@ class PolicyService
     public function reset()
     {
         $this->initialized = false;
-        $this->roles = array();
+        $this->roles = [];
     }
 
     /**

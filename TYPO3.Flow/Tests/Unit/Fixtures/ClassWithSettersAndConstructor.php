@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Fixtures;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 /**
  * A dummy class with setters for testing data mapping
@@ -24,9 +27,20 @@ class ClassWithSettersAndConstructor
      */
     protected $property2;
 
-    public function __construct($property1)
+
+    /**
+     * @var string
+     */
+    protected $property3;
+
+    /**
+     * @param mixed $property1
+     * @param string $anotherProperty
+     */
+    public function __construct($property1, $anotherProperty = '')
     {
         $this->property1 = $property1;
+        $this->property3 = $anotherProperty;
     }
 
     public function getProperty1()

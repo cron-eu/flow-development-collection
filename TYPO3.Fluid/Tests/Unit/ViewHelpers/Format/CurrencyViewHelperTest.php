@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Fluid\Tests\Unit\ViewHelpers\Format;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Fluid package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Tests\UnitTestCase;
 
@@ -15,14 +18,19 @@ use TYPO3\Flow\Tests\UnitTestCase;
  */
 class CurrencyViewHelperTest extends UnitTestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        $this->viewHelper = $this->getMockBuilder('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper')->setMethods(array('renderChildren'))->getMock();
+    }
+
     /**
      * @test
      */
     public function viewHelperRoundsFloatCorrectly()
     {
-        $viewHelper = $this->getMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
-        $actualResult = $viewHelper->render();
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
+        $actualResult = $this->viewHelper->render();
         $this->assertEquals('123,46', $actualResult);
     }
 
@@ -31,9 +39,8 @@ class CurrencyViewHelperTest extends UnitTestCase
      */
     public function viewHelperRendersCurrencySign()
     {
-        $viewHelper = $this->getMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123));
-        $actualResult = $viewHelper->render('foo');
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123));
+        $actualResult = $this->viewHelper->render('foo');
         $this->assertEquals('123,00 foo', $actualResult);
     }
 
@@ -42,9 +49,8 @@ class CurrencyViewHelperTest extends UnitTestCase
      */
     public function viewHelperRespectsDecimalSeparator()
     {
-        $viewHelper = $this->getMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(12345));
-        $actualResult = $viewHelper->render('', '|');
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(12345));
+        $actualResult = $this->viewHelper->render('', '|');
         $this->assertEquals('12.345|00', $actualResult);
     }
 
@@ -53,9 +59,8 @@ class CurrencyViewHelperTest extends UnitTestCase
      */
     public function viewHelperRespectsThousandsSeparator()
     {
-        $viewHelper = $this->getMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(12345));
-        $actualResult = $viewHelper->render('', ',', '|');
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(12345));
+        $actualResult = $this->viewHelper->render('', ',', '|');
         $this->assertEquals('12|345,00', $actualResult);
     }
 
@@ -64,9 +69,8 @@ class CurrencyViewHelperTest extends UnitTestCase
      */
     public function viewHelperRendersNullValues()
     {
-        $viewHelper = $this->getMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(null));
-        $actualResult = $viewHelper->render();
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(null));
+        $actualResult = $this->viewHelper->render();
         $this->assertEquals('0,00', $actualResult);
     }
 
@@ -75,9 +79,8 @@ class CurrencyViewHelperTest extends UnitTestCase
      */
     public function viewHelperRendersNegativeAmounts()
     {
-        $viewHelper = $this->getMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(-123.456));
-        $actualResult = $viewHelper->render();
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(-123.456));
+        $actualResult = $this->viewHelper->render();
         $this->assertEquals('-123,46', $actualResult);
     }
 
@@ -86,14 +89,12 @@ class CurrencyViewHelperTest extends UnitTestCase
      */
     public function viewHelperUsesNumberFormatterOnGivenLocale()
     {
-        $viewHelper = $this->getAccessibleMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-
-        $mockNumberFormatter = $this->getMock('TYPO3\Flow\I18n\Formatter\NumberFormatter', array('formatCurrencyNumber'));
+        $mockNumberFormatter = $this->getMockBuilder('TYPO3\Flow\I18n\Formatter\NumberFormatter')->setMethods(array('formatCurrencyNumber'))->getMock();
         $mockNumberFormatter->expects($this->once())->method('formatCurrencyNumber');
-        $this->inject($viewHelper, 'numberFormatter', $mockNumberFormatter);
+        $this->inject($this->viewHelper, 'numberFormatter', $mockNumberFormatter);
 
-        $viewHelper->setArguments(array('forceLocale' => 'de_DE'));
-        $viewHelper->render('EUR', '#', '*');
+        $this->viewHelper->setArguments(array('forceLocale' => 'de_DE'));
+        $this->viewHelper->render('EUR', '#', '*');
     }
 
     /**
@@ -101,23 +102,20 @@ class CurrencyViewHelperTest extends UnitTestCase
      */
     public function viewHelperFetchesCurrentLocaleViaI18nService()
     {
-        $viewHelper = $this->getAccessibleMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-
         $localizationConfiguration = new \TYPO3\Flow\I18n\Configuration('de_DE');
 
-        $mockLocalizationService = $this->getMock('TYPO3\Flow\I18n\Service', array('getConfiguration'));
+        $mockLocalizationService = $this->getMockBuilder('TYPO3\Flow\I18n\Service')->setMethods(array('getConfiguration'))->getMock();
         $mockLocalizationService->expects($this->once())->method('getConfiguration')->will($this->returnValue($localizationConfiguration));
-        $this->inject($viewHelper, 'localizationService', $mockLocalizationService);
+        $this->inject($this->viewHelper, 'localizationService', $mockLocalizationService);
 
-        $mockNumberFormatter = $this->getMock('TYPO3\Flow\I18n\Formatter\NumberFormatter', array('formatCurrencyNumber'));
+        $mockNumberFormatter = $this->getMockBuilder('TYPO3\Flow\I18n\Formatter\NumberFormatter')->setMethods(array('formatCurrencyNumber'))->getMock();
         $mockNumberFormatter->expects($this->once())->method('formatCurrencyNumber');
-        $this->inject($viewHelper, 'numberFormatter', $mockNumberFormatter);
+        $this->inject($this->viewHelper, 'numberFormatter', $mockNumberFormatter);
 
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
 
-
-        $viewHelper->setArguments(array('forceLocale' => true));
-        $viewHelper->render('EUR');
+        $this->viewHelper->setArguments(array('forceLocale' => true));
+        $this->viewHelper->render('EUR');
     }
 
     /**
@@ -126,17 +124,15 @@ class CurrencyViewHelperTest extends UnitTestCase
      */
     public function viewHelperThrowsExceptionIfLocaleIsUsedWithoutExplicitCurrencySign()
     {
-        $viewHelper = $this->getAccessibleMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-
         $localizationConfiguration = new \TYPO3\Flow\I18n\Configuration('de_DE');
 
-        $mockLocalizationService = $this->getMock('TYPO3\Flow\I18n\Service', array('getConfiguration'));
+        $mockLocalizationService = $this->getMockBuilder('TYPO3\Flow\I18n\Service')->setMethods(array('getConfiguration'))->getMock();
         $mockLocalizationService->expects($this->once())->method('getConfiguration')->will($this->returnValue($localizationConfiguration));
-        $this->inject($viewHelper, 'localizationService', $mockLocalizationService);
+        $this->inject($this->viewHelper, 'localizationService', $mockLocalizationService);
 
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
-        $viewHelper->setArguments(array('forceLocale' => true));
-        $viewHelper->render();
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
+        $this->viewHelper->setArguments(array('forceLocale' => true));
+        $this->viewHelper->render();
     }
 
     /**
@@ -145,20 +141,18 @@ class CurrencyViewHelperTest extends UnitTestCase
      */
     public function viewHelperConvertsI18nExceptionsIntoViewHelperExceptions()
     {
-        $viewHelper = $this->getAccessibleMock('TYPO3\Fluid\ViewHelpers\Format\CurrencyViewHelper', array('renderChildren'));
-
         $localizationConfiguration = new \TYPO3\Flow\I18n\Configuration('de_DE');
 
-        $mockLocalizationService = $this->getMock('TYPO3\Flow\I18n\Service', array('getConfiguration'));
+        $mockLocalizationService = $this->getMockBuilder('TYPO3\Flow\I18n\Service')->setMethods(array('getConfiguration'))->getMock();
         $mockLocalizationService->expects($this->once())->method('getConfiguration')->will($this->returnValue($localizationConfiguration));
-        $this->inject($viewHelper, 'localizationService', $mockLocalizationService);
+        $this->inject($this->viewHelper, 'localizationService', $mockLocalizationService);
 
-        $mockNumberFormatter = $this->getMock('TYPO3\Flow\I18n\Formatter\NumberFormatter', array('formatCurrencyNumber'));
+        $mockNumberFormatter = $this->getMockBuilder('TYPO3\Flow\I18n\Formatter\NumberFormatter')->setMethods(array('formatCurrencyNumber'))->getMock();
         $mockNumberFormatter->expects($this->once())->method('formatCurrencyNumber')->will($this->throwException(new \TYPO3\Flow\I18n\Exception()));
-        $this->inject($viewHelper, 'numberFormatter', $mockNumberFormatter);
+        $this->inject($this->viewHelper, 'numberFormatter', $mockNumberFormatter);
 
-        $viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
-        $viewHelper->setArguments(array('forceLocale' => true));
-        $viewHelper->render('$');
+        $this->viewHelper->expects($this->once())->method('renderChildren')->will($this->returnValue(123.456));
+        $this->viewHelper->setArguments(array('forceLocale' => true));
+        $this->viewHelper->render('$');
     }
 }

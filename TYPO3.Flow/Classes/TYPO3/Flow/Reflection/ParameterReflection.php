@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Reflection;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -25,7 +28,7 @@ class ParameterReflection extends \ReflectionParameter
     /**
      * Returns the declaring class
      *
-     * @return \TYPO3\Flow\Reflection\ClassReflection The declaring class
+     * @return ClassReflection The declaring class
      */
     public function getDeclaringClass()
     {
@@ -35,7 +38,7 @@ class ParameterReflection extends \ReflectionParameter
     /**
      * Returns the parameter class
      *
-     * @return \TYPO3\Flow\Reflection\ClassReflection The parameter class
+     * @return ClassReflection The parameter class
      */
     public function getClass()
     {

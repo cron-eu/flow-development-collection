@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\Tests\Unit\Cache\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use org\bovigo\vfs\vfsStream;
 use TYPO3\Flow\Cache\Backend\SimpleFileBackend;
@@ -49,15 +52,15 @@ class SimpleFileBackendTest extends UnitTestCase
     {
         vfsStream::setup('Temporary/Directory/');
 
-        $this->mockApplicationContext = $this->getMockBuilder('TYPO3\Flow\Core\ApplicationContext')->disableOriginalConstructor()->getMock();
+        $this->mockApplicationContext = $this->getMockBuilder(\TYPO3\Flow\Core\ApplicationContext::class)->disableOriginalConstructor()->getMock();
 
-        $this->mockEnvironment = $this->getMockBuilder('TYPO3\Flow\Utility\Environment')->disableOriginalConstructor()->getMock();
+        $this->mockEnvironment = $this->getMockBuilder(\TYPO3\Flow\Utility\Environment::class)->disableOriginalConstructor()->getMock();
         $this->mockEnvironment->expects($this->any())->method('getMaximumPathLength')->will($this->returnValue(1024));
         $this->mockEnvironment->expects($this->any())->method('getPathToTemporaryDirectory')->will($this->returnValue('vfs://Temporary/Directory/'));
 
-        $this->mockCacheManager = $this->getMock('TYPO3\Flow\Cache\CacheManager', array(), array(), '', false);
+        $this->mockCacheManager = $this->getMockBuilder(\TYPO3\Flow\Cache\CacheManager::class)->disableOriginalConstructor()->getMock();
 
-        $this->mockCacheFrontend = $this->getMockBuilder('TYPO3\Flow\Cache\Frontend\FrontendInterface')->getMock();
+        $this->mockCacheFrontend = $this->getMockBuilder(\TYPO3\Flow\Cache\Frontend\FrontendInterface::class)->getMock();
     }
 
     /**
@@ -67,7 +70,7 @@ class SimpleFileBackendTest extends UnitTestCase
      * @param FrontendInterface $mockCacheFrontend
      * @return SimpleFileBackend
      */
-    protected function getSimpleFileBackend(array $options = array(), FrontendInterface $mockCacheFrontend = null)
+    protected function getSimpleFileBackend(array $options = [], FrontendInterface $mockCacheFrontend = null)
     {
         $simpleFileBackend = new SimpleFileBackend($this->mockApplicationContext, $options);
         $this->inject($simpleFileBackend, 'environment', $this->mockEnvironment);
@@ -87,23 +90,37 @@ class SimpleFileBackendTest extends UnitTestCase
      */
     public function setCacheThrowsExceptionOnNonWritableDirectory()
     {
-        $this->mockEnvironment = $this->getMockBuilder('TYPO3\Flow\Utility\Environment')->disableOriginalConstructor()->getMock();
+        $this->mockEnvironment = $this->getMockBuilder(\TYPO3\Flow\Utility\Environment::class)->disableOriginalConstructor()->getMock();
         $this->mockEnvironment->expects($this->any())->method('getMaximumPathLength')->will($this->returnValue(1024));
         $this->mockEnvironment->expects($this->any())->method('getPathToTemporaryDirectory')->will($this->returnValue('vfs://non/existing/directory'));
         $this->getSimpleFileBackend();
     }
 
-
     /**
      * @test
      * @expectedException \TYPO3\Flow\Cache\Exception
+     * @expectedExceptionCode 1248710426
      */
-    public function setCacheThrowsExceptionIfCachePathLengthExceedsMaximumPathLength()
+    public function setThrowsExceptionIfCachePathLengthExceedsMaximumPathLength()
     {
-        $this->mockEnvironment = $this->getMockBuilder('TYPO3\Flow\Utility\Environment')->disableOriginalConstructor()->getMock();
-        $this->mockEnvironment->expects($this->any())->method('getMaximumPathLength')->will($this->returnValue(5));
-        $this->mockEnvironment->expects($this->any())->method('getPathToTemporaryDirectory')->will($this->returnValue('vfs://Temporary/Directory/'));
-        $this->getSimpleFileBackend();
+        $cachePath = 'vfs://Foo';
+
+        $mockEnvironment = $this->getMockBuilder(\TYPO3\Flow\Utility\Environment::class)->disableOriginalConstructor()->getMock();
+        $mockEnvironment->expects($this->any())->method('getMaximumPathLength')->will($this->returnValue(5));
+        $mockEnvironment->expects($this->any())->method('getPathToTemporaryDirectory')->will($this->returnValue($cachePath));
+
+        $mockCacheManager = $this->getMockBuilder(\TYPO3\Flow\Cache\CacheManager::class)->disableOriginalConstructor()->getMock();
+        $mockCacheManager->expects($this->any())->method('isCachePersistent')->will($this->returnValue(false));
+
+        $entryIdentifier = 'BackendFileTest';
+
+        $backend = $this->getMockBuilder(\TYPO3\Flow\Cache\Backend\SimpleFileBackend::class)->setMethods(['setTag', 'writeCacheFile'])->disableOriginalConstructor()->getMock();
+        $backend->expects($this->once())->method('writeCacheFile')->willReturn(false);
+        $backend->injectCacheManager($mockCacheManager);
+        $backend->injectEnvironment($mockEnvironment);
+        $backend->setCacheDirectory($cachePath);
+
+        $backend->set($entryIdentifier, 'cache data');
     }
 
     /**
@@ -143,10 +160,10 @@ class SimpleFileBackendTest extends UnitTestCase
     public function aDedicatedCacheDirectoryIsUsedForCodeCaches()
     {
         /** @var PhpFrontend|\PHPUnit_Framework_MockObject_MockObject $mockPhpCacheFrontend */
-        $mockPhpCacheFrontend = $this->getMockBuilder('TYPO3\Flow\Cache\Frontend\PhpFrontend')->disableOriginalConstructor()->getMock();
+        $mockPhpCacheFrontend = $this->getMockBuilder(\TYPO3\Flow\Cache\Frontend\PhpFrontend::class)->disableOriginalConstructor()->getMock();
         $mockPhpCacheFrontend->expects($this->any())->method('getIdentifier')->will($this->returnValue('SomePhpCache'));
 
-        $mockEnvironment = $this->getMock('TYPO3\Flow\Utility\Environment', array(), array(), '', false);
+        $mockEnvironment = $this->getMockBuilder(\TYPO3\Flow\Utility\Environment::class)->disableOriginalConstructor()->getMock();
         $mockEnvironment->expects($this->any())->method('getPathToTemporaryDirectory')->will($this->returnValue('vfs://Foo/'));
         $mockEnvironment->expects($this->any())->method('getMaximumPathLength')->will($this->returnValue(1024));
 
@@ -154,7 +171,7 @@ class SimpleFileBackendTest extends UnitTestCase
         // createDirectoryRecursively() in the setCache method.
         mkdir('vfs://Temporary/Directory/Cache');
 
-        $simpleFileBackend = $this->getSimpleFileBackend(array(), $mockPhpCacheFrontend);
+        $simpleFileBackend = $this->getSimpleFileBackend([], $mockPhpCacheFrontend);
         $this->assertEquals('vfs://Temporary/Directory/Cache/Code/SomePhpCache/', $simpleFileBackend->getCacheDirectory());
     }
 
@@ -182,7 +199,7 @@ class SimpleFileBackendTest extends UnitTestCase
     public function setThrowsExceptionIfDataIsNotAString()
     {
         $simpleFileBackend = $this->getSimpleFileBackend();
-        $simpleFileBackend->set('SomeIdentifier', array('not a string'));
+        $simpleFileBackend->set('SomeIdentifier', ['not a string']);
     }
 
     /**
@@ -312,20 +329,20 @@ class SimpleFileBackendTest extends UnitTestCase
      */
     public function invalidEntryIdentifiers()
     {
-        return array(
-            'trailing slash' => array('/myIdentifer'),
-            'trailing dot and slash' => array('./myIdentifer'),
-            'trailing two dots and slash' => array('../myIdentifier'),
-            'trailing with multiple dots and slashes' => array('.././../myIdentifier'),
-            'slash in middle part' => array('my/Identifier'),
-            'dot and slash in middle part' => array('my./Identifier'),
-            'two dots and slash in middle part' => array('my../Identifier'),
-            'multiple dots and slashes in middle part' => array('my.././../Identifier'),
-            'pending slash' => array('myIdentifier/'),
-            'pending dot and slash' => array('myIdentifier./'),
-            'pending dots and slash' => array('myIdentifier../'),
-            'pending multiple dots and slashes' => array('myIdentifier.././../'),
-        );
+        return [
+            'trailing slash' => ['/myIdentifer'],
+            'trailing dot and slash' => ['./myIdentifer'],
+            'trailing two dots and slash' => ['../myIdentifier'],
+            'trailing with multiple dots and slashes' => ['.././../myIdentifier'],
+            'slash in middle part' => ['my/Identifier'],
+            'dot and slash in middle part' => ['my./Identifier'],
+            'two dots and slash in middle part' => ['my../Identifier'],
+            'multiple dots and slashes in middle part' => ['my.././../Identifier'],
+            'pending slash' => ['myIdentifier/'],
+            'pending dot and slash' => ['myIdentifier./'],
+            'pending dots and slash' => ['myIdentifier../'],
+            'pending multiple dots and slashes' => ['myIdentifier.././../'],
+        ];
     }
 
     /**
@@ -485,7 +502,7 @@ class SimpleFileBackendTest extends UnitTestCase
             $simpleFileBackend->set($entryIdentifier, $data);
         }
 
-        $entries = array();
+        $entries = [];
         foreach ($simpleFileBackend as $entryIdentifier => $data) {
             $entries[$entryIdentifier] = $data;
         }

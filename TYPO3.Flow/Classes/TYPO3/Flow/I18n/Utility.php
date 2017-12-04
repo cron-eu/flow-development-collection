@@ -1,12 +1,15 @@
 <?php
 namespace TYPO3\Flow\I18n;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Annotations as Flow;
 
@@ -44,7 +47,7 @@ class Utility
     public static function parseAcceptLanguageHeader($acceptLanguageHeader)
     {
         $acceptLanguageHeader = str_replace(' ', '', $acceptLanguageHeader);
-        $matchingLanguages = array();
+        $matchingLanguages = [];
 
         if (preg_match_all(self::PATTERN_MATCH_ACCEPTLANGUAGE, $acceptLanguageHeader, $matches, \PREG_PATTERN_ORDER) !== false) {
             foreach ($matches[1] as $localeIdentifier) {
@@ -96,7 +99,7 @@ class Utility
 
         $filenameParts = explode('.', $filename);
 
-        if (in_array($filenameParts[count($filenameParts) - 2], array('php', 'rss', 'xml'))) {
+        if (in_array($filenameParts[count($filenameParts) - 2], ['php', 'rss', 'xml'])) {
             return false;
         } elseif (count($filenameParts) === 2 && preg_match(Locale::PATTERN_MATCH_LOCALEIDENTIFIER, $filenameParts[0]) === 1) {
             return $filenameParts[0];

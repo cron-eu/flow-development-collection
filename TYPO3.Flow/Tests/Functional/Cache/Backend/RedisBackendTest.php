@@ -1,15 +1,20 @@
 <?php
 namespace TYPO3\Flow\Tests\Functional\Cache\Backend;
 
-/*                                                                        *
- * This script belongs to the Flow framework.                             *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the MIT license.                                          *
- *                                                                        */
+/*
+ * This file is part of the TYPO3.Flow package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use TYPO3\Flow\Cache\Backend\RedisBackend;
+use TYPO3\Flow\Cache\Frontend\FrontendInterface;
 use TYPO3\Flow\Core\ApplicationContext;
+use TYPO3\Flow\Tests\FunctionalTestCase;
 
 /**
  * Testcase for the redis cache backend
@@ -19,10 +24,12 @@ use TYPO3\Flow\Core\ApplicationContext;
  * no side effects on non-related cache entries.
  *
  * Tests require Redis listening on 127.0.0.1:6379.
+ *
  * @requires extension redis
  */
-class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
+class RedisBackendTest extends FunctionalTestCase
 {
+
     /**
      * @var RedisBackend
      */
@@ -51,9 +58,9 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
             $this->markTestSkipped('redis server not reachable');
         }
         $this->backend = new RedisBackend(
-            new ApplicationContext('Testing'), array('hostname' => '127.0.0.1', 'database' => 0)
+            new ApplicationContext('Testing'), ['hostname' => '127.0.0.1', 'database' => 0]
         );
-        $this->cache = $this->getMock('\TYPO3\Flow\Cache\Frontend\FrontendInterface');
+        $this->cache = $this->createMock(FrontendInterface::class);
         $this->cache->expects($this->any())->method('getIdentifier')->will($this->returnValue('TestCache'));
         $this->backend->setCache($this->cache);
         $this->backend->flush();
@@ -61,6 +68,7 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
 
     /**
      * Tear down test case
+     *
      * @return void
      */
     public function tearDown()
@@ -84,11 +92,11 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
      */
     public function setAddsTags()
     {
-        $this->backend->set('some_entry', 'foo', array('tag1', 'tag2'));
-        $this->backend->set('some_other_entry', 'foo', array('tag2', 'tag3'));
+        $this->backend->set('some_entry', 'foo', ['tag1', 'tag2']);
+        $this->backend->set('some_other_entry', 'foo', ['tag2', 'tag3']);
 
-        $this->assertEquals(array('some_entry'), $this->backend->findIdentifiersByTag('tag1'));
-        $expected = array('some_entry', 'some_other_entry');
+        $this->assertEquals(['some_entry'], $this->backend->findIdentifiersByTag('tag1'));
+        $expected = ['some_entry', 'some_other_entry'];
         $actual = $this->backend->findIdentifiersByTag('tag2');
 
         // since Redis does not garantuee the order of values in sets, manually sort the array for comparison
@@ -96,7 +104,23 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
         $actual = array_values($actual);
 
         $this->assertEquals($expected, $actual);
-        $this->assertEquals(array('some_other_entry'), $this->backend->findIdentifiersByTag('tag3'));
+        $this->assertEquals(['some_other_entry'], $this->backend->findIdentifiersByTag('tag3'));
+    }
+
+    /**
+     * @test
+     */
+    public function setDoesNotAddMultipleEntries()
+    {
+        $this->backend->set('some_entry', 'foo');
+        $this->backend->set('some_entry', 'bar');
+
+        $entryIdentifiers = [];
+        foreach ($this->backend as $entryIdentifier => $entryValue) {
+            $entryIdentifiers[] = $entryIdentifier;
+        }
+
+        $this->assertEquals(['some_entry'], $entryIdentifiers);
     }
 
     /**
@@ -107,7 +131,7 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
         for ($i = 0; $i < 100; $i++) {
             $this->backend->set('entry_' . $i, 'foo');
         }
-        $actualEntries = array();
+        $actualEntries = [];
         foreach ($this->backend as $key => $value) {
             $actualEntries[] = $key;
         }
@@ -138,10 +162,10 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     public function flushByTagFlushesEntryByTag()
     {
         for ($i = 0; $i < 10; $i++) {
-            $this->backend->set('entry_' . $i, 'foo', array('tag1', 'tag2'));
+            $this->backend->set('entry_' . $i, 'foo', ['tag1', 'tag2']);
         }
         for ($i = 10; $i < 20; $i++) {
-            $this->backend->set('entry_' . $i, 'foo', array('tag2'));
+            $this->backend->set('entry_' . $i, 'foo', ['tag2']);
         }
         $this->assertCount(10, $this->backend->findIdentifiersByTag('tag1'));
         $this->assertCount(20, $this->backend->findIdentifiersByTag('tag2'));
@@ -155,10 +179,27 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     /**
      * @test
      */
+    public function flushByTagRemovesEntries()
+    {
+        $this->backend->set('some_entry', 'foo', ['tag1', 'tag2']);
+
+        $this->backend->flushByTag('tag1');
+
+        $entryIdentifiers = [];
+        foreach ($this->backend as $entryIdentifier => $entryValue) {
+            $entryIdentifiers[] = $entryIdentifier;
+        }
+
+        $this->assertEquals([], $entryIdentifiers);
+    }
+
+    /**
+     * @test
+     */
     public function flushFlushesCache()
     {
         for ($i = 0; $i < 10; $i++) {
-            $this->backend->set('entry_' . $i, 'foo', array('tag1'));
+            $this->backend->set('entry_' . $i, 'foo', ['tag1']);
         }
         $this->assertTrue($this->backend->has('entry_5'));
         $this->backend->flush();
@@ -171,11 +212,11 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
     public function removeRemovesEntryFromCache()
     {
         for ($i = 0; $i < 10; $i++) {
-            $this->backend->set('entry_' . $i, 'foo', array('tag1'));
+            $this->backend->set('entry_' . $i, 'foo', ['tag1']);
         }
         $this->assertCount(10, $this->backend->findIdentifiersByTag('tag1'));
         $this->assertEquals('foo', $this->backend->get('entry_1'));
-        $actualEntries = array();
+        $actualEntries = [];
         foreach ($this->backend as $key => $value) {
             $actualEntries[] = $key;
         }
@@ -184,10 +225,26 @@ class RedisBackendTest extends \TYPO3\Flow\Tests\FunctionalTestCase
         $this->backend->remove('entry_3');
         $this->assertCount(9, $this->backend->findIdentifiersByTag('tag1'));
         $this->assertFalse($this->backend->get('entry_3'));
-        $actualEntries = array();
+        $actualEntries = [];
         foreach ($this->backend as $key => $value) {
             $actualEntries[] = $key;
         }
         $this->assertCount(9, $actualEntries);
+    }
+
+    /**
+     * @test
+     */
+    public function expiredEntriesAreSkippedWhenIterating()
+    {
+        $this->backend->set('entry1', 'foo', [], 1);
+        sleep(2);
+        $this->assertFalse($this->backend->has('entry1'));
+
+        $actualEntries = [];
+        foreach ($this->backend as $key => $value) {
+            $actualEntries[] = $key;
+        }
+        $this->assertEmpty($actualEntries, 'Entries should be empty');
     }
 }
