@@ -14,6 +14,7 @@ use TYPO3\Flow\Exception;
 use TYPO3\Flow\Object\ObjectManagerInterface;
 use TYPO3\Flow\Package\PackageManagerInterface;
 use TYPO3\Flow\Persistence\PersistenceManagerInterface;
+use TYPO3\Flow\Resource\Collection;
 use TYPO3\Flow\Resource\CollectionInterface;
 use TYPO3\Flow\Resource\ResourceManager;
 use TYPO3\Flow\Resource\ResourceRepository;
@@ -81,7 +82,13 @@ class ResourceCommandController extends CommandController
             foreach ($collections as $collection) {
                 /** @var CollectionInterface $collection */
                 $this->outputLine('Publishing resources of collection "%s"', array($collection->getName()));
-                $collection->publish();
+                /** @var \TYPO3\Flow\Resource\Collection $collection */
+                $totalCount = count($collection->findResources());
+                $this->output->progressStart($totalCount);
+                $collection->publish(function() {
+                    $this->output->progressAdvance();
+                });
+                $this->output->progressFinish();
             }
         } catch (Exception $exception) {
             $this->outputLine();

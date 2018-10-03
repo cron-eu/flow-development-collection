@@ -71,7 +71,7 @@ interface CollectionInterface
      *
      * @return void
      */
-    public function publish();
+    public function publish($progressFn);
 
     /**
      * Returns all internal data objects of the storage attached to this collection.

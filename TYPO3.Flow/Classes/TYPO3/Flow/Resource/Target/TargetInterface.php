@@ -30,7 +30,7 @@ interface TargetInterface
      * @param Collection $collection The collection to publish
      * @return void
      */
-    public function publishCollection(Collection $collection);
+    public function publishCollection(Collection $collection, $progressFn);
 
     /**
      * Publishes the given persistent resource from the given storage

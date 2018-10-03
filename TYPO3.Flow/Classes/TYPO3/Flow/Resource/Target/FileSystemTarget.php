@@ -155,7 +155,7 @@ class FileSystemTarget implements TargetInterface
      * @return void
      * @throws Exception
      */
-    public function publishCollection(Collection $collection)
+    public function publishCollection(Collection $collection, $progressFn)
     {
         foreach ($collection->findResources() as $resource) {
             /** @var \TYPO3\Flow\Resource\Resource $resource */
@@ -172,6 +172,9 @@ class FileSystemTarget implements TargetInterface
                 throw new Exception(sprintf('Could not publish resource %s with SHA1 hash %s of collection %s because there seems to be no corresponding data in the storage.', $object->getFilename(), $object->getSha1(), $collection->getName()), 1417168142);
             }
             $this->publishFile($sourceStream, $this->getRelativePublicationPathAndFilename($object));
+            if ($progressFn) {
+                $progressFn();
+            }
             fclose($sourceStream);
         }
     }
