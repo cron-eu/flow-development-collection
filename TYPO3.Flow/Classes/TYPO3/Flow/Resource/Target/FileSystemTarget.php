@@ -177,13 +177,14 @@ class FileSystemTarget implements TargetInterface
             /** @var \TYPO3\Flow\Resource\Storage\Object $object */
             $sourceStream = $object->getStream();
             if ($sourceStream === false) {
-                throw new Exception(sprintf('Could not publish resource %s with SHA1 hash %s of collection %s because there seems to be no corresponding data in the storage.', $object->getFilename(), $object->getSha1(), $collection->getName()), 1417168142);
+                $this->systemLogger->log(sprintf('Could not publish resource %s with SHA1 hash %s of collection %s because there seems to be no corresponding data in the storage.', $object->getFilename(), $object->getSha1(), $collection->getName()), LOG_ERR);
+            } else {
+                $this->publishFile($sourceStream, $this->getRelativePublicationPathAndFilename($object));
+                fclose($sourceStream);
             }
-            $this->publishFile($sourceStream, $this->getRelativePublicationPathAndFilename($object));
             if ($progressFn) {
                 $progressFn();
             }
-            fclose($sourceStream);
         }
     }
 
