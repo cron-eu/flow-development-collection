@@ -163,6 +163,7 @@ class FileSystemTarget implements TargetInterface
         /** @var Query $query */
         $query = $collection->findResources();
         $dquery = $query->getQueryBuilder()->getQuery();
+        $em = $query->getQueryBuilder()->getEntityManager();
 
         foreach ($dquery->iterate(null, \Doctrine\ORM\Query::HYDRATE_OBJECT) as $resource) {
             $resource = $resource[0];
@@ -182,6 +183,10 @@ class FileSystemTarget implements TargetInterface
                 $this->publishFile($sourceStream, $this->getRelativePublicationPathAndFilename($object));
                 fclose($sourceStream);
             }
+
+            // detach from Doctrine, so that it can be GC'd immediately
+            $em->detach($resource);
+
             if ($progressFn) {
                 $progressFn();
             }
