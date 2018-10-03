@@ -164,7 +164,8 @@ class FileSystemTarget implements TargetInterface
         $query = $collection->findResources();
         $dquery = $query->getQueryBuilder()->getQuery();
 
-        foreach ($dquery->execute() as $resource) {
+        foreach ($dquery->iterate(null, \Doctrine\ORM\Query::HYDRATE_OBJECT) as $resource) {
+            $resource = $resource[0];
             /** @var \TYPO3\Flow\Resource\Resource $resource */
             $object = new Object();
             $object->setFilename($resource->getFilename());
