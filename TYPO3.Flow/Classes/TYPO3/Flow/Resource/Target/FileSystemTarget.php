@@ -15,6 +15,7 @@ use TYPO3\Flow\Resource\Collection;
 use TYPO3\Flow\Resource\CollectionInterface;
 use TYPO3\Flow\Resource\Resource;
 use TYPO3\Flow\Resource\ResourceMetaDataInterface;
+use TYPO3\Flow\Resource\Storage\Object;
 use TYPO3\Flow\Utility\Files;
 
 /**
@@ -156,7 +157,15 @@ class FileSystemTarget implements TargetInterface
      */
     public function publishCollection(Collection $collection)
     {
-        foreach ($collection->getObjects() as $object) {
+        foreach ($collection->findResources() as $resource) {
+            /** @var \TYPO3\Flow\Resource\Resource $resource */
+            $object = new Object();
+            $object->setFilename($resource->getFilename());
+            $object->setSha1($resource->getSha1());
+            $object->setMd5($resource->getMd5());
+            $object->setFileSize($resource->getFileSize());
+            $object->setStream(function () use ($resource, $collection) { return $collection->getStorage()->getStreamByResource($resource); });
+
             /** @var \TYPO3\Flow\Resource\Storage\Object $object */
             $sourceStream = $object->getStream();
             if ($sourceStream === false) {

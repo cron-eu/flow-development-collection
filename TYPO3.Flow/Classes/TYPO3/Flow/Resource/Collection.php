@@ -168,6 +168,10 @@ class Collection implements CollectionInterface
         return $objects;
     }
 
+    public function findResources() {
+        return $this->storage->findResources($this);
+    }
+
     /**
      * Returns a stream handle of the given persistent resource which allows for opening / copying the resource's
      * data. Note that this stream handle may only be used read-only.

@@ -160,6 +160,14 @@ class FileSystemStorage implements StorageInterface
     }
 
     /**
+     * @param CollectionInterface $collection
+     * @return \Traversable<\TYPO3\Flow\Resource\Resource>
+     */
+    public function findResources(CollectionInterface $collection) {
+        return $this->resourceRepository->findByCollectionName($collection->getName());
+    }
+
+    /**
      * Determines and returns the absolute path and filename for a storage file identified by the given SHA1 hash.
      *
      * This function assures a nested directory structure in order to avoid thousands of files in a single directory
