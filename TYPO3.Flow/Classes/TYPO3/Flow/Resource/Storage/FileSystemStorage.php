@@ -9,6 +9,11 @@ namespace TYPO3\Flow\Resource\Storage;
  *                                                                        */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Persistence\Doctrine\Query;
+use TYPO3\Flow\Persistence\Doctrine\QueryResult;
+use TYPO3\Flow\Persistence\Doctrine\Repository;
+use TYPO3\Flow\Persistence\QueryInterface;
+use TYPO3\Flow\Persistence\QueryResultInterface;
 use TYPO3\Flow\Resource\CollectionInterface;
 use TYPO3\Flow\Resource\Resource;
 use TYPO3\Flow\Resource\ResourceManager;
@@ -161,10 +166,14 @@ class FileSystemStorage implements StorageInterface
 
     /**
      * @param CollectionInterface $collection
-     * @return \Traversable<\TYPO3\Flow\Resource\Resource>
+     * @return QueryInterface
      */
     public function findResources(CollectionInterface $collection) {
-        return $this->resourceRepository->findByCollectionName($collection->getName());
+        /** @var Repository $repository */
+        $repository = $this->resourceRepository;
+        /** @var Query $query */
+        $query = $repository->createQuery();
+        return $query->matching($query->equals('collectionName', $collection->getName(), true));
     }
 
     /**
