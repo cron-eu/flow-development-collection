@@ -11,6 +11,7 @@ namespace TYPO3\Flow\Resource\Target;
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Http\HttpRequestHandlerInterface;
 use TYPO3\Flow\Http\Request;
+use TYPO3\Flow\Persistence\Doctrine\QueryResult;
 use TYPO3\Flow\Resource\Collection;
 use TYPO3\Flow\Resource\CollectionInterface;
 use TYPO3\Flow\Resource\Resource;
@@ -157,7 +158,11 @@ class FileSystemTarget implements TargetInterface
      */
     public function publishCollection(Collection $collection, $progressFn)
     {
-        foreach ($collection->findResources() as $resource) {
+        /** @var QueryResult $findResult */
+        $findResult = $collection->findResources();
+        $findResult->rewind();
+        while($findResult->valid()) {
+            $resource = $findResult->current();
             /** @var \TYPO3\Flow\Resource\Resource $resource */
             $object = new Object();
             $object->setFilename($resource->getFilename());
@@ -176,6 +181,8 @@ class FileSystemTarget implements TargetInterface
                 $progressFn();
             }
             fclose($sourceStream);
+
+            $findResult->next();
         }
     }
 
