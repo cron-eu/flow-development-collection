@@ -139,7 +139,7 @@ class Collection implements CollectionInterface
      *
      * @return void
      */
-    public function publish($progressFn)
+    public function publish($progressFn = null)
     {
         $this->target->publishCollection($this, $progressFn);
     }
