@@ -64,11 +64,15 @@ class ResourceCommandController extends CommandController
      * to their respective configured publishing targets.
      *
      * @param string $collection If specified, only resources of this collection are published. Example: 'persistent'
+     * @param string $newerThan process only resources newer than the specified time stamp (Format must be parseable by new \DateTime)
      * @return void
      */
-    public function publishCommand($collection = null)
+    public function publishCommand($collection = null, $newerThan = null)
     {
         try {
+
+            $newerThan = $newerThan ? new \DateTime($newerThan) : null;
+
             if ($collection === null) {
                 $collections = $this->resourceManager->getCollections();
             } else {
@@ -85,11 +89,15 @@ class ResourceCommandController extends CommandController
                 $this->outputLine('Publishing resources of collection "%s"', array($collection->getName()));
                 /** @var \TYPO3\Flow\Resource\Collection $collection */
                 /** @var QueryResult $findResourcesResult */
-                $findResourcesResult = $collection->findResources();
+                $findResourcesResult = $collection->findResources($newerThan);
                 $this->output->progressStart($findResourcesResult->count());
-                $collection->publish(function() {
-                    $this->output->progressAdvance();
-                });
+                if ($collection->getTarget() instanceof \TYPO3\Flow\Resource\Target\FileSystemSymlinkTarget) {
+                    $collection->publish(function() {
+                        $this->output->progressAdvance();
+                    }, $newerThan);
+                } else {
+                    $collection->publish();
+                }
                 $this->output->progressFinish();
             }
         } catch (Exception $exception) {

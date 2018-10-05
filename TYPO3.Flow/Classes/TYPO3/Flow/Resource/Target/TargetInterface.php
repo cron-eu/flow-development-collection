@@ -28,9 +28,11 @@ interface TargetInterface
      * Publishes the whole collection to this target
      *
      * @param Collection $collection The collection to publish
+     * @param \Closure $progressFn
+     * @param \DateTime $newerThan
      * @return void
      */
-    public function publishCollection(Collection $collection, $progressFn);
+    public function publishCollection(Collection $collection, $progressFn = null, $newerThan = null);
 
     /**
      * Publishes the given persistent resource from the given storage

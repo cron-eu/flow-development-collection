@@ -166,14 +166,28 @@ class FileSystemStorage implements StorageInterface
 
     /**
      * @param CollectionInterface $collection
+     * @param \DateTime newerThan
      * @return QueryInterface
      */
-    public function findResources(CollectionInterface $collection) {
+    public function findResources(CollectionInterface $collection, \DateTime $newerThan = null) {
+
         /** @var Repository $repository */
         $repository = $this->resourceRepository;
         /** @var Query $query */
         $query = $repository->createQuery();
-        return $query->matching($query->equals('collectionName', $collection->getName(), true));
+        $constraints = [
+            $query->equals('collectionName', $collection->getName(), true)
+        ];
+
+        if ($newerThan) {
+            $constraints[] =
+                $query->logicalOr(
+                    $query->greaterThan('lastPublishedDateTime', $newerThan),
+                    $query->equals('lastPublishedDateTime', null)
+                );
+        }
+
+        return $query->matching($query->logicalAnd($constraints));
     }
 
     /**

@@ -155,13 +155,15 @@ class FileSystemTarget implements TargetInterface
      * Publishes the whole collection to this target
      *
      * @param \TYPO3\Flow\Resource\Collection $collection The collection to publish
+     * @param \Closure $progressFn
+     * @param \DateTime $newerThan
      * @return void
      * @throws Exception
      */
-    public function publishCollection(Collection $collection, $progressFn)
+    public function publishCollection(Collection $collection, $progressFn = null, $newerThan = null)
     {
         /** @var Query $query */
-        $query = $collection->findResources();
+        $query = $collection->findResources($newerThan);
         $dquery = $query->getQueryBuilder()->getQuery();
         $em = $query->getQueryBuilder()->getEntityManager();
 
