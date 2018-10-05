@@ -81,6 +81,14 @@ class Resource implements ResourceMetaDataInterface, CacheAwareInterface
     protected $md5;
 
     /**
+     * Timestamp when this resource was last published
+     *
+     * @var \DateTime
+     * @ORM\Column(nullable=true)
+     */
+    protected $lastPublishedDateTime;
+
+    /**
      * As soon as the Resource has been published, modifying this object is not allowed
      *
      * @Flow\Transient
@@ -363,6 +371,22 @@ class Resource implements ResourceMetaDataInterface, CacheAwareInterface
     {
         $this->throwExceptionIfProtected();
         $this->md5 = $md5;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getLastPublishedDateTime()
+    {
+        return $this->lastPublishedDateTime;
+    }
+
+    /**
+     * @param \DateTime $lastPublishedDateTime
+     */
+    public function setLastPublishedDateTime($lastPublishedDateTime)
+    {
+        $this->lastPublishedDateTime = $lastPublishedDateTime;
     }
 
     /**
