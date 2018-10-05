@@ -183,9 +183,9 @@ class FileSystemTarget implements TargetInterface
                 $this->publishFile($sourceStream, $this->getRelativePublicationPathAndFilename($object));
                 fclose($sourceStream);
                 $resource->setLastPublishedDateTime(new \DateTime());
+                $em->flush($resource);
             }
 
-            $em->flush($resource);
             // detach from Doctrine, so that it can be GC'd immediately
             $em->detach($resource);
 
@@ -211,7 +211,6 @@ class FileSystemTarget implements TargetInterface
         }
         $this->publishFile($sourceStream, $this->getRelativePublicationPathAndFilename($resource));
         fclose($sourceStream);
-        $resource->setLastPublishedDateTime(new \DateTime());
     }
 
     /**
