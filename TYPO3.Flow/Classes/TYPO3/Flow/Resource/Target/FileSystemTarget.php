@@ -97,6 +97,11 @@ class FileSystemTarget implements TargetInterface
     protected $systemLogger;
 
     /**
+     * @var bool
+     */
+    public $disableLogging = false;
+
+    /**
      * Constructor
      *
      * @param string $name Name of this target instance, according to the resource settings
@@ -167,6 +172,7 @@ class FileSystemTarget implements TargetInterface
         $dquery = $query->getQueryBuilder()->getQuery();
         $dquery->useResultCache(false);
         $em = $query->getQueryBuilder()->getEntityManager();
+        $this->disableLogging = true;
 
         foreach ($dquery->iterate(null, \Doctrine\ORM\Query::HYDRATE_OBJECT) as $resource) {
             $resource = $resource[0];
@@ -298,7 +304,9 @@ class FileSystemTarget implements TargetInterface
             throw new Exception(sprintf('Could not publish "%s" into resource publishing target "%s" because the source file could not be copied to the target location.', $sourceStream, $this->name), 1375258399, (isset($exception) ? $exception : null));
         }
 
-        $this->systemLogger->log(sprintf('FileSystemTarget: Published file. (target: %s, file: %s)', $this->name, $relativeTargetPathAndFilename), LOG_DEBUG);
+        if (!$this->disableLogging) {
+            $this->systemLogger->log(sprintf('FileSystemTarget: Published file. (target: %s, file: %s)', $this->name, $relativeTargetPathAndFilename), LOG_DEBUG);
+        }
     }
 
     /**
