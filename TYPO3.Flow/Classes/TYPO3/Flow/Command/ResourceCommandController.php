@@ -135,12 +135,31 @@ class ResourceCommandController extends CommandController
 
         $brokenResources = array();
         $relatedAssets = new \SplObjectStorage();
-        foreach ($this->resourceRepository->findAll() as $resource) {
-            $this->output->progressAdvance(1);
-            /* @var \TYPO3\Flow\Resource\Resource $resource */
-            $stream = $resource->getStream();
-            if (!is_resource($stream)) {
-                $brokenResources[] = $resource;
+        $query = $this->resourceRepository->createQuery();
+        if ($query instanceof \TYPO3\Flow\Persistence\Doctrine\Query) {
+            // if available, do use the Doctrine iterate API to save system resources and for better performance
+            $dquery = $query->getQueryBuilder()->getQuery();
+            $em = $dquery->getEntityManager();
+            foreach ($dquery->iterate(null, \Doctrine\ORM\Query::HYDRATE_OBJECT) as $row) {
+                $resource = $row[0];
+                $this->output->progressAdvance(1);
+                /* @var \TYPO3\Flow\Resource\Resource $resource */
+                $stream = $resource->getStream();
+                if (!is_resource($stream)) {
+                    $brokenResources[] = $resource;
+                } else {
+                    // detach from Doctrine, so that it can be GC'd immediately
+                    $em->detach($resource);
+                }
+            }
+        } else {
+            foreach ($this->resourceRepository->findAll() as $resource) {
+                $this->output->progressAdvance(1);
+                /* @var \TYPO3\Flow\Resource\Resource $resource */
+                $stream = $resource->getStream();
+                if (!is_resource($stream)) {
+                    $brokenResources[] = $resource;
+                }
             }
         }
 
