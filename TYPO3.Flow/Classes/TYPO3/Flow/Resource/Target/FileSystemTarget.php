@@ -165,6 +165,7 @@ class FileSystemTarget implements TargetInterface
         /** @var Query $query */
         $query = $collection->findResources($newerThan);
         $dquery = $query->getQueryBuilder()->getQuery();
+        $dquery->useResultCache(false);
         $em = $query->getQueryBuilder()->getEntityManager();
 
         foreach ($dquery->iterate(null, \Doctrine\ORM\Query::HYDRATE_OBJECT) as $resource) {
