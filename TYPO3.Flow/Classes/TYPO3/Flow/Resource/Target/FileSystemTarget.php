@@ -162,8 +162,11 @@ class FileSystemTarget implements TargetInterface
      * @param \TYPO3\Flow\Resource\Collection $collection The collection to publish
      * @param \Closure $progressFn
      * @param \DateTime $newerThan
+     *
      * @return void
-     * @throws Exception
+     * @throws Exception *@throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \TYPO3\Flow\Utility\Exception
      */
     public function publishCollection(Collection $collection, $progressFn = null, $newerThan = null)
     {
@@ -192,14 +195,19 @@ class FileSystemTarget implements TargetInterface
                 $this->publishFile($sourceStream, $this->getRelativePublicationPathAndFilename($object));
                 fclose($sourceStream);
                 $resource->setLastPublishedDateTime(new \DateTime());
-                $em->flush($resource);
+                $resourcePool[] = $resource;
             }
-
-            // detach from Doctrine, so that it can be GC'd immediately
-            $em->detach($resource);
 
             if ($progressFn) {
                 $progressFn();
+            }
+
+            if (count($resourcePool) > 500) {
+                $em->flush($resourcePool);
+                foreach ($resourcePool as $resourceToDetatch) {
+                    $em->detach($resourceToDetatch);
+                }
+                $resourcePool = [];
             }
         }
     }
