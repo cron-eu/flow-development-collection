@@ -11,10 +11,14 @@ namespace TYPO3\Flow\Resource\Target;
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Http\HttpRequestHandlerInterface;
 use TYPO3\Flow\Http\Request;
+use TYPO3\Flow\Persistence\Doctrine\Query;
+use TYPO3\Flow\Persistence\Doctrine\QueryResult;
+use TYPO3\Flow\Persistence\QueryResultInterface;
 use TYPO3\Flow\Resource\Collection;
 use TYPO3\Flow\Resource\CollectionInterface;
 use TYPO3\Flow\Resource\Resource;
 use TYPO3\Flow\Resource\ResourceMetaDataInterface;
+use TYPO3\Flow\Resource\Storage\Object;
 use TYPO3\Flow\Utility\Files;
 
 /**
@@ -93,6 +97,11 @@ class FileSystemTarget implements TargetInterface
     protected $systemLogger;
 
     /**
+     * @var bool
+     */
+    public $disableLogging = false;
+
+    /**
      * Constructor
      *
      * @param string $name Name of this target instance, according to the resource settings
@@ -151,19 +160,55 @@ class FileSystemTarget implements TargetInterface
      * Publishes the whole collection to this target
      *
      * @param \TYPO3\Flow\Resource\Collection $collection The collection to publish
+     * @param \Closure $progressFn
+     * @param \DateTime $newerThan
+     *
      * @return void
-     * @throws Exception
+     * @throws Exception *@throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \TYPO3\Flow\Utility\Exception
      */
-    public function publishCollection(Collection $collection)
+    public function publishCollection(Collection $collection, $progressFn = null, $newerThan = null)
     {
-        foreach ($collection->getObjects() as $object) {
+        /** @var Query $query */
+        $query = $collection->findResources($newerThan);
+        $dquery = $query->getQueryBuilder()->getQuery();
+        $dquery->useResultCache(false);
+        $em = $query->getQueryBuilder()->getEntityManager();
+        $this->disableLogging = true;
+
+        foreach ($dquery->iterate(null, \Doctrine\ORM\Query::HYDRATE_OBJECT) as $resource) {
+            $resource = $resource[0];
+            /** @var \TYPO3\Flow\Resource\Resource $resource */
+            $object = new Object();
+            $object->setFilename($resource->getFilename());
+            $object->setSha1($resource->getSha1());
+            $object->setMd5($resource->getMd5());
+            $object->setFileSize($resource->getFileSize());
+            $object->setStream(function () use ($resource, $collection) { return $collection->getStorage()->getStreamByResource($resource); });
+
             /** @var \TYPO3\Flow\Resource\Storage\Object $object */
             $sourceStream = $object->getStream();
             if ($sourceStream === false) {
-                throw new Exception(sprintf('Could not publish resource %s with SHA1 hash %s of collection %s because there seems to be no corresponding data in the storage.', $object->getFilename(), $object->getSha1(), $collection->getName()), 1417168142);
+                $this->systemLogger->log(sprintf('Could not publish resource %s with SHA1 hash %s of collection %s because there seems to be no corresponding data in the storage.', $object->getFilename(), $object->getSha1(), $collection->getName()), LOG_ERR);
+            } else {
+                $this->publishFile($sourceStream, $this->getRelativePublicationPathAndFilename($object));
+                fclose($sourceStream);
+                $resource->setLastPublishedDateTime(new \DateTime());
+                $resourcePool[] = $resource;
             }
-            $this->publishFile($sourceStream, $this->getRelativePublicationPathAndFilename($object));
-            fclose($sourceStream);
+
+            if ($progressFn) {
+                $progressFn();
+            }
+
+            if (count($resourcePool) > 500) {
+                $em->flush($resourcePool);
+                foreach ($resourcePool as $resourceToDetatch) {
+                    $em->detach($resourceToDetatch);
+                }
+                $resourcePool = [];
+            }
         }
     }
 
@@ -267,7 +312,9 @@ class FileSystemTarget implements TargetInterface
             throw new Exception(sprintf('Could not publish "%s" into resource publishing target "%s" because the source file could not be copied to the target location.', $sourceStream, $this->name), 1375258399, (isset($exception) ? $exception : null));
         }
 
-        $this->systemLogger->log(sprintf('FileSystemTarget: Published file. (target: %s, file: %s)', $this->name, $relativeTargetPathAndFilename), LOG_DEBUG);
+        if (!$this->disableLogging) {
+            $this->systemLogger->log(sprintf('FileSystemTarget: Published file. (target: %s, file: %s)', $this->name, $relativeTargetPathAndFilename), LOG_DEBUG);
+        }
     }
 
     /**

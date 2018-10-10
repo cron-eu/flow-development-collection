@@ -137,11 +137,18 @@ class Collection implements CollectionInterface
     /**
      * Publishes the whole collection to the corresponding publishing target
      *
+     * @param \Closure $progressFn
+     * @param \DateTime $newerThan
+     *
      * @return void
      */
-    public function publish()
+    public function publish($progressFn = null, $newerThan = null)
     {
-        $this->target->publishCollection($this);
+        if ($this->target instanceof Target\FileSystemSymlinkTarget) {
+            $this->target->publishCollection($this, $progressFn, $newerThan);
+        } else {
+            $this->target->publishCollection($this);
+        }
     }
 
     /**
@@ -166,6 +173,10 @@ class Collection implements CollectionInterface
 #		}
 
         return $objects;
+    }
+
+    public function findResources($newerThan = null) {
+        return $this->storage->findResources($this, $newerThan);
     }
 
     /**

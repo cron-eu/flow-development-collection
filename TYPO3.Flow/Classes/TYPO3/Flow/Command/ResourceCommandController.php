@@ -13,7 +13,9 @@ use TYPO3\Flow\Cli\CommandController;
 use TYPO3\Flow\Exception;
 use TYPO3\Flow\Object\ObjectManagerInterface;
 use TYPO3\Flow\Package\PackageManagerInterface;
+use TYPO3\Flow\Persistence\Doctrine\QueryResult;
 use TYPO3\Flow\Persistence\PersistenceManagerInterface;
+use TYPO3\Flow\Resource\Collection;
 use TYPO3\Flow\Resource\CollectionInterface;
 use TYPO3\Flow\Resource\ResourceManager;
 use TYPO3\Flow\Resource\ResourceRepository;
@@ -62,11 +64,15 @@ class ResourceCommandController extends CommandController
      * to their respective configured publishing targets.
      *
      * @param string $collection If specified, only resources of this collection are published. Example: 'persistent'
+     * @param string $newerThan process only resources newer than the specified time stamp (Format must be parseable by new \DateTime)
      * @return void
      */
-    public function publishCommand($collection = null)
+    public function publishCommand($collection = null, $newerThan = null)
     {
         try {
+
+            $newerThan = $newerThan ? new \DateTime($newerThan) : null;
+
             if ($collection === null) {
                 $collections = $this->resourceManager->getCollections();
             } else {
@@ -81,7 +87,18 @@ class ResourceCommandController extends CommandController
             foreach ($collections as $collection) {
                 /** @var CollectionInterface $collection */
                 $this->outputLine('Publishing resources of collection "%s"', array($collection->getName()));
-                $collection->publish();
+                /** @var \TYPO3\Flow\Resource\Collection $collection */
+                /** @var QueryResult $findResourcesResult */
+                $findResourcesResult = $collection->findResources($newerThan);
+                $this->output->progressStart($findResourcesResult->count());
+                if ($collection->getTarget() instanceof \TYPO3\Flow\Resource\Target\FileSystemSymlinkTarget) {
+                    $collection->publish(function() {
+                        $this->output->progressAdvance();
+                    }, $newerThan);
+                } else {
+                    $collection->publish();
+                }
+                $this->output->progressFinish();
             }
         } catch (Exception $exception) {
             $this->outputLine();
@@ -118,12 +135,31 @@ class ResourceCommandController extends CommandController
 
         $brokenResources = array();
         $relatedAssets = new \SplObjectStorage();
-        foreach ($this->resourceRepository->findAll() as $resource) {
-            $this->output->progressAdvance(1);
-            /* @var \TYPO3\Flow\Resource\Resource $resource */
-            $stream = $resource->getStream();
-            if (!is_resource($stream)) {
-                $brokenResources[] = $resource;
+        $query = $this->resourceRepository->createQuery();
+        if ($query instanceof \TYPO3\Flow\Persistence\Doctrine\Query) {
+            // if available, do use the Doctrine iterate API to save system resources and for better performance
+            $dquery = $query->getQueryBuilder()->getQuery();
+            $em = $dquery->getEntityManager();
+            foreach ($dquery->iterate(null, \Doctrine\ORM\Query::HYDRATE_OBJECT) as $row) {
+                $resource = $row[0];
+                $this->output->progressAdvance(1);
+                /* @var \TYPO3\Flow\Resource\Resource $resource */
+                $stream = $resource->getStream();
+                if (!is_resource($stream)) {
+                    $brokenResources[] = $resource;
+                } else {
+                    // detach from Doctrine, so that it can be GC'd immediately
+                    $em->detach($resource);
+                }
+            }
+        } else {
+            foreach ($this->resourceRepository->findAll() as $resource) {
+                $this->output->progressAdvance(1);
+                /* @var \TYPO3\Flow\Resource\Resource $resource */
+                $stream = $resource->getStream();
+                if (!is_resource($stream)) {
+                    $brokenResources[] = $resource;
+                }
             }
         }
 

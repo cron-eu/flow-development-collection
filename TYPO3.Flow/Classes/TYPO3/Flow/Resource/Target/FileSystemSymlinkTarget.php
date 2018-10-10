@@ -22,9 +22,11 @@ class FileSystemSymlinkTarget extends FileSystemTarget
      * Publishes the whole collection to this target
      *
      * @param \TYPO3\Flow\Resource\Collection $collection The collection to publish
+     * @param \Closure $progressFn
+     * @param \DateTime $newerThan
      * @return void
      */
-    public function publishCollection(Collection $collection)
+    public function publishCollection(Collection $collection, $progressFn = null, $newerThan = null)
     {
         $storage = $collection->getStorage();
         if ($storage instanceof PackageStorage) {
@@ -32,7 +34,7 @@ class FileSystemSymlinkTarget extends FileSystemTarget
                 $this->publishDirectory($path, $packageKey);
             }
         } else {
-            parent::publishCollection($collection);
+            parent::publishCollection($collection, $progressFn, $newerThan);
         }
     }
 
